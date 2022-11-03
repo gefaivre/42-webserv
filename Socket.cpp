@@ -88,9 +88,11 @@ void Socket::setStruct()
 }
 
 
+//	----------------------
+//	WAIT AND PARSE REQUEST
+//	----------------------
 
-
-void Socket::waitAndCopyRequest()
+void Socket::waitAndParseRequest()
 {
 
 
@@ -103,7 +105,7 @@ void Socket::waitAndCopyRequest()
 	std::string buf;
 	_request.clear();
 
-	while (read( _newsocket , a, 1) != 0)
+	while (recv( _newsocket , a, 1, 0) != 0)
 	{
 		if (a[0] != '\n')
 			buf += a[0];
@@ -118,24 +120,48 @@ void Socket::waitAndCopyRequest()
 	parsingRequest();
 }
 
+void Socket::parsingRequest()
+{
+	for(unsigned long int i = 0; i < /* _request.size() */ 1 ; i++)
+	{
+		if (_request.size() > 0 && i == 0)
+		{
+			_requestData.methode = _request[i].substr(0, _request[i].find(" ", 0));
+			unsigned int first = _requestData.methode.size() + 1;
+			unsigned int last = _request[i].find(" ", first);
+			_requestData.path = _request[i].substr(first, last - first);
+			_requestData.protocolVersion = _request[i].substr(last + 1, _request[i].size());
+		}
+	}
+	// std::cout << _requestData.methode << std::endl;
+	// std::cout << _requestData.path << std::endl;
+}
+
+//	------------------------
+//	CREATE AND SEND RESPONSE
+//	------------------------
+
 void Socket::createAndSendResponse()
 {
 
 	std::cout <<"-----------" << std::endl;
-	std::cout << "Methode\t=\t" << _parsing.methode << std::endl;
-	std::cout << "File\t=\t" << _parsing.file << std::endl;
+	std::cout << "Methode\t=\t" << _requestData.methode << std::endl;
+	std::cout << "File\t=\t" << _requestData.path << std::endl;
+	std::cout << "ProtoV\t=\t" << _requestData.protocolVersion << std::endl;
 	std::cout <<"-----------" << std::endl;
 
-	if (_parsing.methode == "GET")
+	fillHeaderData();
+
+	if (_requestData.methode == "GET")
 	{
-		if (_parsing.file == "/")
+		if (_requestData.path == "/")
 		{
 			std::ifstream fileToSend("index.html");
 			sendResponse(fileToSend);
 		}
 		else
 		{
-			std::ifstream fileToSend(_parsing.file.c_str());
+			std::ifstream fileToSend(_requestData.path.c_str());
 			if (fileToSend.is_open())
 			{
 				sendResponse(fileToSend);
@@ -145,55 +171,53 @@ void Socket::createAndSendResponse()
 				std::ifstream fileToSend("404.html");
 				sendResponse(fileToSend);
 			}
-
-
 		}
 	}
+}
+
+void Socket::fillHeaderData()
+{
+	_headerData.protocolVersion = _requestData.protocolVersion;
+	if (stat(_requestData.path) == 0)
+	{
+		_headerData.statusCode = 200;
+		_headerData.statusMessage = "OK";
+
+	}
+	_headerData.contentLenght = ;
+	_headerData.contentType;
 
 }
+
 
 void Socket::sendResponse(std::ifstream &fileToSend)
 {
 
 	std::string str;
-	if(fileToSend.is_open())
-	{
-		std::ostringstream ss;
-		ss << fileToSend.rdbuf(); // reading data
-		str = ss.str();
-		fileToSend.close();
-	}
+	std::ostringstream ss;
 
-	write(_newsocket , str.c_str() , strlen(str.c_str()));
+	ss << fileToSend.rdbuf();
+	str = ss.str();
+	fileToSend.close();
+
+	send(_newsocket , str.c_str() , strlen(str.c_str()), 0);
 
 	close(_newsocket);
 }
+
+
+
+
+//
+//	UTILS
+//
+
 
 void Socket::displayRequest()
 {
 	for(long unsigned int i = 0; i < _request.size(); i++)
 		std::cout << _request[i] << std::endl;
 }
-
-
-void Socket::parsingRequest()
-{
-	for(unsigned long int i = 0; i < /* _request.size() */ 1 ; i++)
-	{
-		if (_request.size() > 0 && _request[i].compare(0, 3, "GET") == 0)
-		{
-			_parsing.methode = "GET";
-			unsigned int first = 4;
-			unsigned int last = _request[i].find(" ", 5);
-			_parsing.file = _request[i].substr(first, last - first);
-		}
-	}
-	// std::cout << _parsing.methode << std::endl;
-	// std::cout << _parsing.file << std::endl;
-}
-
-
-
 
 /*
 ** --------------------------------- ACCESSOR ---------------------------------

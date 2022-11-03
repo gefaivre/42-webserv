@@ -28,7 +28,7 @@ public:
 	~Socket();
 
 
-	void waitAndCopyRequest();
+	void waitAndParseRequest();
 
 	void displayRequest();
 
@@ -48,21 +48,27 @@ private:
 	int _port;
 	int _sockfd;
 
-	struct	s_parsing
+	typedef struct	s_requestData
 	{
 		std::string methode;
-		std::string file;
+		std::string path;
+		std::string protocolVersion;
 
-	}				t_parsing;
-	s_parsing _parsing;
+	}				t_requestData;
+	s_requestData _requestData;
 
-	struct	s_response
+	teypedef struct	s_headerData
 	{
-		std::string methode;
-		std::string file;
+		std::string protocolVersion;
+		int			statusCode;
+		std::string statusMessage;
+		std::string contentLenght;
+		std::string contentType;
 
-	}				t_response;
-	s_response _response;
+	}				t_headerData;
+	s_headerData _headerData;
+	std::vector<std::string> _responseHeader;
+	void fillHeaderData();
 
 	void parsingRequest();
 	void sendResponse(std::ifstream &fileToSend);
