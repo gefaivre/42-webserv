@@ -5,8 +5,7 @@
 */
 
 Socket::Socket()
-{
-}
+{}
 
 
 Socket::Socket(int port, int domain, int type, int protocol):
@@ -20,8 +19,15 @@ Socket::Socket(int port, int domain, int type, int protocol):
         std::cout << "Socket error" << std::endl;
         std::cout << errno << std::endl;
     }
+	int yes = 1;
+	if (setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR,
+                        (void*)&yes, sizeof(yes)) < 0)
+    {
+        std::cout << "Setsockopt error" << std::endl;
+        std::cout << errno << std::endl;
+    }
 
-	 if( (bind(_sockfd, (struct sockaddr*)&_addr, sizeof(_addr))) == -1)
+	if( (bind(_sockfd, (struct sockaddr*)&_addr, sizeof(_addr))) == -1)
     {
         std::cout << "Bind error" << std::endl;
         std::cout << errno << std::endl;
@@ -45,6 +51,7 @@ Socket::Socket(int port, int domain, int type, int protocol):
 
 Socket::~Socket()
 {
+	close(_sockfd);
 }
 
 
@@ -81,56 +88,110 @@ void Socket::setStruct()
 }
 
 
-void Socket::acceptAndRead()
+
+
+void Socket::waitAndCopyRequest()
 {
-	int new_socket;
+
+
 	socklen_t addrlen = sizeof(_addr);
 
-	new_socket = accept(_sockfd, (struct sockaddr *)&_addr, &addrlen);
+	_newsocket = accept(_sockfd, (struct sockaddr *)&_addr, &addrlen);
 
-	// const size_t npos = -1;
+
 	char a[1] = {0};
 	std::string buf;
+	_request.clear();
 
-	while (read( new_socket , a, 1) != 0)
+	while (read( _newsocket , a, 1) != 0)
 	{
 		if (a[0] != '\n')
-		{
 			buf += a[0];
-		}
 		else
 		{
 			_request.push_back(buf);
 			buf.clear();
-			if (_request.size() > 1)
-				std::cout << " _request.find = " <<  _request[_request.size() - 1].find("\r\n") << std::endl;
+			if (_request.size() > 1 && _request[_request.size() - 1].find("\r") == 0 )
+				break;
 		}
+	}
+	parsingRequest();
+}
 
-		// MET LES \n DANS LA STRING OU COMPAR JUSTE LES \r
+void Socket::createAndSendResponse()
+{
+
+	std::cout <<"-----------" << std::endl;
+	std::cout << "Methode\t=\t" << _parsing.methode << std::endl;
+	std::cout << "File\t=\t" << _parsing.file << std::endl;
+	std::cout <<"-----------" << std::endl;
+
+	if (_parsing.methode == "GET")
+	{
+		if (_parsing.file == "/")
+		{
+			std::ifstream fileToSend("index.html");
+			sendResponse(fileToSend);
+		}
+		else
+		{
+			std::ifstream fileToSend(_parsing.file.c_str());
+			if (fileToSend.is_open())
+			{
+				sendResponse(fileToSend);
+			}
+			else
+			{
+				std::ifstream fileToSend("404.html");
+				sendResponse(fileToSend);
+			}
 
 
-		// if (_request.size() > 1 && _request[_request.size() - 2].find("\r\n") != npos && _request[_request.size() - 1].find("\r\n") != npos)
-		// {
-		// 	std::cout << "############3_request.size()\t=\t" << _request.size() << std::endl;
-		// 	break;
-		// }
-
-	// 	if (_request.size() > 1 && _request[_request.size() - 1].find("\r\n") == 0 )
-	// 	{
-	// 		std::cout << "############3_request.size()\t=\t" << _request.size() << std::endl;
-	// 		break;
-	// 	}
+		}
 	}
 
-	for(long unsigned int i = 0; i < _request.size(); i++)
-    {
-        std::cout << _request[i] << std::endl;
-    }
-	std::cout << std::endl;
-
-	write(new_socket , "hello\n" , strlen("hello\n"));
-	close(new_socket);
 }
+
+void Socket::sendResponse(std::ifstream &fileToSend)
+{
+
+	std::string str;
+	if(fileToSend.is_open())
+	{
+		std::ostringstream ss;
+		ss << fileToSend.rdbuf(); // reading data
+		str = ss.str();
+		fileToSend.close();
+	}
+
+	write(_newsocket , str.c_str() , strlen(str.c_str()));
+
+	close(_newsocket);
+}
+
+void Socket::displayRequest()
+{
+	for(long unsigned int i = 0; i < _request.size(); i++)
+		std::cout << _request[i] << std::endl;
+}
+
+
+void Socket::parsingRequest()
+{
+	for(unsigned long int i = 0; i < /* _request.size() */ 1 ; i++)
+	{
+		if (_request.size() > 0 && _request[i].compare(0, 3, "GET") == 0)
+		{
+			_parsing.methode = "GET";
+			unsigned int first = 4;
+			unsigned int last = _request[i].find(" ", 5);
+			_parsing.file = _request[i].substr(first, last - first);
+		}
+	}
+	// std::cout << _parsing.methode << std::endl;
+	// std::cout << _parsing.file << std::endl;
+}
+
 
 
 

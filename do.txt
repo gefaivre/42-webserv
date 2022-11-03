@@ -1,0 +1,6 @@
+#gefaivre
+
+- Replace read/write by recv/send;
+- remake Socket object archi
+- Let's create a header response in _response
+

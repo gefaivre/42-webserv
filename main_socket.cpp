@@ -2,13 +2,21 @@
 
 int main(int ac, char **av)
 {
-    if (ac != 2)
-    {
-        std::cout << "Usage: ./webserv [port]" << std::endl;
-        return (0);
-    }
-    Socket socket(atoi(av[1]));
+	if (ac != 2)
+	{
+		std::cout << "Usage: ./webserv [port]" << std::endl;
+		return (0);
+	}
 
-    socket.acceptAndRead();
+	Socket socket(atoi(av[1]));
+
+	for(size_t i = 0;; i++)
+	{
+		socket.waitAndCopyRequest();
+		// socket.displayRequest();
+		socket.createAndSendResponse();
+	}
+
+
 
 }
