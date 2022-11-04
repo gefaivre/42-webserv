@@ -130,7 +130,7 @@ void Socket::parsingRequest()
 			unsigned int first = _requestData.methode.size() + 1;
 			unsigned int last = _request[i].find(" ", first);
 			_requestData.path = _request[i].substr(first, last - first);
-			_requestData.protocolVersion = _request[i].substr(last + 1, _request[i].size());
+			_requestData.protocol = _request[i].substr(last + 1, _request[i].size() - 9);
 		}
 	}
 	// std::cout << _requestData.methode << std::endl;
@@ -147,57 +147,93 @@ void Socket::createAndSendResponse()
 	std::cout <<"-----------" << std::endl;
 	std::cout << "Methode\t=\t" << _requestData.methode << std::endl;
 	std::cout << "File\t=\t" << _requestData.path << std::endl;
-	std::cout << "ProtoV\t=\t" << _requestData.protocolVersion << std::endl;
+	std::cout << "ProtoV\t=\t" << _requestData.protocol << std::endl;
 	std::cout <<"-----------" << std::endl;
-
-	fillHeaderData();
 
 	if (_requestData.methode == "GET")
 	{
-		if (_requestData.path == "/")
-		{
-			std::ifstream fileToSend("index.html");
-			sendResponse(fileToSend);
-		}
-		else
-		{
-			std::ifstream fileToSend(_requestData.path.c_str());
-			if (fileToSend.is_open())
-			{
-				sendResponse(fileToSend);
-			}
-			else
-			{
-				std::ifstream fileToSend("404.html");
-				sendResponse(fileToSend);
-			}
-		}
+		foundFileToSend();
+		fillHeaderData();
+		sendResponse();
+
 	}
+
+	std::cout <<"-----------" << std::endl;
+	std::cout << "Protocol\t=\t" << _headerData.protocol << std::endl;
+	std::cout << "Status\t=\t" << _headerData.statusCode << std::endl;
+	std::cout << "Mesg\t=\t" << _headerData.statusMessage << std::endl;
+	std::cout <<"-----------" << std::endl;
+}
+void Socket::foundFileToSend()
+{
+	if (_requestData.path == "/")
+		_fileToSend = "index.html";
+	else if (_requestData.path.find('.') == std::string::npos)
+	{
+		_fileToSend = _requestData.path + ".html";
+	}
+	struct stat buffer;
+	if (stat(_fileToSend.c_str(), &buffer) == -1)
+		_fileToSend = "404.html";	
+}
+
+void Socket::fillFilesExtension()
+{
+	_switchFilesExtension.insert( std::pair<std::string, std::string>("html","text/html"));
+	_switchFilesExtension.insert(std::pair<std::string, std::string>("ico","image/ico"));
+	_switchFilesExtension.insert(std::pair<std::string, std::string>("default","text/html") );
 }
 
 void Socket::fillHeaderData()
 {
-	_headerData.protocolVersion = _requestData.protocolVersion;
-	if (stat(_requestData.path) == 0)
+	fillFilesExtension();
+	_headerData.protocol = _requestData.protocol;
+	if (_fileToSend == "404.html")
 	{
-		_headerData.statusCode = 200;
-		_headerData.statusMessage = "OK";
+		_headerData.statusCode = "404";
+		_headerData.statusMessage = "Not Found";
 
 	}
-	_headerData.contentLenght = ;
-	_headerData.contentType;
+	else
+	{
+		_headerData.statusCode = "200";
+		_headerData.statusMessage = "OK";
+	}
+	std::string type = _fileToSend.substr(_fileToSend.find('.'), _fileToSend.size());
+	_headerData.contentType = _switchFilesExtension[type];
+	if (_headerData.contentType.size() == 0)
+		_headerData.contentType = _switchFilesExtension["default"];
 
+	// _headerData.contentLenght = ;
 }
 
-
-void Socket::sendResponse(std::ifstream &fileToSend)
+void Socket::sendResponse()
 {
-
+	std::ifstream fileToSend(_fileToSend.c_str());
 	std::string str;
 	std::ostringstream ss;
 
+
+
+	std::cout << "_headerData.protocol\t\t=\t" << _headerData.protocol  <<std::endl;
+	std::cout << "_headerData.statusCode\t\t=\t" << _headerData.statusCode  << std::endl;
+	std::cout << "_headerData.statusMessage\t=\t" << _headerData.statusMessage << std::endl;
+	
+
+
+	ss << _headerData.protocol;
+	ss << " ";
+	ss << _headerData.statusCode;
+	ss << " ";
+	ss << _headerData.statusMessage;
+	ss << "\r\n";
+	ss << "\r\n";
 	ss << fileToSend.rdbuf();
+	ss << "\r\n";
 	str = ss.str();
+
+	std::cout << str << std::endl;
+
 	fileToSend.close();
 
 	send(_newsocket , str.c_str() , strlen(str.c_str()), 0);

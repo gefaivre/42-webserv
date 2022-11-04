@@ -7,11 +7,13 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 
 #include <unistd.h>
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include <fstream>
 #include <sstream>
 
@@ -52,15 +54,15 @@ private:
 	{
 		std::string methode;
 		std::string path;
-		std::string protocolVersion;
+		std::string protocol;
 
 	}				t_requestData;
 	s_requestData _requestData;
 
-	teypedef struct	s_headerData
+	typedef struct	s_headerData
 	{
-		std::string protocolVersion;
-		int			statusCode;
+		std::string protocol;
+		std::string	statusCode;
 		std::string statusMessage;
 		std::string contentLenght;
 		std::string contentType;
@@ -68,10 +70,16 @@ private:
 	}				t_headerData;
 	s_headerData _headerData;
 	std::vector<std::string> _responseHeader;
+	std::map<std::string, std::string> _switchFilesExtension;
+	void fillFilesExtension();
 	void fillHeaderData();
 
+
+	std::string _fileToSend;
+	void foundFileToSend();
+
 	void parsingRequest();
-	void sendResponse(std::ifstream &fileToSend);
+	void sendResponse();
 
 };
 
