@@ -4,9 +4,11 @@
 
 
 
+Header
+\r\n
+\r\n
+Body (html)
 
-HTTP/1.1 200 OK
-Content-Type: text/html
 
 <!-- Content-Length: 149
 Connection: keep-alive
