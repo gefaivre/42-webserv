@@ -94,26 +94,23 @@ void Socket::setStruct()
 
 void Socket::waitAndParseRequest()
 {
-
-
 	socklen_t addrlen = sizeof(_addr);
 
 	_newsocket = accept(_sockfd, (struct sockaddr *)&_addr, &addrlen);
-
 
 	char a[1] = {0};
 	std::string buf;
 	_request.clear();
 
-	while (recv( _newsocket , a, 1, 0) != 0)
+	while (recv( _newsocket , a, 1, 0))
 	{
-		if (a[0] != '\n')
-			buf += a[0];
-		else
+		buf += a[0];
+		if (a[0] == '\n' )
 		{
+			buf.erase(buf.find("\r\n") ,buf.size());
 			_request.push_back(buf);
 			buf.clear();
-			if (_request.size() > 1 && _request[_request.size() - 1].find("\r") == 0 )
+			if (_request[_request.size() - 1].size() == 0 )
 				break;
 		}
 	}
@@ -130,11 +127,9 @@ void Socket::parsingRequest()
 			unsigned int first = _requestData.methode.size() + 1;
 			unsigned int last = _request[i].find(" ", first);
 			_requestData.path = _request[i].substr(first, last - first);
-			_requestData.protocol = _request[i].substr(last + 1, _request[i].size() - 9);
+			_requestData.protocol = _request[i].substr(last + 1, _request[i].size());
 		}
 	}
-	// std::cout << _requestData.methode << std::endl;
-	// std::cout << _requestData.path << std::endl;
 }
 
 //	------------------------
@@ -144,11 +139,11 @@ void Socket::parsingRequest()
 void Socket::createAndSendResponse()
 {
 
-	std::cout <<"-----------" << std::endl;
-	std::cout << "Methode\t=\t" << _requestData.methode << std::endl;
-	std::cout << "File\t=\t" << _requestData.path << std::endl;
-	std::cout << "ProtoV\t=\t" << _requestData.protocol << std::endl;
-	std::cout <<"-----------" << std::endl;
+	// std::cout <<"-----------" << std::endl;
+	// std::cout << "Methode\t=\t" << _requestData.methode << std::endl;
+	// std::cout << "File\t=\t" << _requestData.path << std::endl;
+	// std::cout << "ProtoV\t=\t" << _requestData.protocol << std::endl;
+	// std::cout <<"-----------" << std::endl;
 
 	if (_requestData.methode == "GET")
 	{
@@ -158,23 +153,31 @@ void Socket::createAndSendResponse()
 
 	}
 
-	std::cout <<"-----------" << std::endl;
-	std::cout << "Protocol\t=\t" << _headerData.protocol << std::endl;
-	std::cout << "Status\t=\t" << _headerData.statusCode << std::endl;
-	std::cout << "Mesg\t=\t" << _headerData.statusMessage << std::endl;
-	std::cout <<"-----------" << std::endl;
+	// std::cout <<"-----------" << std::endl;
+	// std::cout << "Protocol\t=\t" << _headerData.protocol << std::endl;
+	// std::cout << "Status\t=\t" << _headerData.statusCode << std::endl;
+	// std::cout << "Mesg\t=\t" << _headerData.statusMessage << std::endl;
+	// std::cout <<"-----------" << std::endl;
 }
 void Socket::foundFileToSend()
 {
+	std::cout << "_requestData.path\t=\t" << _requestData.path << std::endl;
 	if (_requestData.path == "/")
 		_fileToSend = "index.html";
 	else if (_requestData.path.find('.') == std::string::npos)
 	{
 		_fileToSend = _requestData.path + ".html";
 	}
+	else
+		_fileToSend = _requestData.path;
+	if (_fileToSend[0] == '/')
+		_fileToSend.erase(0,1);
+
 	struct stat buffer;
 	if (stat(_fileToSend.c_str(), &buffer) == -1)
-		_fileToSend = "404.html";	
+		_fileToSend = "404.html";
+	
+	std::cout << "_fileToSend\t=\t" << _fileToSend << std::endl;
 }
 
 void Socket::fillFilesExtension()
@@ -211,15 +214,7 @@ void Socket::sendResponse()
 {
 	std::ifstream fileToSend(_fileToSend.c_str());
 	std::string str;
-	std::ostringstream ss;
-
-
-
-	std::cout << "_headerData.protocol\t\t=\t" << _headerData.protocol  <<std::endl;
-	std::cout << "_headerData.statusCode\t\t=\t" << _headerData.statusCode  << std::endl;
-	std::cout << "_headerData.statusMessage\t=\t" << _headerData.statusMessage << std::endl;
-	
-
+	std::ostringstream ss;	
 
 	ss << _headerData.protocol;
 	ss << " ";
@@ -232,7 +227,9 @@ void Socket::sendResponse()
 	ss << "\r\n";
 	str = ss.str();
 
-	std::cout << str << std::endl;
+	// std::cout << "-----------------------" << std::endl;
+	// std::cout << str << std::endl;
+	// std::cout << "-----------------------" << std::endl;
 
 	fileToSend.close();
 

@@ -25,3 +25,10 @@ Vary: Accept-Encoding,Cookie
 Age: 7 -->
 
 
+
+-ouvrir la socket
+-attendre la request
+-parser la request
+-trouver le fichier
+-cree le Header
+-send le ficher avec le header
