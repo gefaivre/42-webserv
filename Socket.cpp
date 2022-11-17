@@ -138,13 +138,6 @@ void Socket::parsingRequest()
 
 void Socket::createAndSendResponse()
 {
-
-	// std::cout <<"-----------" << std::endl;
-	// std::cout << "Methode\t=\t" << _requestData.methode << std::endl;
-	// std::cout << "File\t=\t" << _requestData.path << std::endl;
-	// std::cout << "ProtoV\t=\t" << _requestData.protocol << std::endl;
-	// std::cout <<"-----------" << std::endl;
-
 	if (_requestData.methode == "GET")
 	{
 		foundFileToSend();
@@ -152,16 +145,11 @@ void Socket::createAndSendResponse()
 		sendResponse();
 
 	}
-
-	// std::cout <<"-----------" << std::endl;
-	// std::cout << "Protocol\t=\t" << _headerData.protocol << std::endl;
-	// std::cout << "Status\t=\t" << _headerData.statusCode << std::endl;
-	// std::cout << "Mesg\t=\t" << _headerData.statusMessage << std::endl;
-	// std::cout <<"-----------" << std::endl;
 }
+
 void Socket::foundFileToSend()
 {
-	std::cout << "_requestData.path\t=\t" << _requestData.path << std::endl;
+	// std::cout << "_requestData.path\t=\t" << _requestData.path << std::endl;
 	if (_requestData.path == "/")
 		_fileToSend = "index.html";
 	else if (_requestData.path.find('.') == std::string::npos)
@@ -177,13 +165,13 @@ void Socket::foundFileToSend()
 	if (stat(_fileToSend.c_str(), &buffer) == -1)
 		_fileToSend = "404.html";
 	
-	std::cout << "_fileToSend\t=\t" << _fileToSend << std::endl;
+	// std::cout << "_fileToSend\t=\t" << _fileToSend << std::endl;
 }
 
 void Socket::fillFilesExtension()
 {
 	_switchFilesExtension.insert( std::pair<std::string, std::string>("html","text/html"));
-	_switchFilesExtension.insert(std::pair<std::string, std::string>("ico","image/ico"));
+	_switchFilesExtension.insert(std::pair<std::string, std::string>("ico","image/x-icon"));
 	_switchFilesExtension.insert(std::pair<std::string, std::string>("default","text/html") );
 }
 
@@ -202,38 +190,56 @@ void Socket::fillHeaderData()
 		_headerData.statusCode = "200";
 		_headerData.statusMessage = "OK";
 	}
-	std::string type = _fileToSend.substr(_fileToSend.find('.'), _fileToSend.size());
+	std::string type = _fileToSend.substr(_fileToSend.find('.') + 1, _fileToSend.size());
 	_headerData.contentType = _switchFilesExtension[type];
 	if (_headerData.contentType.size() == 0)
 		_headerData.contentType = _switchFilesExtension["default"];
 
-	// _headerData.contentLenght = ;
+	std::string file;
+	std::string line;
+	std::ifstream myfile;
+
+	myfile.open(_fileToSend.c_str(), std::ifstream::in);
+	while ( std::getline(myfile,line) )
+	{
+		if (file.size() != 0)
+			file += '\n';
+		file += line;
+	}
+	myfile.close();
+
+	std::stringstream oui;
+	oui << file.size();
+	oui >> _headerData.contentLength;
 }
 
 void Socket::sendResponse()
 {
-	std::ifstream fileToSend(_fileToSend.c_str());
+
 	std::string str;
-	std::ostringstream ss;	
+	std::string file;
+	std::string line;
+	std::ifstream myfile;
 
-	ss << _headerData.protocol;
-	ss << " ";
-	ss << _headerData.statusCode;
-	ss << " ";
-	ss << _headerData.statusMessage;
-	ss << "\r\n";
-	ss << "\r\n";
-	ss << fileToSend.rdbuf();
-	ss << "\r\n";
-	str = ss.str();
+	myfile.open(_fileToSend.c_str(), std::ifstream::in);
+	while ( std::getline(myfile,line) )
+	{
+		if (file.size() != 0)
+			file += '\n';
+		file += line;
+	}
+	myfile.close();
 
-	// std::cout << "-----------------------" << std::endl;
-	// std::cout << str << std::endl;
-	// std::cout << "-----------------------" << std::endl;
+	str += _headerData.protocol;
+	str += " ";
+	str += _headerData.statusCode;
+	str += " ";
+	str += _headerData.statusMessage + "\r\n";
+	str += "Content-Length: " + _headerData.contentLength + "\r\n";
+	str += "\r\n";
+	str += file;
 
-	fileToSend.close();
-
-	send(_newsocket , str.c_str() , strlen(str.c_str()), 0);
+	send(_newsocket, str.c_str(), str.size(), 0);
 
 	close(_newsocket);
 }

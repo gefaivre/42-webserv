@@ -64,7 +64,7 @@ private:
 		std::string protocol;
 		std::string	statusCode;
 		std::string statusMessage;
-		std::string contentLenght;
+		std::string contentLength;
 		std::string contentType;
 
 	}				t_headerData;
