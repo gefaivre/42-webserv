@@ -1,12 +1,20 @@
 #include "Socket.hpp"
+#include "Parser.hpp"
+#include "Server.hpp"
 
 int main(int ac, char **av)
 {
 	if (ac != 2)
 	{
-		std::cout << "Usage: ./webserv [port]" << std::endl;
+		std::cerr << "Usage: ./webserv [port]" << std::endl;
 		return (0);
 	}
+
+	Parser *config = new Parser(av[1]);
+
+	(void) config;
+
+	std::cout << "test" << std::endl;
 
 	Socket socket(atoi(av[1]));
 

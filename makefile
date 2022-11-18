@@ -1,6 +1,6 @@
 NAME= webserv
 
-SRC=	main_socket.cpp \
+SRC=	main.cpp \
 		Socket.cpp \
 		parsing/ft_split.cpp \
 		parsing/Parser.cpp \
