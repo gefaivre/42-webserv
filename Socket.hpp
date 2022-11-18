@@ -55,6 +55,8 @@ private:
 		std::string methode;
 		std::string path;
 		std::string protocol;
+		std::string Connection;
+		std::string Pragma;
 
 	}				t_requestData;
 	s_requestData _requestData;
@@ -68,6 +70,7 @@ private:
 		std::string contentType;
 
 	}				t_headerData;
+	
 	s_headerData _headerData;
 	std::vector<std::string> _responseHeader;
 	std::map<std::string, std::string> _switchFilesExtension;
