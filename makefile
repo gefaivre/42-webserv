@@ -1,10 +1,14 @@
 NAME= webserv
 
 SRC=	main_socket.cpp \
-		Socket.cpp
+		Socket.cpp \
+		parsing/ft_split.cpp \
+		parsing/Parser.cpp \
+		parsing/Server.cpp
 
-INC=	Socket.hpp
 
+INC_PATH =	includes/
+INC = $(addprefix -I , $(INC_PATH))
 CXX=c++
 
 CXXFLAGS= -Wall -Wextra -Werror -g3 -std=c++98
@@ -13,8 +17,8 @@ OBJ=$(SRC:.c=.o)
 	
 all: $(NAME)
 
-$(NAME): $(OBJ) $(INC)
-	${CXX} $(CXXFLAGS) -o $(NAME) $(OBJ)
+$(NAME): $(OBJ) 
+	${CXX} $(CXXFLAGS) -o $(NAME) $(OBJ) $(INC)
 	@echo [$(NAME)]: Created !
 
 clean:
