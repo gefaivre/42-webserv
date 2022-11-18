@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/18 13:42:55 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/18 14:04:34 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/18 16:04:47 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,5 +24,7 @@ vector<string>	ft_split(string str, char c)
 		arr.push_back(str.substr(start, end - start));
 		start = end + 1;
 	}
+	if (str[str.length() - 1] != c)
+		arr.push_back(str.substr(start, str.length() - start));
 	return (arr);
 }
