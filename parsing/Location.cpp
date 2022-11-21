@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 14:08:38 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/21 14:44:35 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/21 15:02:12 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,18 @@ Location::Location(/* args */)
 {
 }
 
+Location::Location(string key)
+{
+	_key = key;
+}
+
 Location::~Location()
 {
+}
+
+string	Location::getKey(void)
+{
+	return (_key);
 }
 
 void	Location::addCgi(string key, string value)

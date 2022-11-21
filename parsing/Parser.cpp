@@ -6,11 +6,12 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/21 14:17:27 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/21 15:02:25 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Parser.hpp"
+#include "Location.hpp"
 
 void	Parser::prepareLine()
 {
@@ -113,6 +114,7 @@ void	Parser::getServerConf(void)
 {
 	int level = 0;
 	int i = 0;
+	Location	*location;
 
 	string sTarget = "server {";
 	Server	server = Server();
@@ -138,7 +140,8 @@ void	Parser::getServerConf(void)
 			//Checar que tem a palavra location + 2 espacos. Pq o path vai ser variavel
 			if (_content.find(target, _currIdx) == _currIdx)
 			{
-				cout << "	Location:" << _content.substr(_currIdx + 9, nextOpenBracket - _currIdx - 10) << endl;
+				location = new Location(_content.substr(_currIdx + 9, nextOpenBracket - _currIdx - 10));
+				cout << "	Location:" << location->getKey() << endl;
 				level++;
 			}
 			else
