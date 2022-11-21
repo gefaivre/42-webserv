@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/17 15:04:07 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/21 14:43:09 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,4 +81,9 @@ string	Server::getCgi(void)
 void	Server::setAcceptedMethods(t_methods methods)
 {
 	_acceptedMethods = methods;
+}
+
+t_methods	Server::getAcceptedMethods()
+{
+	return (_acceptedMethods);
 }

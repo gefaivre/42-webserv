@@ -1,5 +1,5 @@
 NAME = webserv
-SRCS = main.cpp Parser.cpp Server.cpp ft_split.cpp
+SRCS = main.cpp Parser.cpp Server.cpp ft_split.cpp Location.cpp
 
 OBJS_PATH = objects/
 OBJS = ${SRCS:.cpp=.o}
