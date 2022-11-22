@@ -84,6 +84,12 @@ private:
 	void parsingRequest();
 	void sendResponse();
 
+	std::string _path;
+	bool 		_autoindex;
+
+	int	fileExist(std::string file_path);
+	int	isDirectory(std::string file_path);
+
 };
 
 std::ostream &			operator<<( std::ostream & o, Socket const & i );

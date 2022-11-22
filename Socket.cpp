@@ -9,7 +9,7 @@ Socket::Socket()
 
 
 Socket::Socket(int port, int domain, int type, int protocol):
-	_port(port)
+	_port(port), _path("www/"), _autoindex(1)
 {
 	setStruct();
 
@@ -149,21 +149,38 @@ void Socket::createAndSendResponse()
 
 void Socket::foundFileToSend()
 {
-	// std::cout << "_requestData.path\t=\t" << _requestData.path << std::endl;
-	if (_requestData.path == "/")
-		_fileToSend = "index.html";
-	else if (_requestData.path.find('.') == std::string::npos)
+	_fileToSend = _requestData.path ;
+	if (_fileToSend[0] == '/')
+		_fileToSend.erase(0, 1);
+
+
+
+	// std::cout << "isDirectory(" << _path + _fileToSend << ") = " << isDirectory(_path + _fileToSend) << std::endl;
+	std::cout << isDirectory(_path + _fileToSend) << std::endl;
+
+	if (_fileToSend == "" && _autoindex == 1 && !fileExist(_path + "index.html"))
+		_fileToSend = _path;
+	else if (_fileToSend == "")
 	{
-		_fileToSend = _requestData.path + ".html";
+		_fileToSend = _path + "index.html";
+		std::cout << "2" << std::endl;
 	}
 	else
-		_fileToSend = _requestData.path;
-	if (_fileToSend[0] == '/')
-		_fileToSend.erase(0,1);
+		_fileToSend = _path + _fileToSend;
 
-	struct stat buffer;
-	if (stat(_fileToSend.c_str(), &buffer) == -1)
-		_fileToSend = "404.html";
+	std::cout << "_fileToSend\t=\t" << _fileToSend << std::endl;
+
+	FILE *f = fopen(_fileToSend.c_str(), "r+");
+
+	if ( f == NULL )
+	{
+		// if (_autoindex == 1 && errno = 21)
+			// Index of;
+		// else
+			_fileToSend = _path + "404.html";
+	}
+	else
+		fclose(f);
 	
 	// std::cout << "_fileToSend\t=\t" << _fileToSend << std::endl;
 }
@@ -179,7 +196,7 @@ void Socket::fillHeaderData()
 {
 	fillFilesExtension();
 	_headerData.protocol = _requestData.protocol;
-	if (_fileToSend == "404.html")
+	if (_fileToSend == _path + "404.html")
 	{
 		_headerData.statusCode = "404";
 		_headerData.statusMessage = "Not Found";
@@ -256,6 +273,47 @@ void Socket::displayRequest()
 {
 	for(long unsigned int i = 0; i < _request.size(); i++)
 		std::cout << _request[i] << std::endl;
+}
+
+int Socket::fileExist(std::string file_path)
+{
+	std::cout << "file_path in fileExist\t=\t" << file_path << std::endl;
+
+	struct stat sb;
+	int status = stat(file_path.c_str(), &sb);
+	std::cout << "status in fileExist\t=\t" << status << std::endl;
+
+	return (!(status));
+
+
+	// printf("File type:                ");
+
+   	// switch (sb.st_mode & S_IFMT) {
+    // case S_IFBLK:  printf("block device\n");            break;
+    // case S_IFCHR:  printf("character device\n");        break;
+    // case S_IFDIR:  printf("directory\n");               break;
+    // case S_IFIFO:  printf("FIFO/pipe\n");               break;
+    // case S_IFLNK:  printf("symlink\n");                 break;
+    // case S_IFREG:  printf("regular file\n");            break;
+    // case S_IFSOCK: printf("socket\n");                  break;
+    // default:       printf("unknown?\n");                break;
+    // }
+}
+
+int Socket::isDirectory(std::string file_path)
+{
+	if (file_path.size() > 0 && file_path[file_path.size() - 1] == '/')
+		file_path.erase(file_path.size() - 1);
+	std::cout << "file_path\t=\t" << file_path << std::endl;
+
+	struct stat sb;
+	stat(file_path.c_str(), &sb);
+
+	
+
+	if (S_ISREG(sb.st_mode))
+		return (0);
+	return (1);
 }
 
 /*

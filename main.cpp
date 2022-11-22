@@ -10,11 +10,9 @@ int main(int ac, char **av)
 		return (0);
 	}
 
-	Parser *config = new Parser(av[1]);
+	// Parser *config = new Parser(av[1]);
 
-	(void) config;
-
-	std::cout << "test" << std::endl;
+	// (void) config;
 
 	Socket socket(atoi(av[1]));
 
