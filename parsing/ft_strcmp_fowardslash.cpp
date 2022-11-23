@@ -1,35 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   ft_strcmp_fowardslash.cpp                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/14 15:00:52 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/23 14:06:21 by mgoncalv         ###   ########.fr       */
+/*   Created: 2022/11/23 14:06:09 by mgoncalv          #+#    #+#             */
+/*   Updated: 2022/11/23 14:08:17 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Parser.hpp"
-#include "iostream"
+#include "webserv.h"
 
-// using namespace std;
-
-
-
-
-int main(int argc, char **argv)
+int	ft_strcmp_fowardslash(string str1, string str2)
 {
-	if (argc != 2)
+	int	foward = 0;
+	int i = 0;
+	while (str1[i] && str2[i] && str1[i] == str2[i])
 	{
-		cerr << "Error: bad arguments" << endl;
-		return (1);
+		if (str1[i] == '/')
+			foward++;
+		i++;
 	}
-	string	str1 = "/etc/www/hello/oi/index.html";
-	string	str2 = "/etc/www/hello/tchau/index.html";
-	ft_strcmp_fowardslash(str1, str2);
-	(void) argv;
-	// Parser *config = new Parser(argv[1]);
-	// (void) config;
-	return (0);
+	return (foward);
 }

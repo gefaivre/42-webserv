@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/21 14:43:09 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/23 14:27:44 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,4 +86,36 @@ void	Server::setAcceptedMethods(t_methods methods)
 t_methods	Server::getAcceptedMethods()
 {
 	return (_acceptedMethods);
+}
+
+bool		Server::locationExist(string key)
+{
+	return (_locations.find(key) != _locations.end());
+}
+
+void		Server::addLocation(Location *location)
+{
+	if (!locationExist(location->getKey()))
+	{
+		_locations[location->getKey()] = *location;
+	}
+	else
+		cerr << "Location already exists!" << endl;
+		
+}
+
+
+Location	Server::getLocationByPath(string path)
+{
+//contar quantas /partes/ a key de uma location tem em comum com path.
+	int			max = 0;
+	Location	loc;
+
+	map<string, Location>::iterator	it;
+	for (it = _locations.begin(); it != _locations.end(); it++)
+	{
+		if	(ft_strcmp_fowardslash(path, it->first) > max)
+			loc = it->second;
+	}
+	return loc;
 }
