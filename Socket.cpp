@@ -140,49 +140,42 @@ void Socket::createAndSendResponse()
 {
 	if (_requestData.methode == "GET")
 	{
-		foundFileToSend();
+		int isIndex = foundFileToSend();
 		fillHeaderData();
-		sendResponse();
+		if (isIndex)
+			sendIndexOf();
+		else
+			sendResponse();
 
 	}
 }
 
-void Socket::foundFileToSend()
+int Socket::foundFileToSend()
 {
 	_fileToSend = _requestData.path ;
 	if (_fileToSend[0] == '/')
 		_fileToSend.erase(0, 1);
 
-
-
-	// std::cout << "isDirectory(" << _path + _fileToSend << ") = " << isDirectory(_path + _fileToSend) << std::endl;
-	std::cout << isDirectory(_path + _fileToSend) << std::endl;
-
-	if (_fileToSend == "" && _autoindex == 1 && !fileExist(_path + "index.html"))
+	if (_autoindex == 1 && isDirectory(_path + _fileToSend) && !fileExist(_path + _fileToSend + "index.html"))
 		_fileToSend = _path;
-	else if (_fileToSend == "")
-	{
+	else if (isDirectory(_path + _fileToSend))
 		_fileToSend = _path + "index.html";
-		std::cout << "2" << std::endl;
-	}
 	else
 		_fileToSend = _path + _fileToSend;
 
-	std::cout << "_fileToSend\t=\t" << _fileToSend << std::endl;
-
 	FILE *f = fopen(_fileToSend.c_str(), "r+");
-
-	if ( f == NULL )
+	if ( f == NULL)
 	{
-		// if (_autoindex == 1 && errno = 21)
-			// Index of;
-		// else
-			_fileToSend = _path + "404.html";
+		if (_autoindex == 1 && errno == 21)
+		{
+			std::cout << "foundFileToSend = 1, _fileToSend\t=\t" << _fileToSend  << std::endl;
+			return (1);
+		}
+		_fileToSend = _path + "404.html";
 	}
 	else
 		fclose(f);
-	
-	// std::cout << "_fileToSend\t=\t" << _fileToSend << std::endl;
+	return (0);
 }
 
 void Socket::fillFilesExtension()
@@ -232,7 +225,6 @@ void Socket::fillHeaderData()
 
 void Socket::sendResponse()
 {
-
 	std::string str;
 	std::string file;
 	std::string line;
@@ -260,6 +252,52 @@ void Socket::sendResponse()
 
 	close(_newsocket);
 }
+#include <dirent.h>
+void Socket::sendIndexOf()
+{
+
+	std::string str;
+
+	str += _headerData.protocol;
+	str += " ";
+	str += _headerData.statusCode;
+	str += " ";
+	str += _headerData.statusMessage + "\r\n";
+	// str += "Content-Length: " + _headerData.contentLength + "\r\n";
+	str += "\r\n";
+	str += "<!DOCTYPE html>\n<html>\n<head>\n<title> Index of ";
+	str += _requestData.path;
+	str += "</title>\n</head>";
+	str += "<body>\n<h1>Index of ";
+	str += _requestData.path;
+	str += "</h1>\n";
+
+	DIR *dir;
+	struct dirent *ent;
+	std::cout << "_fileToSend OpenDir\t=\t" << _fileToSend << std::endl;
+	if ((dir = opendir (_fileToSend.c_str())) != NULL)
+	{
+		while ((ent = readdir (dir)) != NULL)
+		{
+			std::string file(ent->d_name);
+			str += ("<a href= \"" + file + "\">" + file + "</a></br>\n\r");
+		}
+	closedir (dir);
+	}
+	else
+		perror ("");
+	str += "</h1>\n";
+	str += "<hr>\n<p>Webserv/1.0</p>\n</body>";
+	str += "\n\r";
+
+
+
+
+
+	send(_newsocket, str.c_str(), str.size(), 0);
+
+	close(_newsocket);
+}
 
 
 
@@ -277,34 +315,17 @@ void Socket::displayRequest()
 
 int Socket::fileExist(std::string file_path)
 {
-	std::cout << "file_path in fileExist\t=\t" << file_path << std::endl;
-
 	struct stat sb;
 	int status = stat(file_path.c_str(), &sb);
-	std::cout << "status in fileExist\t=\t" << status << std::endl;
 
 	return (!(status));
-
-
-	// printf("File type:                ");
-
-   	// switch (sb.st_mode & S_IFMT) {
-    // case S_IFBLK:  printf("block device\n");            break;
-    // case S_IFCHR:  printf("character device\n");        break;
-    // case S_IFDIR:  printf("directory\n");               break;
-    // case S_IFIFO:  printf("FIFO/pipe\n");               break;
-    // case S_IFLNK:  printf("symlink\n");                 break;
-    // case S_IFREG:  printf("regular file\n");            break;
-    // case S_IFSOCK: printf("socket\n");                  break;
-    // default:       printf("unknown?\n");                break;
-    // }
 }
+
 
 int Socket::isDirectory(std::string file_path)
 {
 	if (file_path.size() > 0 && file_path[file_path.size() - 1] == '/')
 		file_path.erase(file_path.size() - 1);
-	std::cout << "file_path\t=\t" << file_path << std::endl;
 
 	struct stat sb;
 	stat(file_path.c_str(), &sb);

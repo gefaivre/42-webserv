@@ -19,7 +19,6 @@ int main(int ac, char **av)
 	for(size_t i = 0;; i++)
 	{
 		socket.waitAndParseRequest();
-		socket.displayRequest();
 		socket.createAndSendResponse();
 	}
 }

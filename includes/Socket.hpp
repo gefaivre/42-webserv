@@ -79,9 +79,10 @@ private:
 
 
 	std::string _fileToSend;
-	void foundFileToSend();
+	int foundFileToSend();
 
 	void parsingRequest();
+	void sendIndexOf();
 	void sendResponse();
 
 	std::string _path;
