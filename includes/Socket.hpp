@@ -9,6 +9,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <dirent.h>
+
 #include <unistd.h>
 #include <iostream>
 #include <string>
@@ -90,6 +92,7 @@ private:
 
 	int	fileExist(std::string file_path);
 	int	isDirectory(std::string file_path);
+	std::string _currentDirectory;
 
 };
 

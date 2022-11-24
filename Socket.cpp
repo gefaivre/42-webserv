@@ -132,9 +132,9 @@ void Socket::parsingRequest()
 	}
 }
 
-//	------------------------
-//	CREATE AND SEND RESPONSE
-//	------------------------
+//	----------------
+//	CREATE RESPONSE
+//	----------------
 
 void Socket::createAndSendResponse()
 {
@@ -146,18 +146,18 @@ void Socket::createAndSendResponse()
 			sendIndexOf();
 		else
 			sendResponse();
-
 	}
 }
 
 int Socket::foundFileToSend()
 {
 	_fileToSend = _requestData.path ;
+	std::cout << "_requestData.path\t=\t" << _requestData.path << std::endl;
 	if (_fileToSend[0] == '/')
 		_fileToSend.erase(0, 1);
 
 	if (_autoindex == 1 && isDirectory(_path + _fileToSend) && !fileExist(_path + _fileToSend + "index.html"))
-		_fileToSend = _path;
+		_fileToSend = _path + _fileToSend;
 	else if (isDirectory(_path + _fileToSend))
 		_fileToSend = _path + "index.html";
 	else
@@ -167,10 +167,7 @@ int Socket::foundFileToSend()
 	if ( f == NULL)
 	{
 		if (_autoindex == 1 && errno == 21)
-		{
-			std::cout << "foundFileToSend = 1, _fileToSend\t=\t" << _fileToSend  << std::endl;
 			return (1);
-		}
 		_fileToSend = _path + "404.html";
 	}
 	else
@@ -223,6 +220,12 @@ void Socket::fillHeaderData()
 	oui >> _headerData.contentLength;
 }
 
+
+//	----------------
+//	SEND RESPONSE
+//	----------------
+
+
 void Socket::sendResponse()
 {
 	std::string str;
@@ -252,18 +255,19 @@ void Socket::sendResponse()
 
 	close(_newsocket);
 }
-#include <dirent.h>
+
 void Socket::sendIndexOf()
 {
-
 	std::string str;
+
+	std::string newfiletosend =  _fileToSend;
+	newfiletosend.erase(0,4);
 
 	str += _headerData.protocol;
 	str += " ";
 	str += _headerData.statusCode;
 	str += " ";
 	str += _headerData.statusMessage + "\r\n";
-	// str += "Content-Length: " + _headerData.contentLength + "\r\n";
 	str += "\r\n";
 	str += "<!DOCTYPE html>\n<html>\n<head>\n<title> Index of ";
 	str += _requestData.path;
@@ -274,18 +278,23 @@ void Socket::sendIndexOf()
 
 	DIR *dir;
 	struct dirent *ent;
-	std::cout << "_fileToSend OpenDir\t=\t" << _fileToSend << std::endl;
-	if ((dir = opendir (_fileToSend.c_str())) != NULL)
+
+	dir = opendir (_fileToSend.c_str());
+	std::cout << "_fileToSend\t=\t" << _fileToSend << std::endl;
+	while ((ent = readdir (dir)) != NULL)
 	{
-		while ((ent = readdir (dir)) != NULL)
-		{
-			std::string file(ent->d_name);
-			str += ("<a href= \"" + file + "\">" + file + "</a></br>\n\r");
-		}
-	closedir (dir);
+		std::string file(ent->d_name);
+		if (isDirectory(file))
+			file += "/";
+
+		std::cout << "file\t=\t" << file << std::endl;
+		
+		str += ("<a href= \"" + file + "\">" + file + "</a></br>\n\r");
 	}
-	else
-		perror ("");
+
+	closedir (dir);
+
+
 	str += "</h1>\n";
 	str += "<hr>\n<p>Webserv/1.0</p>\n</body>";
 	str += "\n\r";
@@ -293,10 +302,10 @@ void Socket::sendIndexOf()
 
 
 
-
 	send(_newsocket, str.c_str(), str.size(), 0);
 
 	close(_newsocket);
+	std::cout  << std::endl;
 }
 
 
@@ -328,7 +337,9 @@ int Socket::isDirectory(std::string file_path)
 		file_path.erase(file_path.size() - 1);
 
 	struct stat sb;
-	stat(file_path.c_str(), &sb);
+	if (stat(file_path.c_str(), &sb) == -1)
+		return (0);
+
 
 	
 
