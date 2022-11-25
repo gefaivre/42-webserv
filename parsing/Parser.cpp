@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/23 15:59:00 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/25 17:41:42 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,7 @@
 void	Parser::prepareLine()
 {
 	string			line;
-	size_t			find;
 	string			buffer;
-	static string	context;
 
 	
 	while (getline(_configFile, line))
@@ -26,46 +24,9 @@ void	Parser::prepareLine()
 		if (line[line.find_first_not_of(" \n\t\v\f\r")] != '#')
 			buffer += line;
 	}
-	
-	//REMOVE INVALID SPACES
-	find = buffer.find("\n\t\v\f\r");
-	while (find != string::npos)
-	{
-		buffer.erase(find, 1);
-		find = buffer.find("\n\t\v\f\r");
-	}
-
-	
-	//ADD SPACE TO BRACKETS
-	//Problema: se eu insiro um espaco antes o index da chave muda
-	find = buffer.find("{");
-	while (find != string::npos)
-	{
-		if (find > 0 && buffer[find - 1] != ' ')
-			buffer.insert(find, " ");
-		if (find > 0 && buffer[find + 1] != ' ')
-			buffer.insert(find + 1, " ");
-		find = buffer.find("{", find + 1);
-	}
-	
-	find = buffer.find("}");
-	while (find != string::npos)
-	{
-		if (find > 0 && buffer[find - 1] != ' ')
-			buffer.insert(find, " ");
-		if (find > 0 && buffer[find + 1] != ' ')
-			buffer.insert(find + 1, " ");
-		find = buffer.find("}", find + 1);
-	}
-
-	//REMOVE DOUBLE SPACES
-	find = buffer.find("  ");
-	while (find != string::npos)
-	{
-		buffer.erase(find, 1);
-		find = buffer.find("  ");
-	}
-
+	ft_remove_invalid_spaces(buffer);
+	ft_wrap_brackets_in_spaces(&buffer);
+	ft_remove_double_spaces(&buffer);
 
 	//TRIM LINE
 	// if (buffer[0] == ' ')
@@ -74,12 +35,7 @@ void	Parser::prepareLine()
 	// 	buffer.erase(buffer.length() - 1, 1);
 
 	//ADD SPACE START AND SPACE END
-	if (buffer[0] != ' ')
-		buffer.insert(0, " ");
-	if (buffer[buffer.length() - 1] != ' ')
-		buffer.insert(buffer.length(), " ");
-	
-	cout << buffer << endl;
+	ft_wrap_in_spaces(&buffer);
 
 	_content = buffer;
 	cout << buffer << endl;
@@ -142,6 +98,7 @@ void	Parser::getServerConf(void)
 			if (_content.find(target, _currIdx) == _currIdx)
 			{
 				location = new Location(_content.substr(_currIdx + 9, nextOpenBracket - _currIdx - 10));
+				server.addLocation(location);
 				cout << "	Location:" << location->getKey() << endl;
 				level++;
 			}
@@ -175,6 +132,7 @@ void	Parser::getServerConf(void)
 			else
 			{
 				string directive = _content.substr(_currIdx, nextSemicolon - _currIdx);
+				//Checar aqui o level. if level = 1 chamar a funcao que ajeita o location.
 				
 				//Tentar botar um limite nessa funcao find para nao percorrer toda a string
 				if (directive.find("listen ") == 0)
@@ -198,20 +156,34 @@ void	Parser::getServerConf(void)
 				}
 				else if (directive.find("autoindex ") == 0)
 				{
+					bool	autoindex;
 					cout << "	Autoindex: " << directive.substr(10) << "."<< endl;
 					if (directive.substr(10) == "off")
-						server.setAutoIndex(false);
+						autoindex = false;
 					else if (directive.substr(10) == "on")
-						server.setAutoIndex(true);
+						autoindex = true;
 					else
 					{
 						cerr << "Error: autoindex: invalid value" << endl;
 						exit (1);
 					}
+					if (level == 1)
+						server.setAutoIndex(autoindex);
+					else if (level == 2)
+						location->setAutoIndex(autoindex);
 				}
-				else if (directive.find("root ") == 0 && level == 2)
+				else if (directive.find("root ") == 0)
 				{
-					cout << "		Root:"<< directive.substr(5) << endl;
+					if (level == 1)
+					{
+						server.setRoot(directive.substr(5));
+						cout << "	Root: "<< server.getRoot() << endl;
+					}
+					else if (level == 2)
+					{
+						location->setRoot(directive.substr(5));
+						cout << "		Root: "<< location->getRoot() << endl;
+					}
 				}
 				else if (directive.find("client_max_body_size ") == 0)
 				{
@@ -241,6 +213,8 @@ void	Parser::getServerConf(void)
 					}
 					if (level == 1)
 						server.setAcceptedMethods(methods);
+					else if (level == 2)
+						location->setAcceptedMethods(methods);
 					cout << "	Accepted_methods: "<< directive.substr(17) << "." << endl;
 				}
 				_currIdx = nextSemicolon + 2;

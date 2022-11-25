@@ -1,5 +1,13 @@
 NAME = webserv
-SRCS = main.cpp Parser.cpp Server.cpp ft_split.cpp Location.cpp ft_strcmp_fowardslash.cpp
+SRCS = 	main.cpp \
+		Parser.cpp Server.cpp \
+		ft_split.cpp \
+		Location.cpp \
+		ft_strcmp_fowardslash.cpp \
+		ft_remove_invalid_spaces.cpp \
+		ft_remove_double_spaces.cpp \
+		ft_wrap_in_spaces.cpp \
+		ft_wrap_brackets_in_spaces.cpp \
 
 OBJS_PATH = objects/
 OBJS = ${SRCS:.cpp=.o}
