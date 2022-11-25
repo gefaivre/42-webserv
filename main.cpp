@@ -1,6 +1,6 @@
-#include "Socket.hpp"
-#include "Parser.hpp"
-#include "Server.hpp"
+#include "engine/Socket.hpp"
+#include "engine/ParsingRequest.hpp"
+#include "engine/CreateResponse.hpp"
 
 int main(int ac, char **av)
 {
@@ -14,13 +14,24 @@ int main(int ac, char **av)
 
 	// (void) config;
 
+
+
+	std::string path("www/");
+	bool autoindex = 1;
+
+
 	Socket socket(atoi(av[1]));
 
-	for(size_t i = 0;; i++)
+	for(;;)
 	{
-		socket.waitAndParseRequest();
-		// socket.displayRequest();
-		socket.createAndSendResponse();
+		socket.waitRequest();
+		socket.displayRequest();
+
+		ParsingRequest parsingRequest(path, autoindex, socket.getRequest());
+
+		CreateResponse createResponse(path, autoindex, parsingRequest.getData());
+
+		socket.sendResponse(createResponse.getResponse());
 	}
 }
 

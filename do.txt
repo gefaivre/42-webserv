@@ -32,3 +32,10 @@ Age: 7 -->
 -trouver le fichier
 -cree le Header
 -send le ficher avec le header
+
+
+
+
+ParsingRequest :
+
+set bool isIndex;
