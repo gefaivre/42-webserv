@@ -19,7 +19,29 @@ int main(int ac, char **av)
 	for(size_t i = 0;; i++)
 	{
 		socket.waitAndParseRequest();
-		socket.displayRequest();
+		// socket.displayRequest();
 		socket.createAndSendResponse();
 	}
 }
+
+// int main_exemple(int ac, char **av)
+// {
+// 	if (ac != 2)
+// 	{
+// 		std::cerr << "Usage: ./webserv [port]" << std::endl;
+// 		return (0);
+// 	}
+
+// 	Parser *config = new Parser(av[1]);
+
+// 	Socket socket(config);
+
+// 	Parsing parsing;
+
+// 	parsing = socket.waitRequest;
+
+// 	Engine engine(parsing);
+
+// 	socket.sendResponse(engine);
+
+// }

@@ -152,7 +152,6 @@ void Socket::createAndSendResponse()
 int Socket::foundFileToSend()
 {
 	_fileToSend = _requestData.path ;
-	std::cout << "_requestData.path\t=\t" << _requestData.path << std::endl;
 	if (_fileToSend[0] == '/')
 		_fileToSend.erase(0, 1);
 
@@ -280,14 +279,11 @@ void Socket::sendIndexOf()
 	struct dirent *ent;
 
 	dir = opendir (_fileToSend.c_str());
-	std::cout << "_fileToSend\t=\t" << _fileToSend << std::endl;
 	while ((ent = readdir (dir)) != NULL)
 	{
 		std::string file(ent->d_name);
-		if (isDirectory(file))
+		if (isDirectory(_fileToSend + file))
 			file += "/";
-
-		std::cout << "file\t=\t" << file << std::endl;
 		
 		str += ("<a href= \"" + file + "\">" + file + "</a></br>\n\r");
 	}
@@ -305,7 +301,6 @@ void Socket::sendIndexOf()
 	send(_newsocket, str.c_str(), str.size(), 0);
 
 	close(_newsocket);
-	std::cout  << std::endl;
 }
 
 
@@ -333,19 +328,27 @@ int Socket::fileExist(std::string file_path)
 
 int Socket::isDirectory(std::string file_path)
 {
+
+	// std::cout << ">------------------isDirectory" << std::endl;
+	// std::cout << "file_path\t=\t" << file_path << std::endl;
 	if (file_path.size() > 0 && file_path[file_path.size() - 1] == '/')
 		file_path.erase(file_path.size() - 1);
 
 	struct stat sb;
 	if (stat(file_path.c_str(), &sb) == -1)
+	{
+		// std::cout << "<---------------End-isDirectory-1 (file not found)" << std::endl;
 		return (0);
 
+	}
 
-	
-
-	if (S_ISREG(sb.st_mode))
-		return (0);
-	return (1);
+	if (S_ISDIR(sb.st_mode))
+	{
+		// std::cout << "<---------------End-isDirectory-2 (is a directory)" << std::endl;
+		return (1);
+	}
+	// std::cout << "<---------------End-isDirectory-3 (is not a directory)" << std::endl;
+	return (0);
 }
 
 /*
