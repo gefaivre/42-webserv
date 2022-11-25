@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/21 16:17:34 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/23 15:59:00 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ void	Parser::prepareLine()
 	cout << buffer << endl;
 
 	_content = buffer;
+	cout << buffer << endl;
 }
 
 // void	Parser::checkHttpContext()
