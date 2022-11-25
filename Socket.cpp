@@ -97,12 +97,15 @@ void Socket::waitAndParseRequest()
 	socklen_t addrlen = sizeof(_addr);
 
 	_newsocket = accept(_sockfd, (struct sockaddr *)&_addr, &addrlen);
-
+	if (_newsocket == -1) //handle errors (This call returns a non-negative descriptor on success, otherwise it returns -1 on error)
+	{
+        std::cout << "Socket error with accept function" << std::endl;
+		exit(errno);
+    }
 	char a[1] = {0};
 	std::string buf;
 	_request.clear();
-
-	while (recv( _newsocket , a, 1, 0))
+	while (recv(_newsocket, a, 1, 0) != -1) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
 	{
 		buf += a[0];
 		if (a[0] == '\n' )
