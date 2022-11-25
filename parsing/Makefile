@@ -1,14 +1,16 @@
 NAME = webserv
-SRCS = main.cpp Parser.cpp Server.cpp ft_split.cpp
+SRCS = main.cpp Parser.cpp Server.cpp ft_split.cpp Location.cpp ft_strcmp_fowardslash.cpp
 
 OBJS_PATH = objects/
 OBJS = ${SRCS:.cpp=.o}
 CFLAGS = -Wall -Wextra -Werror -std=c++98
 CC = c++
 RM = rm -f
+INC_PATH = ../includes/
+INCLUDES = $(addprefix -I , $(INC_PATH))
 
 %.o: %.cpp
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDES)
 
 all: ${NAME}
 

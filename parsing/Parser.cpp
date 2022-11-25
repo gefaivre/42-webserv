@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/18 14:45:53 by gefaivre         ###   ########.fr       */
+/*   Updated: 2022/11/21 16:17:34 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Parser.hpp"
+#include "Location.hpp"
 
 void	Parser::prepareLine()
 {
@@ -106,10 +107,14 @@ Parser::Parser(void)
 {
 }
 
+//TODO: remove space before ;
+//TODO: se fizermos a classe server e location herdarem da mesma classe base podemos criar uma funcao que aceita as duas usando polimorfismo.
+//TODO: ou podemos usar uma classe template
 void	Parser::getServerConf(void)
 {
 	int level = 0;
 	int i = 0;
+	Location	*location;
 
 	string sTarget = "server {";
 	Server	server = Server();
@@ -135,7 +140,8 @@ void	Parser::getServerConf(void)
 			//Checar que tem a palavra location + 2 espacos. Pq o path vai ser variavel
 			if (_content.find(target, _currIdx) == _currIdx)
 			{
-				cout << "	Location:" << _content.substr(_currIdx + 9, nextOpenBracket - _currIdx - 10) << endl;
+				location = new Location(_content.substr(_currIdx + 9, nextOpenBracket - _currIdx - 10));
+				cout << "	Location:" << location->getKey() << endl;
 				level++;
 			}
 			else
@@ -192,6 +198,15 @@ void	Parser::getServerConf(void)
 				else if (directive.find("autoindex ") == 0)
 				{
 					cout << "	Autoindex: " << directive.substr(10) << "."<< endl;
+					if (directive.substr(10) == "off")
+						server.setAutoIndex(false);
+					else if (directive.substr(10) == "on")
+						server.setAutoIndex(true);
+					else
+					{
+						cerr << "Error: autoindex: invalid value" << endl;
+						exit (1);
+					}
 				}
 				else if (directive.find("root ") == 0 && level == 2)
 				{
@@ -200,15 +215,32 @@ void	Parser::getServerConf(void)
 				else if (directive.find("client_max_body_size ") == 0)
 				{
 					cout << "	Client_max_body_size: "<< directive.substr(21) << endl;
+					server.setClientMaxBodySize(atoi(directive.substr(21).c_str()));
 				}
 				else if (directive.find("accepted_methods ") == 0)
 				{
 					vector<string> acMethods = ft_split(directive.substr(17), ' ');
-					// for (int i = 0; i < acMethods; i++)
-					// {
-						
-					// }
-					cout << "	Accepted_methods: "<< directive.substr(17) << endl;
+					t_methods	methods;
+					methods._delete = false;
+					methods._get = false;
+					methods._post = false;
+					for (size_t i = 0; i < acMethods.size(); i++)
+					{
+						if (acMethods[i] == "GET")
+							methods._get = true;
+						else if (acMethods[i] == "POST")
+							methods._get = true;
+						else if (acMethods[i] == "DELETE")
+							methods._delete = true;
+						else
+						{
+							cerr << "Error: invalid method" << endl;
+							exit(1);
+						}
+					}
+					if (level == 1)
+						server.setAcceptedMethods(methods);
+					cout << "	Accepted_methods: "<< directive.substr(17) << "." << endl;
 				}
 				_currIdx = nextSemicolon + 2;
 			}
