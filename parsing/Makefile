@@ -11,7 +11,7 @@ SRCS = 	main.cpp \
 
 OBJS_PATH = objects/
 OBJS = ${SRCS:.cpp=.o}
-CFLAGS = -Wall -Wextra -Werror -std=c++98
+CFLAGS = -Wall -Wextra -Werror -g3 -std=c++98
 CC = c++
 RM = rm -f
 INC_PATH = ../includes/

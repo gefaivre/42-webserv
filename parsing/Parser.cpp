@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/25 17:41:42 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/25 18:42:41 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,26 +15,25 @@
 
 void	Parser::prepareLine()
 {
-	string			line;
+string			line;
 	string			buffer;
-
 	
 	while (getline(_configFile, line))
 	{
-		if (line[line.find_first_not_of(" \n\t\v\f\r")] != '#')
+		if (line.size() && line[line.find_first_not_of(" \n\t\v\f\r")] != '#')
 			buffer += line;
 	}
-	ft_remove_invalid_spaces(buffer);
+	ft_remove_invalid_spaces(&buffer);
 	ft_wrap_brackets_in_spaces(&buffer);
 	ft_remove_double_spaces(&buffer);
 
-	//TRIM LINE
+	// TRIM LINE
 	// if (buffer[0] == ' ')
 	// 	buffer.erase(0,1);
 	// if (buffer[buffer.length() - 1] == ' ')
 	// 	buffer.erase(buffer.length() - 1, 1);
 
-	//ADD SPACE START AND SPACE END
+	// ADD SPACE START AND SPACE END
 	ft_wrap_in_spaces(&buffer);
 
 	_content = buffer;

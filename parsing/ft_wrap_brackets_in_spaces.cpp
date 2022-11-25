@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/25 17:17:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/25 17:36:08 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/25 18:00:56 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ void	ft_wrap_target_in_spaces(string *str, string target)
 	//Por enquanto corrigimos isso com o mais um, mas na verdade precisamos fazer find++ se ele entrar no primeiro if;
 		if (find > 0 && (*str)[find - 1] != ' ')
 			str->insert(find, " ");
+	//TODO: cuidado: aqui assumimos que target tem somente uma letra
 		if (find > 0 && (*str)[find + 1] != ' ')
 			str->insert(find + 1, " ");
 		find = str->find(target, find + 1);

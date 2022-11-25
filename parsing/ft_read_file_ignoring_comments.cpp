@@ -1,27 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_remove_invalid_spaces.cpp                       :+:      :+:    :+:   */
+/*   ft_read_file_ignoring_comments.cpp                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/25 16:10:23 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/25 18:25:37 by mgoncalv         ###   ########.fr       */
+/*   Created: 2022/11/25 18:29:58 by mgoncalv          #+#    #+#             */
+/*   Updated: 2022/11/25 18:41:47 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
+#include <fstream>
 
-using namespace std;
+// using namespace std;
 
-void	ft_remove_invalid_spaces(string *str)
+string	ft_read_file_ignoring_comments(ifstream	_configFile)
 {
-	size_t	find;
-
-	find = str->find("\n\t\v\f\r");
-	while (find != string::npos)
+	string			line;
+	string			buffer;
+	
+	while (getline(_configFile, line))
 	{
-		str->erase(find, 1);
-		find = str->find("\n\t\v\f\r");
+		if (line.size() && line[line.find_first_not_of(" \n\t\v\f\r")] != '#')
+			buffer += line;
 	}
+	return (buffer);
 }
