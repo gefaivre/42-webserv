@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/29 14:58:52 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/29 15:22:39 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ string			line;
 	ft_wrap_in_spaces(&buffer);
 
 	_content = buffer;
-	cout << "*" << buffer << "*" << endl;
+	cout << buffer << endl;
 }
 
 // void	Parser::checkHttpContext()
@@ -116,7 +116,7 @@ void	Parser::getServerConf(void)
 				_currIdx += 2;
 			}
 		}
-		if (nextSemicolon < nextOpenBracket && nextSemicolon < nextCloseBracket)
+		if (nextSemicolon < nextOpenBracket && nextSemicolon < nextClos << "*"eBracket)
 		{
 			//Se tiver uma palavra antes temos uma directive;
 			//Se nao, temos um ; solto

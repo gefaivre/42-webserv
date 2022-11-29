@@ -1,52 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Parser.hpp                                         :+:      :+:    :+:   */
+/*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/14 14:21:20 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/25 18:41:48 by mgoncalv         ###   ########.fr       */
+/*   Created: 2022/11/29 15:23:03 by mgoncalv          #+#    #+#             */
+/*   Updated: 2022/11/29 15:33:53 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSER_HPP
-# define PARSER_HPP
+#ifndef CONFIG_HPP
+# define CONFIG_HPP
 
+#include <map>
 #include <iostream>
-#include <stack>
-#include <fstream>
-#include <string>
-#include <vector>
-
-#include <stdlib.h>
-
 #include "webserv.h"
-
-#include "Server.hpp"
 
 using namespace std;
 
-class Parser
+class Config
 {
 private:
-	ifstream		_configFile;
-	string			_fileName;
-	stack<string>	_context;
-	string			_content;
-	size_t			_currIdx;
-	vector<Server>	_servers;
-	
+	string				_key;
+	map<string, string> _cgi;
+	bool				_autoIndex;
+	string				_root;
+	t_methods			_acceptedMethods;
 public:
-	Parser(void);
-	~Parser(void);
-
-	Parser(char *configName);
-
-	void	prepareLine();
-	void	checkHttpContext();
-	void	getServerConf();
-	string	ft_read_file_ignoring_comments();
+	Config(/* args */);
+	~Config();
 };
 
 
