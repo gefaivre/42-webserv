@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/25 18:42:41 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/29 14:58:52 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ string			line;
 	ft_remove_invalid_spaces(&buffer);
 	ft_wrap_brackets_in_spaces(&buffer);
 	ft_remove_double_spaces(&buffer);
-
 	// TRIM LINE
 	// if (buffer[0] == ' ')
 	// 	buffer.erase(0,1);
@@ -37,7 +36,7 @@ string			line;
 	ft_wrap_in_spaces(&buffer);
 
 	_content = buffer;
-	cout << buffer << endl;
+	cout << "*" << buffer << "*" << endl;
 }
 
 // void	Parser::checkHttpContext()
