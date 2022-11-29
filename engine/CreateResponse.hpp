@@ -1,15 +1,9 @@
 #ifndef CREATERESPONSE_HPP
 # define CREATERESPONSE_HPP
 
-# include <iostream>
-# include <string>
-
 # include "utils.hpp"
-#include <vector>
-#include <map>
-#include <fstream>
-#include <sstream>
-#include <dirent.h>
+#include "general_includes.hpp"
+
 
 class CreateResponse
 {

@@ -1,7 +1,5 @@
 #include "utils.hpp"
 
-
-
 int fileExist(std::string file_path)
 {
 	struct stat sb;
@@ -33,4 +31,12 @@ int isDirectory(std::string file_path)
 	}
 	// std::cout << "<---------------End-isDirectory-3 (is not a directory)" << std::endl;
 	return (0);
+}
+
+void	*ft_define_error(char *str)
+{
+	std::string std_str(str);
+	std::cout << std_str << std::endl;
+	std::cout << strerror(errno) << std::endl;
+	exit(errno);
 }

@@ -10,7 +10,8 @@ SRC=	main.cpp \
 INC =	engine/Socket.hpp \
 		engine/CreateResponse.hpp \
 		engine/ParsingRequest.hpp \
-		engine/utils.hpp
+		engine/utils.hpp \
+		engine/general_includes.hpp
 
 CXX=c++
 

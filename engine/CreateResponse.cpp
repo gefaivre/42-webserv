@@ -27,6 +27,13 @@ _path(path), _autoindex(autoindex), _requestData(requestData)
 
 CreateResponse::~CreateResponse()
 {
+	// delete [] _headerData.protocol;
+	// _headerData.protocol.delete();
+	// _headerData.statusCode.clear();
+	// _headerData.statusMessage.clear();
+	// _headerData.contentLength.clear();
+	_headerData.contentType.erase();
+	_header.clear();
 }
 
 

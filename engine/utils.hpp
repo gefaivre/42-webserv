@@ -1,12 +1,8 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
+#include "general_includes.hpp"
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string>
-	
 typedef struct	s_requestData
 {
 	std::string methode;
@@ -33,5 +29,8 @@ typedef struct	s_headerData
 int fileExist(std::string file_path);
 
 int isDirectory(std::string file_path);
+
+void	*ft_define_error(char *str);
+
 
 #endif

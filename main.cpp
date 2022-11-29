@@ -17,7 +17,7 @@ int main(int ac, char **av)
 
 
 	std::string path("www/");
-	bool autoindex = 1;
+	// bool autoindex = 1;
 
 
 	Socket socket(atoi(av[1]));
@@ -25,13 +25,14 @@ int main(int ac, char **av)
 	for(;;)
 	{
 		socket.waitRequest();
-		socket.displayRequest();
+		exit(0);
+	// 	socket.displayRequest();
 
-		ParsingRequest parsingRequest(path, autoindex, socket.getRequest());
+	// 	ParsingRequest parsingRequest(path, autoindex, socket.getRequest());
 
-		CreateResponse createResponse(path, autoindex, parsingRequest.getData());
+	// 	CreateResponse createResponse(path, autoindex, parsingRequest.getData());
 
-		socket.sendResponse(createResponse.getResponse());
+	// 	socket.sendResponse(createResponse.getResponse());
 	}
 }
 
