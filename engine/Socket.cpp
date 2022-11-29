@@ -79,8 +79,6 @@ void Socket::setStruct()
 
 void Socket::waitRequest()
 {
-	std::cout << "saLIT" << std::endl;
-	
 	socklen_t addrlen = sizeof(_addr);
 
 	_newsocket = accept(_sockfd, (struct sockaddr *)&_addr, &addrlen);

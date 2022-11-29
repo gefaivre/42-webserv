@@ -86,6 +86,7 @@ int ParsingRequest::foundFileToSend()
 	FILE *f = fopen(_requestData.fileToSend.c_str(), "r+");
 	if ( f == NULL)
 	{
+		//est-ce que la on met un message erreur ?
 		if (_autoindex == 1 && errno == 21)
 			return (1);
 		_requestData.fileToSend = _path + "404.html";

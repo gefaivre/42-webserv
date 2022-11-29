@@ -32,7 +32,7 @@ int main(int ac, char **av)
 		CreateResponse createResponse(path, autoindex, parsingRequest.getData());
 
 		socket.sendResponse(createResponse.getResponse());
-		// return (0);
+		return (0);
 	}
 }
 

@@ -76,7 +76,6 @@ void CreateResponse::fillHeaderData()
 	{
 		_headerData.statusCode = "404";
 		_headerData.statusMessage = "Not Found";
-
 	}
 	else
 	{
@@ -162,6 +161,8 @@ void CreateResponse::BodyIsIndex()
 	struct dirent *ent;
 
 	dir = opendir (_requestData.fileToSend.c_str());
+	if (dir == NULL)
+		ft_define_error("Error while opening the directory");
 	while ((ent = readdir (dir)) != NULL)
 	{
 		std::string file(ent->d_name);
@@ -170,8 +171,8 @@ void CreateResponse::BodyIsIndex()
 		
 		_body += ("<a href= \"" + file + "\">" + file + "</a></br>\n\r");
 	}
-	closedir (dir);
-
+	if (closedir(dir) == -1)
+		ft_define_error("Error while closing the directory");
 	_body += "</h1>\n";
 	_body += "<hr>\n<p>Webserv/1.0</p>\n</body>";
 	_body += "\n\r";
