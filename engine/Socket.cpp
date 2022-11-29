@@ -14,15 +14,15 @@ Socket::Socket(int port, int domain, int type, int protocol):
 
 	_sockfd = socket(domain, type, protocol); //AF_INET,SOCK_STREAM, 0
 	if (_sockfd == -1)
-		ft_define_error((char *)"Socket error");
+		ft_define_error("Socket error");
 	int yes = 1;
 	if (setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR,
 		(void*)&yes, sizeof(yes)) == -1)
-		ft_define_error((char *)"Setsockopt error");
+		ft_define_error("Setsockopt error");
 	if( (bind(_sockfd, (struct sockaddr*)&_addr, sizeof(_addr))) == -1)
-		ft_define_error((char *)"Bind error");
+		ft_define_error("Bind error");
 	if (listen(_sockfd, SOMAXCONN) == -1)
-		ft_define_error((char *)"Listen error");
+		ft_define_error("Listen error");
 }
 
 // Socket::Socket( const Socket & src )
@@ -36,7 +36,6 @@ Socket::Socket(int port, int domain, int type, int protocol):
 
 Socket::~Socket()
 {
-	delete (_request);
 	close(_sockfd);
 }
 
@@ -86,29 +85,26 @@ void Socket::waitRequest()
 
 	_newsocket = accept(_sockfd, (struct sockaddr *)&_addr, &addrlen);
 	if (_newsocket == -1) //handle errors (This call returns a non-negative descriptor on success, otherwise it returns -1 on error)
-		ft_define_error((char *)"Error the connection with the socket was not established");
+		ft_define_error("Error the connection with the socket was not established");
 	
 	char a[1] = {0};
 	std::string buf;
-	_request = new std::vector<std::string>;
-	_request->clear();
+	_request.clear();
 	ssize_t tmp_recv;
 	
 	while ((tmp_recv = recv(_newsocket, a, 1, 0))) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
 	{
 		if (tmp_recv == -1)
-			ft_define_error((char *)"Error with the message from a socket");
+			ft_define_error("Error with the message from a socket");
 		
 		buf += a[0];
 		if (a[0] == '\n' )
 		{
 			buf.erase(buf.find("\r\n") ,buf.size());
-			_request->push_back(buf);
-			/*
+			_request.push_back(buf);
 			buf.clear();
-			if (_request[_request->size() - 1].size() == 0 )
+			if (_request[_request.size() - 1].size() == 0 )
 				break;
-			*/
 		}
 		
 	}	
@@ -122,14 +118,10 @@ void Socket::waitRequest()
 
 void Socket::sendResponse(std::string str)
 {
-	// if (send(_newsocket, str.c_str(), str.size(), 0) == -1)
-	if (send(_newsocket, str.c_str(), str.size(), 0))
-	{
-		ft_define_error((char *)"Send error");
-	}
-	if (close(_newsocket))
-		ft_define_error((char *)"Close error");
-
+	if (send(_newsocket, str.c_str(), str.size(), 0) == -1)
+		ft_define_error("Send error");
+	if (close(_newsocket) == -1)
+		ft_define_error("Close error");
 }
 
 
@@ -138,11 +130,11 @@ void Socket::sendResponse(std::string str)
 //
 
 
-// void Socket::displayRequest()
-// {
-// 	for(long unsigned int i = 0; i < _request.size(); i++)
-// 		std::cout << _request[i] << std::endl;
-// }
+void Socket::displayRequest()
+{
+	for(long unsigned int i = 0; i < _request.size(); i++)
+		std::cout << _request[i] << std::endl;
+}
 
 
 /*
@@ -154,9 +146,9 @@ int Socket::getPort() const
 	return (_port);
 }
 
-// std::vector<std::string> Socket::getRequest() const
-// {
-// 	return (_request);
-// }
+std::vector<std::string> Socket::getRequest() const
+{
+	return (_request);
+}
 
 /* ************************************************************************** */

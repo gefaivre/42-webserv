@@ -29,7 +29,7 @@ private:
 	struct sockaddr_in _addr;
 	void setStruct();
 
-	std::vector<std::string>  * _request;
+	std::vector<std::string> _request;
 	int _newsocket;
 
 	int _port;

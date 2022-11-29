@@ -1,7 +1,9 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
+
 #include "general_includes.hpp"
+using namespace std;
 
 typedef struct	s_requestData
 {
@@ -30,7 +32,7 @@ int fileExist(std::string file_path);
 
 int isDirectory(std::string file_path);
 
-void	*ft_define_error(char *str);
+int	ft_define_error(string str);
 
 
 #endif
