@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   ft_read_file_ignoring_comments.cpp                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/25 18:29:58 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/25 18:41:47 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/30 14:31:16 by mateus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <fstream>
 
-// using namespace std;
+using namespace std;
 
 string	ft_read_file_ignoring_comments(ifstream	_configFile)
 {

@@ -1,6 +1,6 @@
 NAME = webserv
 SRCS = 	main.cpp \
-		Parser.cpp Server.cpp \
+		Parser.cpp Server.cpp Config.cpp\
 		ft_split.cpp \
 		Location.cpp \
 		ft_strcmp_fowardslash.cpp \

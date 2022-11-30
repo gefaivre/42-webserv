@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:03 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/29 15:33:53 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/30 14:47:16 by mateus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ using namespace std;
 class Config
 {
 private:
-	string				_key;
 	map<string, string> _cgi;
 	bool				_autoIndex;
 	string				_root;
@@ -30,6 +29,20 @@ private:
 public:
 	Config(/* args */);
 	~Config();
+
+	// Acessors:
+	void	addCgi(string key, string value);
+	map<string, string> getCgiMap(void);
+	string	getCgiValue(string key);
+
+	void	setAutoIndex(bool autoIndex);
+	bool	getAutoIndex(void);
+
+	void	setRoot(string root);
+	string	getRoot(void);
+
+	void 		setAcceptedMethods(t_methods methods);
+	t_methods	getAcceptedMethods();
 };
 
 

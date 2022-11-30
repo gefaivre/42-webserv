@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/29 15:22:39 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/30 14:23:08 by mateus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ void	Parser::getServerConf(void)
 				_currIdx += 2;
 			}
 		}
-		if (nextSemicolon < nextOpenBracket && nextSemicolon < nextClos << "*"eBracket)
+		if (nextSemicolon < nextOpenBracket && nextSemicolon < nextCloseBracket )
 		{
 			//Se tiver uma palavra antes temos uma directive;
 			//Se nao, temos um ; solto

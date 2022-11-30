@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:29:46 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/25 16:08:13 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/30 14:47:40 by mateus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,21 +17,22 @@
 #include <vector>
 #include "webserv.h"
 #include <map>
+#include "Config.hpp"
 
 #include "Location.hpp"
 
 using namespace std;
 
-class Server
+class Server: public Config
 {
 private:
 	int						_port;
 	vector<string>			_name;
-	bool					_autoIndex;
-	string					_root;
+	// bool					_autoIndex;
+	// string					_root;
 	int						_clientMaxBodySize;
-	string					_cgi;
-	t_methods				_acceptedMethods;
+	// string					_cgi;
+	// t_methods				_acceptedMethods;
 	map<string, Location>	_locations;
 		
 
@@ -48,20 +49,20 @@ public:
 	void			setName(vector<string> name);
 	vector<string>	getName(void);
 
-	void			setAutoIndex(bool autoIndex);
-	bool			getAutoIndex(void);
+	// void			setAutoIndex(bool autoIndex);
+	// bool			getAutoIndex(void);
 
-	void			setRoot(string root);
-	string			getRoot(void);
+	// void			setRoot(string root);
+	// string			getRoot(void);
 
 	void			setClientMaxBodySize(int clientMaxBodySize);
 	int				getClientMaxBodySize(void);
 
-	void			setCgi(string cgi);
-	string			getCgi(void);
+	// void			setCgi(string cgi);
+	// string			getCgi(void);
 
-	void 			setAcceptedMethods(t_methods methods);
-	t_methods		getAcceptedMethods();
+	// void 			setAcceptedMethods(t_methods methods);
+	// t_methods		getAcceptedMethods();
 
 
 	bool			locationExist(string key);

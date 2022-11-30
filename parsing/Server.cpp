@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/23 14:27:44 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/11/30 14:46:39 by mateus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,25 +38,25 @@ vector<string> Server::getName(void)
 	return (_name);
 }
 
-void Server::setAutoIndex(bool autoIndex)
-{
-	_autoIndex = autoIndex;
-}
+// void Server::setAutoIndex(bool autoIndex)
+// {
+// 	_autoIndex = autoIndex;
+// }
 
-bool	Server::getAutoIndex(void)
-{
-	return (_autoIndex);
-}
+// bool	Server::getAutoIndex(void)
+// {
+// 	return (_autoIndex);
+// }
 
-void	Server::setRoot(string root)
-{
-	_root = root;
-}
+// void	Server::setRoot(string root)
+// {
+// 	_root = root;
+// }
 
-string Server::getRoot(void)
-{
-	return (_root);
-}
+// string Server::getRoot(void)
+// {
+// 	return (_root);
+// }
 
 void	Server::setClientMaxBodySize(int clientMaxBodySize)
 {
@@ -68,25 +68,25 @@ int		Server::getClientMaxBodySize(void)
 	return (_clientMaxBodySize);
 }
 
-void 	Server::setCgi(string cgi)
-{
-	_cgi = cgi;
-}
+// void 	Server::setCgi(string cgi)
+// {
+// 	_cgi = cgi;
+// }
 
-string	Server::getCgi(void)
-{
-	return (_cgi);
-}
+// string	Server::getCgi(void)
+// {
+// 	return (_cgi);
+// }
 
-void	Server::setAcceptedMethods(t_methods methods)
-{
-	_acceptedMethods = methods;
-}
+// void	Server::setAcceptedMethods(t_methods methods)
+// {
+// 	_acceptedMethods = methods;
+// }
 
-t_methods	Server::getAcceptedMethods()
-{
-	return (_acceptedMethods);
-}
+// t_methods	Server::getAcceptedMethods()
+// {
+// 	return (_acceptedMethods);
+// }
 
 bool		Server::locationExist(string key)
 {
