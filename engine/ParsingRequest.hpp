@@ -29,6 +29,7 @@ class ParsingRequest
 
 
 		void parsingRequest();
+		int filepermission();
 
 		int foundFileToSend();
 

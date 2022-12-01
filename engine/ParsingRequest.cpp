@@ -52,7 +52,7 @@ ParsingRequest::~ParsingRequest()
 
 void ParsingRequest::parsingRequest()
 {
-	for(unsigned long int i = 0; i < /* _request.size() */ 1 ; i++)
+	for(unsigned long int i = 0; i < _request.size()  ; i++)
 	{
 		if (_request.size() > 0 && i == 0)
 		{
@@ -62,7 +62,22 @@ void ParsingRequest::parsingRequest()
 			_requestData.path = _request[i].substr(first, last - first);
 			_requestData.protocol = _request[i].substr(last + 1, _request[i].size());
 		}
+		// std::cout << "_request = " <<_request[i] << std::endl;
 	}
+}
+
+int ParsingRequest::filepermission()
+{
+	int fd;
+	std::cout << _requestData.fileToSend << std::endl;
+	fd = access(_requestData.fileToSend.c_str(), F_OK);
+	if (fd == -1)
+		_requestData.fileToSend = _path + "404.html";
+	fd = access(_requestData.fileToSend.c_str(), R_OK);
+	if (fd == -1)
+		_requestData.fileToSend = _path + "403.html";
+
+	return (0);
 }
 
 int ParsingRequest::foundFileToSend()
@@ -70,6 +85,8 @@ int ParsingRequest::foundFileToSend()
 	_requestData.fileToSend = _requestData.path ;
 	if (_requestData.fileToSend[0] == '/')
 		_requestData.fileToSend.erase(0, 1);
+	// std::cout << "file = " << _requestData.fileToSend[0] << std::endl;
+	// std::cout << "fileToSend = " << _requestData.fileToSend << std::endl;
 
 	_requestData.isIndex = 0;
 	
@@ -86,10 +103,9 @@ int ParsingRequest::foundFileToSend()
 	FILE *f = fopen(_requestData.fileToSend.c_str(), "r+");
 	if ( f == NULL)
 	{
-		//est-ce que la on met un message erreur ?
 		if (_autoindex == 1 && errno == 21)
 			return (1);
-		_requestData.fileToSend = _path + "404.html";
+		filepermission();
 	}
 	else
 		fclose(f);

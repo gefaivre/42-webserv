@@ -14,9 +14,9 @@ int isDirectory(string file_path)
 {
 
 	// cout << ">------------------isDirectory" << endl;
-	// cout << "file_path\t=\t" << file_path << endl;
 	if (file_path.size() > 0 && file_path[file_path.size() - 1] == '/')
 		file_path.erase(file_path.size() - 1);
+	// cout << "file_path\t=\t" << file_path << endl;
 
 	struct stat sb;
 	if (stat(file_path.c_str(), &sb) == -1)
@@ -25,7 +25,6 @@ int isDirectory(string file_path)
 		return (0);
 
 	}
-
 	if (S_ISDIR(sb.st_mode))
 	{
 		// cout << "<---------------End-isDirectory-2 (is a directory)" << endl;

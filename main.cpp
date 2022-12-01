@@ -25,14 +25,13 @@ int main(int ac, char **av)
 	for(;;)
 	{
 		socket.waitRequest();
-		socket.displayRequest();
+		// socket.displayRequest();
 
 		ParsingRequest parsingRequest(path, autoindex, socket.getRequest());
 
 		CreateResponse createResponse(path, autoindex, parsingRequest.getData());
 
 		socket.sendResponse(createResponse.getResponse());
-		return (0);
 	}
 }
 
