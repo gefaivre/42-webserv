@@ -99,7 +99,8 @@ void CreateResponse::fillHeaderData()
 		file += line;
 	}
 	myfile.close();
-
+	// std::time_t time_now = std::time(0);
+	// _headerData.date = time_now;
 	std::stringstream oui;
 	oui << file.size();
 	oui >> _headerData.contentLength;
@@ -112,7 +113,9 @@ void CreateResponse::createHeader()
 	_header += " ";
 	_header += _headerData.statusCode;
 	_header += " ";
-	_header += _headerData.statusMessage + "\r\n";
+	_header += _headerData.statusMessage;
+	_header += " ";
+	_header += _headerData.date + "\r\n";
 	// _header += "Content-Length: " + _headerData.contentLength + "\r\n";
 }
 

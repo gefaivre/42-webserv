@@ -7,7 +7,7 @@
 ParsingRequest::ParsingRequest(std::string path, bool autoindex, std::vector<std::string> request):
 _path(path), _autoindex(autoindex), _request(request)
 {
-
+	std::cout << autoindex << std::endl;
 	parsingRequest();
 	foundFileToSend();
 }
@@ -74,9 +74,8 @@ int ParsingRequest::filepermission()
 	if (fd == -1)
 		_requestData.fileToSend = _path + "404.html";
 	fd = access(_requestData.fileToSend.c_str(), R_OK);
-	if (fd == -1)
+	if (fd == -1 || _autoindex == 0)
 		_requestData.fileToSend = _path + "403.html";
-
 	return (0);
 }
 
@@ -97,6 +96,8 @@ int ParsingRequest::foundFileToSend()
 	}
 	else if (isDirectory(_path + _requestData.fileToSend))
 		_requestData.fileToSend = _path + "index.html";
+	else if (_autoindex == 0 && isDirectory(_path + _requestData.fileToSend) && !fileExist(_path + _requestData.fileToSend + "index.html"))
+		filepermission();
 	else
 		_requestData.fileToSend = _path + _requestData.fileToSend;
 
