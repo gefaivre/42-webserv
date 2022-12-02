@@ -6,7 +6,7 @@
 /*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/30 14:23:08 by mateus           ###   ########.fr       */
+/*   Updated: 2022/12/02 13:43:38 by mateus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,79 +65,66 @@ Parser::Parser(void)
 //TODO: remove space before ;
 //TODO: se fizermos a classe server e location herdarem da mesma classe base podemos criar uma funcao que aceita as duas usando polimorfismo.
 //TODO: ou podemos usar uma classe template
-void	Parser::getServerConf(void)
+
+void	Parser::parseEndOfContext(int i, int *level)
 {
-	int level = 0;
-	int i = 0;
-	Location	*location;
-
-	string sTarget = "server {";
-	Server	server = Server();
-	cout << "server:" << endl;
-	// _context.push("server");
-	level++;
-	_currIdx += sTarget.length() + 1;
-	while (level)
+	//Atencao: um server {} e valido?
+	//Se tiver uma palavra antes significa que falta um ;
+	if(i == 0)
+		cerr << "error: } invalid" << endl;
+	else
 	{
-		//Split this function:
-		size_t	nextOpenBracket = _content.find("{", _currIdx);
-		size_t	nextCloseBracket = _content.find("}",_currIdx);
-		size_t	nextSemicolon = _content.find(";", _currIdx);
+		*level = *level - 1;
+		_currIdx += 2;
+	}
+}
 
+Location *Parser::parseNewContext(size_t nextOpenBracket, Server *server, int *level)
+{
+	string		target = "location ";
+	int 		target_length = target.length();
+	Location *location = NULL;
+	int directive_value_start;
+	// checar se tem uma letra antes ex.: location
+	// Checar que tem a palavra location + 2 espacos. Pq o path vai ser variavel
+	if (_content.find(target, _currIdx) == _currIdx)
+	{
+		directive_value_start = _currIdx + target_length;
+		location = new Location(_content.substr(directive_value_start, nextOpenBracket - directive_value_start - 1));
+		server->addLocation(location);
+		cout << "	Location:" << location->getKey() << endl;
+		*level = *level + 1;
+	}
+	else
+		cerr << "error: { invalid" << endl;
+	_currIdx += (nextOpenBracket - _currIdx) + 2;
+	return (location);
+}
 
-		// cout << "current = ."<< _content.substr(_currIdx, 100)<< "." << endl;
-		if (nextOpenBracket < nextCloseBracket && nextOpenBracket < nextSemicolon)
-		{
-
-			string target = "location ";
-			
-			//checar se tem uma letra antes ex.: location
-			//Checar que tem a palavra location + 2 espacos. Pq o path vai ser variavel
-			if (_content.find(target, _currIdx) == _currIdx)
-			{
-				location = new Location(_content.substr(_currIdx + 9, nextOpenBracket - _currIdx - 10));
-				server.addLocation(location);
-				cout << "	Location:" << location->getKey() << endl;
-				level++;
-			}
-			else
-				cerr << "error: { invalid" << endl;
-			_currIdx += (nextOpenBracket - _currIdx) + 2;
-		}
-		if (nextCloseBracket < nextOpenBracket && nextCloseBracket < nextSemicolon)
-		{
-			//Atencao: um server {} e valido?
-			//Se tiver uma palavra antes significa que falta um ;
-			if(i == 0)
-				cerr << "error: } invalid" << endl;
-			else
-			{
-				level--;
-				_currIdx += 2;
-			}
-		}
-		if (nextSemicolon < nextOpenBracket && nextSemicolon < nextCloseBracket )
-		{
-			//Se tiver uma palavra antes temos uma directive;
+//TODO: colocar as funcoes set port e get port na classe location.
+// get port vai retornar a porta do server parent. set port vai dar gerar uma excessao.
+void	Parser::parseDirective(size_t nextSemiColon, Server *server, Location *location, int level)
+{
+	//Se tiver uma palavra antes temos uma directive;
 			//Se nao, temos um ; solto
 			// cout << "; found && " << _content[_currIdx + 1] << endl;
 			
-			if (_content[_currIdx + 1] == ';' || _currIdx == nextSemicolon)
+			if (_content[_currIdx + 1] == ';' || _currIdx == nextSemiColon)
 			{
 				cerr << "error: bad ;" << endl;
 				exit(1);
 			}
 			else
 			{
-				string directive = _content.substr(_currIdx, nextSemicolon - _currIdx);
+				string directive = _content.substr(_currIdx, nextSemiColon - _currIdx);
 				//Checar aqui o level. if level = 1 chamar a funcao que ajeita o location.
 				
 				//Tentar botar um limite nessa funcao find para nao percorrer toda a string
 				if (directive.find("listen ") == 0)
 				{
 					//Check if already have a port
-					server.setPort(atoi(directive.substr(7, directive.length() - 6).c_str()));
-					cout << "	Port:" << server.getPort() <<"." << endl;
+					server->setPort(atoi(directive.substr(7, directive.length() - 6).c_str()));
+					cout << "	Port:" << server->getPort() <<"." << endl;
 				}
 				else if (directive.find("server_name ") == 0)
 				{
@@ -149,8 +136,8 @@ void	Parser::getServerConf(void)
 					//Aqui precisamos de um split
 					// name.push_back(directive.substr(12, directive.length() - 11));
 					
-					server.setName(ft_split(directive.substr(12, directive.length() - 11), ' '));
-					// cout << "Server name:" <<  server._name <<"." << endl;
+					server->setName(ft_split(directive.substr(12, directive.length() - 11), ' '));
+					// cout << "Server name:" <<  server->_name <<"." << endl;
 				}
 				else if (directive.find("autoindex ") == 0)
 				{
@@ -166,7 +153,7 @@ void	Parser::getServerConf(void)
 						exit (1);
 					}
 					if (level == 1)
-						server.setAutoIndex(autoindex);
+						server->setAutoIndex(autoindex);
 					else if (level == 2)
 						location->setAutoIndex(autoindex);
 				}
@@ -174,8 +161,8 @@ void	Parser::getServerConf(void)
 				{
 					if (level == 1)
 					{
-						server.setRoot(directive.substr(5));
-						cout << "	Root: "<< server.getRoot() << endl;
+						server->setRoot(directive.substr(5));
+						cout << "	Root: "<< server->getRoot() << endl;
 					}
 					else if (level == 2)
 					{
@@ -186,7 +173,7 @@ void	Parser::getServerConf(void)
 				else if (directive.find("client_max_body_size ") == 0)
 				{
 					cout << "	Client_max_body_size: "<< directive.substr(21) << endl;
-					server.setClientMaxBodySize(atoi(directive.substr(21).c_str()));
+					server->setClientMaxBodySize(atoi(directive.substr(21).c_str()));
 				}
 				else if (directive.find("accepted_methods ") == 0)
 				{
@@ -210,13 +197,46 @@ void	Parser::getServerConf(void)
 						}
 					}
 					if (level == 1)
-						server.setAcceptedMethods(methods);
+						server->setAcceptedMethods(methods);
 					else if (level == 2)
 						location->setAcceptedMethods(methods);
 					cout << "	Accepted_methods: "<< directive.substr(17) << "." << endl;
 				}
-				_currIdx = nextSemicolon + 2;
+				_currIdx = nextSemiColon + 2;
 			}
+}
+
+void	Parser::getServerConf(void)
+{
+	int level = 0;
+	int i = 0;
+	Location	*location;
+
+	//TODO: veridicar que a primeira coisa que aparece é server {}
+	//TODO: criar um vetor de CONF, o primeiro eu vou fazer = new Server, depois vai ser com as locations
+	string sTarget = "server {";
+	Server	*server = new Server();
+	cout << "server:" << endl;
+	// _context.push("server");
+	level++;
+	_currIdx += sTarget.length() + 1;
+	while (level)
+	{
+		size_t next = _content.find_first_of("{};", _currIdx);
+		switch (_content[next])
+		{
+		case '{':
+			location = parseNewContext(next, server, &level);
+			break;
+		case '}':
+			parseEndOfContext(i, &level);
+			break;
+		case ';':
+			parseDirective(next, server, location, level);
+			break;
+		default:
+			// End of line
+			break;
 		}
 		i++;
 	}
