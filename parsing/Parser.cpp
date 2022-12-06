@@ -6,7 +6,7 @@
 /*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/02 13:43:38 by mateus           ###   ########.fr       */
+/*   Updated: 2022/12/05 14:06:34 by mateus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,13 +120,13 @@ void	Parser::parseDirective(size_t nextSemiColon, Server *server, Location *loca
 				//Checar aqui o level. if level = 1 chamar a funcao que ajeita o location.
 				
 				//Tentar botar um limite nessa funcao find para nao percorrer toda a string
-				if (directive.find("listen ") == 0)
+				if (ft_starts_with(directive, "listen "))
 				{
 					//Check if already have a port
 					server->setPort(atoi(directive.substr(7, directive.length() - 6).c_str()));
 					cout << "	Port:" << server->getPort() <<"." << endl;
 				}
-				else if (directive.find("server_name ") == 0)
+				else if (ft_starts_with(directive, "server_name "))
 				{
 					if (level > 1)
 					{
@@ -139,7 +139,7 @@ void	Parser::parseDirective(size_t nextSemiColon, Server *server, Location *loca
 					server->setName(ft_split(directive.substr(12, directive.length() - 11), ' '));
 					// cout << "Server name:" <<  server->_name <<"." << endl;
 				}
-				else if (directive.find("autoindex ") == 0)
+				else if (ft_starts_with(directive, "autoindex "))
 				{
 					bool	autoindex;
 					cout << "	Autoindex: " << directive.substr(10) << "."<< endl;
@@ -157,7 +157,7 @@ void	Parser::parseDirective(size_t nextSemiColon, Server *server, Location *loca
 					else if (level == 2)
 						location->setAutoIndex(autoindex);
 				}
-				else if (directive.find("root ") == 0)
+				else if (ft_starts_with(directive, "root "))
 				{
 					if (level == 1)
 					{
@@ -170,12 +170,12 @@ void	Parser::parseDirective(size_t nextSemiColon, Server *server, Location *loca
 						cout << "		Root: "<< location->getRoot() << endl;
 					}
 				}
-				else if (directive.find("client_max_body_size ") == 0)
+				else if (ft_starts_with(directive, "client_max_body_size "))
 				{
 					cout << "	Client_max_body_size: "<< directive.substr(21) << endl;
 					server->setClientMaxBodySize(atoi(directive.substr(21).c_str()));
 				}
-				else if (directive.find("accepted_methods ") == 0)
+				else if (ft_starts_with(directive, "accepted_methods "))
 				{
 					vector<string> acMethods = ft_split(directive.substr(17), ' ');
 					t_methods	methods;

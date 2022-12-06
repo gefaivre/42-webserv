@@ -8,6 +8,9 @@ SRCS = 	main.cpp \
 		ft_remove_double_spaces.cpp \
 		ft_wrap_in_spaces.cpp \
 		ft_wrap_brackets_in_spaces.cpp \
+		ft_strcmp.cpp \
+		ft_strncmp.cpp \
+		ft_starts_with.cpp
 
 OBJS_PATH = objects/
 OBJS = ${SRCS:.cpp=.o}
