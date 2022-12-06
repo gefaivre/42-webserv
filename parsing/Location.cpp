@@ -6,7 +6,7 @@
 /*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 14:08:38 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/30 14:43:46 by mateus           ###   ########.fr       */
+/*   Updated: 2022/12/06 14:05:03 by mateus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,32 @@ Location::~Location()
 string	Location::getKey(void)
 {
 	return (_key);
+}
+
+
+
+void	Location::setPort(int port)
+{
+	(void)port;
+	// _port = port;
+	// Simplesmente nao vai mudar a porta pois a porta é definido somente pelo server
+	// Throw an error
+}
+int		Location::getPort(void)
+{
+	return (_port);
+}
+
+void	Location::setName(vector<string> name)
+{
+	(void) name;
+	// _name = name;
+	// Simplesmente nao vai mudar o nome pois o nome é definido somente pelo server
+	// Throw an error
+}
+vector<string> Location::getName(void)
+{
+	return (_name);
 }
 
 // void	Location::addCgi(string key, string value)
