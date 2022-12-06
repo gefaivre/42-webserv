@@ -7,7 +7,7 @@
 ParsingRequest::ParsingRequest(std::string path, bool autoindex, std::vector<std::string> request):
 _path(path), _autoindex(autoindex), _request(request)
 {
-
+	std::cout << autoindex << std::endl;
 	parsingRequest();
 	foundFileToSend();
 }
@@ -52,7 +52,7 @@ ParsingRequest::~ParsingRequest()
 
 void ParsingRequest::parsingRequest()
 {
-	for(unsigned long int i = 0; i < /* _request.size() */ 1 ; i++)
+	for(unsigned long int i = 0; i < _request.size()  ; i++)
 	{
 		if (_request.size() > 0 && i == 0)
 		{
@@ -62,7 +62,21 @@ void ParsingRequest::parsingRequest()
 			_requestData.path = _request[i].substr(first, last - first);
 			_requestData.protocol = _request[i].substr(last + 1, _request[i].size());
 		}
+		// std::cout << "_request = " <<_request[i] << std::endl;
 	}
+}
+
+int ParsingRequest::filepermission()
+{
+	int fd;
+	std::cout << _requestData.fileToSend << std::endl;
+	fd = access(_requestData.fileToSend.c_str(), F_OK);
+	if (fd == -1)
+		_requestData.fileToSend = _path + "404.html";
+	fd = access(_requestData.fileToSend.c_str(), R_OK);
+	if (fd == -1 || _autoindex == 0)
+		_requestData.fileToSend = _path + "403.html";
+	return (0);
 }
 
 int ParsingRequest::foundFileToSend()
@@ -70,6 +84,8 @@ int ParsingRequest::foundFileToSend()
 	_requestData.fileToSend = _requestData.path ;
 	if (_requestData.fileToSend[0] == '/')
 		_requestData.fileToSend.erase(0, 1);
+	// std::cout << "file = " << _requestData.fileToSend[0] << std::endl;
+	// std::cout << "fileToSend = " << _requestData.fileToSend << std::endl;
 
 	_requestData.isIndex = 0;
 	
@@ -80,6 +96,8 @@ int ParsingRequest::foundFileToSend()
 	}
 	else if (isDirectory(_path + _requestData.fileToSend))
 		_requestData.fileToSend = _path + "index.html";
+	else if (_autoindex == 0 && isDirectory(_path + _requestData.fileToSend) && !fileExist(_path + _requestData.fileToSend + "index.html"))
+		filepermission();
 	else
 		_requestData.fileToSend = _path + _requestData.fileToSend;
 
@@ -88,7 +106,7 @@ int ParsingRequest::foundFileToSend()
 	{
 		if (_autoindex == 1 && errno == 21)
 			return (1);
-		_requestData.fileToSend = _path + "404.html";
+		filepermission();
 	}
 	else
 		fclose(f);

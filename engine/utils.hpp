@@ -2,11 +2,9 @@
 #define UTILS_HPP
 
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string>
-	
+#include "general_includes.hpp"
+using namespace std;
+
 typedef struct	s_requestData
 {
 	std::string methode;
@@ -25,7 +23,7 @@ typedef struct	s_headerData
 	std::string statusMessage;
 	std::string contentLength;
 	std::string contentType;
-
+	// std::string	date;
 }				t_headerData;
 
 
@@ -33,5 +31,8 @@ typedef struct	s_headerData
 int fileExist(std::string file_path);
 
 int isDirectory(std::string file_path);
+
+int	ft_define_error(string str);
+
 
 #endif

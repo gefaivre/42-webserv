@@ -27,6 +27,13 @@ _path(path), _autoindex(autoindex), _requestData(requestData)
 
 CreateResponse::~CreateResponse()
 {
+	// delete [] _headerData.protocol;
+	// _headerData.protocol.delete();
+	// _headerData.statusCode.clear();
+	// _headerData.statusMessage.clear();
+	// _headerData.contentLength.clear();
+	_headerData.contentType.erase();
+	_header.clear();
 }
 
 
@@ -69,7 +76,6 @@ void CreateResponse::fillHeaderData()
 	{
 		_headerData.statusCode = "404";
 		_headerData.statusMessage = "Not Found";
-
 	}
 	else
 	{
@@ -93,7 +99,8 @@ void CreateResponse::fillHeaderData()
 		file += line;
 	}
 	myfile.close();
-
+	// std::time_t time_now = std::time(0);
+	// _headerData.date = time_now;
 	std::stringstream oui;
 	oui << file.size();
 	oui >> _headerData.contentLength;
@@ -106,7 +113,9 @@ void CreateResponse::createHeader()
 	_header += " ";
 	_header += _headerData.statusCode;
 	_header += " ";
-	_header += _headerData.statusMessage + "\r\n";
+	_header += _headerData.statusMessage;
+	_header += " ";
+	_header += _headerData.date + "\r\n";
 	// _header += "Content-Length: " + _headerData.contentLength + "\r\n";
 }
 
@@ -155,6 +164,8 @@ void CreateResponse::BodyIsIndex()
 	struct dirent *ent;
 
 	dir = opendir (_requestData.fileToSend.c_str());
+	if (dir == NULL)
+		ft_define_error("Error while opening the directory");
 	while ((ent = readdir (dir)) != NULL)
 	{
 		std::string file(ent->d_name);
@@ -163,8 +174,8 @@ void CreateResponse::BodyIsIndex()
 		
 		_body += ("<a href= \"" + file + "\">" + file + "</a></br>\n\r");
 	}
-	closedir (dir);
-
+	if (closedir(dir) == -1)
+		ft_define_error("Error while closing the directory");
 	_body += "</h1>\n";
 	_body += "<hr>\n<p>Webserv/1.0</p>\n</body>";
 	_body += "\n\r";

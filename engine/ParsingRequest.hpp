@@ -1,13 +1,8 @@
 #ifndef PARSINGREQUEST_HPP
 # define PARSINGREQUEST_HPP
 
-# include <iostream>
-# include <string>
-
 # include "utils.hpp"
-# include <vector>
-# include <cstdio>
-# include <cerrno>
+#include "general_includes.hpp"
 
 class ParsingRequest
 {
@@ -34,6 +29,7 @@ class ParsingRequest
 
 
 		void parsingRequest();
+		int filepermission();
 
 		int foundFileToSend();
 

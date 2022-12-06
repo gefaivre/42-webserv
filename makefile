@@ -9,18 +9,23 @@ SRC=	main.cpp \
 
 INC =	engine/Socket.hpp \
 		engine/CreateResponse.hpp \
-		engine/ParsingRequest.hpp 
+		engine/ParsingRequest.hpp \
+		engine/utils.hpp \
+		engine/general_includes.hpp
 
 CXX=c++
 
 CXXFLAGS= -Wall -Wextra -Werror -g3 -std=c++98
 
 OBJ=$(SRC:.c=.o)
-	
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INC)
+
 all: $(NAME)
 
 $(NAME): $(OBJ) 
-	${CXX} $(CXXFLAGS) -o $(NAME) $(OBJ) $(INC)
+	${CXX} $(CXXFLAGS) $(OBJ) -o $(NAME)
 	@echo [$(NAME)]: Created !
 
 clean:

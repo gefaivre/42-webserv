@@ -1,30 +1,8 @@
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
 
-#include <netinet/in.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-
-
-
-#include <unistd.h>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <map>
-#include <fstream>
-#include <sstream>
-
-#include <cerrno>
-
 #include "utils.hpp"
-
-
-
-
+#include "general_includes.hpp"
 
 class Socket
 {
