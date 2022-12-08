@@ -9,8 +9,9 @@ qui reçoit une requete avec un host qui correspond pas à son port d'écoute
 (par exemple tu reçois une requete pour example.org mais la config définit que example.org est 
 defini est servi sur le port 1234) alors tu dois pouvoir envoyer une réponse qui redirige vers 
 le bon port (check 301)
+=> Ds ton serveur s'il y a une connection bonjour tu redirige sur aurevoir
+=> gérer le 301
 
-
-Questions : 
-☐ Est-ce qu'on doit faire un fichier .htaccess ?
-☐ Est-ce qu'on ne doit pas mettre la date ?
+Questions :
+N Est-ce qu'on doit faire un fichier .htaccess ?
+Y Est-ce qu'on ne doit pas mettre la date ?

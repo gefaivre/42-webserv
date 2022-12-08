@@ -4,7 +4,7 @@ SRC=	main.cpp \
 		engine/utils.cpp \
 		engine/Socket.cpp \
 		engine/CreateResponse.cpp \
-		engine/ParsingRequest.cpp 
+		engine/ParsingRequest.cpp
 
 
 INC =	engine/Socket.hpp \
