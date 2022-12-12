@@ -7,13 +7,17 @@
 CreateResponse::CreateResponse(std::string path, bool autoindex, t_requestData requestData):
 _path(path), _autoindex(autoindex), _requestData(requestData)
 {
-	fillHeaderData();
-
-	createHeader();
-
-	createBody();
-
-	joinHeaderBody();
+	if (_requestData.methode == "GET")
+	{
+		fillHeaderData();
+		createHeader();
+		createBody();
+		joinHeaderBody();
+	}
+	else if (_requestData.methode == "POST")
+	{
+		collectData();
+	}
 }
 
 // CreateResponse::CreateResponse( const CreateResponse & src )
@@ -60,6 +64,11 @@ CreateResponse::~CreateResponse()
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
+
+void CreateResponse::collectData()
+{
+	std::cout << "stu" << std::endl;
+}
 
 void CreateResponse::fillFilesExtension()
 {

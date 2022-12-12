@@ -37,6 +37,8 @@ class CreateResponse
 		std::vector<std::string> _responseHeader;
 		std::map<std::string, std::string> _switchFilesExtension;
 
+		//POST METHOD
+		void collectData();
 
 		void createAndSendResponse();
 		void fillFilesExtension();
