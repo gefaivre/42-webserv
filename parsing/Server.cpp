@@ -6,7 +6,7 @@
 /*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/06 14:03:33 by mateus           ###   ########.fr       */
+/*   Updated: 2022/12/08 14:32:29 by mateus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,4 +118,14 @@ Location	Server::getLocationByPath(string path)
 			loc = it->second;
 	}
 	return loc;
+}
+
+
+void	Server::setupLocations()
+{
+	map<string, Location>::iterator iter;
+	for (iter = _locations.begin(); iter != _locations.end(); iter++)
+	{
+		iter->second.beSetup(this);
+	}
 }

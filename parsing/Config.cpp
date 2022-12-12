@@ -6,7 +6,7 @@
 /*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/30 15:53:13 by mateus           ###   ########.fr       */
+/*   Updated: 2022/12/09 13:02:26 by mateus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,17 @@
 
 Config::Config()
 {
+	_wasSet = new vector<string>();
 }
 
 Config::~Config()
 {
+	delete _wasSet;
 }
 
 void	Config::addCgi(string key, string value)
 {
+	_wasSet->push_back("cgi");
 	if (_cgi.find(key) != _cgi.end())
 		cerr << "This cgi is already been handled by: " << _cgi[key] << endl;
 	else
@@ -43,6 +46,7 @@ string	Config::getCgiValue(string key)
 
 void Config::setAutoIndex(bool autoIndex)
 {
+	_wasSet->push_back("autoIndex");
 	_autoIndex = autoIndex;
 }
 
@@ -53,6 +57,7 @@ bool	Config::getAutoIndex(void)
 
 void	Config::setRoot(string root)
 {
+	_wasSet->push_back("root");
 	_root = root;
 }
 
@@ -63,6 +68,7 @@ string Config::getRoot(void)
 
 void	Config::setAcceptedMethods(t_methods methods)
 {
+	_wasSet->push_back("acceptedMethods");
 	_acceptedMethods = methods;
 }
 
