@@ -29,7 +29,7 @@ int main(int ac, char **av)
 
 		ParsingRequest parsingRequest(path, autoindex, socket.getRequest());
 
-		CreateResponse createResponse(path, autoindex, parsingRequest.getData());
+		CreateResponse createResponse(path, autoindex, parsingRequest.getData(), socket._newsocket);
 
 		socket.sendResponse(createResponse.getResponse());
 	}

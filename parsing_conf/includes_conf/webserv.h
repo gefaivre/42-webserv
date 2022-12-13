@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/18 14:02:30 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/18 14:04:51 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/12/13 15:47:23 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 using namespace std;
 
 vector<string>	ft_split(string str, char c);
+
+char **ft_split(char *str);
 
 #endif
 

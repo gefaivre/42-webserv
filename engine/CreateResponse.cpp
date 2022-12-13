@@ -1,22 +1,21 @@
 #include "CreateResponse.hpp"
 
+
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-CreateResponse::CreateResponse(std::string path, bool autoindex, t_requestData requestData):
+CreateResponse::CreateResponse(std::string path, bool autoindex, t_requestData requestData, int newsocket):
 _path(path), _autoindex(autoindex), _requestData(requestData)
 {
-	if (_requestData.methode == "GET")
-	{
 		fillHeaderData();
 		createHeader();
 		createBody();
 		joinHeaderBody();
-	}
-	else if (_requestData.methode == "POST")
+	if (_requestData.methode == "POST")
 	{
-		collectData();
+		// std::cout << "new socket = " << newsocket << std::endl;
+		collectData(newsocket);
 	}
 }
 
@@ -65,9 +64,35 @@ CreateResponse::~CreateResponse()
 ** --------------------------------- METHODS ----------------------------------
 */
 
-void CreateResponse::collectData()
+char **define_env_cgi()
 {
-	std::cout << "stu" << std::endl;
+	char **cgienv;
+	ft_split("last_name=jbach GATEWAY_INTERFACE=CGI/1.1 PATH_INFO=/website/sendDatas/data.php REQUEST_METHOD=POST SCRIPT_FILENAME=./website/sendDatas/data.php SERVER_PROTOCOL=HTTP/1.1 REDIRECT_STATUS=200 CONTENT_TYPE=application/x-www-form-urlencoded CONTENT_LENGTH=11 /usr/bin/php-cgi";
+
+	return (cgienv);
+}
+
+void CreateResponse::collectData(int newsocket)
+{
+	std::cout << "post method" << std::endl;
+	int cgiPipe[2];
+	int nReponse;
+	if (pipe(cgiPipe))
+		perror("error from pipe cgi");
+	int cgiPid = fork();
+	ft_split()
+	if (cgiPid == 0)
+	{
+		close(cgiPipe[1]);
+		dup2(cgiPipe[0], newsocket);
+		dup2(nReponse, newsocket);
+		if (execve("/usr/bin/php-cgi", NULL, cgienv))
+	}
+	// else
+	// {
+
+	// }
+
 }
 
 void CreateResponse::fillFilesExtension()
@@ -94,7 +119,7 @@ void CreateResponse::fillHeaderData()
 	std::string type = _requestData.fileToSend.substr(_requestData.fileToSend.find('.') + 1, _requestData.fileToSend.size());
 	_headerData.contentType = _switchFilesExtension[type];
 	if (_headerData.contentType.size() == 0)
-		_headerData.contentType = _switchFilesExtension["default"];
+		_headerData.contentType = _swiaCGIEnvtchFilesExtension["default"];
 
 	std::string file;
 	std::string line;

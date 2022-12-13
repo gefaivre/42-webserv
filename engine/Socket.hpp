@@ -22,6 +22,7 @@ public:
 	int getPort() const;
 
 	std::vector<std::string> getRequest() const;
+	int _newsocket;
 
 private:
 	Socket();
@@ -30,7 +31,6 @@ private:
 	void setStruct();
 
 	std::vector<std::string> _request;
-	int _newsocket;
 
 	int _port;
 	int _sockfd;

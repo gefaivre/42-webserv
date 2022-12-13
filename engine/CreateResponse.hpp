@@ -3,6 +3,7 @@
 
 # include "utils.hpp"
 #include "general_includes.hpp"
+#include "Socket.hpp"
 
 
 class CreateResponse
@@ -10,7 +11,7 @@ class CreateResponse
 
 	public:
 
-		CreateResponse(std::string path, bool autoindex, t_requestData requestData);
+		CreateResponse(std::string path, bool autoindex, t_requestData requestData, int newsocket);
 
 		// CreateResponse( CreateResponse const & src );
 		~CreateResponse();
@@ -38,7 +39,7 @@ class CreateResponse
 		std::map<std::string, std::string> _switchFilesExtension;
 
 		//POST METHOD
-		void collectData();
+		void collectData(int newsocket);
 
 		void createAndSendResponse();
 		void fillFilesExtension();
@@ -46,6 +47,7 @@ class CreateResponse
 
 		void createHeader();
 		std::string _header;
+		char **ft_split(char *str);
 
 		void createBody();
 		void BodyIsNotIndex();

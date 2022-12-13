@@ -23,9 +23,13 @@ le bon port (check 301)
 => Ds ton serveur s'il y a une connection bonjour tu redirige sur aurevoir
 => gérer le 301
 
+pour POST :
+juste on balance le body dans l'entree standard du processus CGI
+
 pour cgi :
 echo "datas=hello" | last_name=fleger GATEWAY_INTERFACE=CGI/1.1 
-PATH_INFO=/website/sendDatas/data.php REQUEST_METHOD=POST SCRIPT_FILENAME=./website/sendDatas/data.php SERVER_PROTOCOL=HTTP/1.1 REDIRECT_STATUS=200 CONTENT_TYPE=application/x-www-form-urlencoded CONTENT_LENGTH=11 /usr/bin/php-cgi
+PATH_INFO=/website/sendDatas/data.php REQUEST_METHOD=POST SCRIPT_FILENAME=./website/sendDatas/data.php 
+SERVER_PROTOCOL=HTTP/1.1 REDIRECT_STATUS=200 CONTENT_TYPE=application/x-www-form-urlencoded CONTENT_LENGTH=11 /usr/bin/php-cgi
 
 Questions :
 N Est-ce qu'on doit faire un fichier .htaccess ?

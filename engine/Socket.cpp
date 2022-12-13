@@ -84,7 +84,6 @@ void Socket::waitRequest()
 	_newsocket = accept(_sockfd, (struct sockaddr *)&_addr, &addrlen);
 	if (_newsocket == -1) //handle errors (This call returns a non-negative descriptor on success, otherwise it returns -1 on error)
 		ft_define_error("Error the connection with the socket was not established");
-	
 	char a[1] = {0};
 	std::string buf;
 	_request.clear();
