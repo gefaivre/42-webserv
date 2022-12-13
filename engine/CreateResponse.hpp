@@ -6,6 +6,8 @@
 #include "Socket.hpp"
 
 
+char **ft_split(char *str);
+
 class CreateResponse
 {
 
@@ -47,7 +49,6 @@ class CreateResponse
 
 		void createHeader();
 		std::string _header;
-		char **ft_split(char *str);
 
 		void createBody();
 		void BodyIsNotIndex();

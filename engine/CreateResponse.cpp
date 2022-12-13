@@ -8,10 +8,10 @@
 CreateResponse::CreateResponse(std::string path, bool autoindex, t_requestData requestData, int newsocket):
 _path(path), _autoindex(autoindex), _requestData(requestData)
 {
-		fillHeaderData();
-		createHeader();
-		createBody();
-		joinHeaderBody();
+	fillHeaderData();
+	createHeader();
+	createBody();
+	joinHeaderBody();
 	if (_requestData.methode == "POST")
 	{
 		// std::cout << "new socket = " << newsocket << std::endl;
@@ -64,32 +64,43 @@ CreateResponse::~CreateResponse()
 ** --------------------------------- METHODS ----------------------------------
 */
 
-char **define_env_cgi()
-{
-	char **cgienv;
-	ft_split("last_name=jbach GATEWAY_INTERFACE=CGI/1.1 PATH_INFO=/website/sendDatas/data.php REQUEST_METHOD=POST SCRIPT_FILENAME=./website/sendDatas/data.php SERVER_PROTOCOL=HTTP/1.1 REDIRECT_STATUS=200 CONTENT_TYPE=application/x-www-form-urlencoded CONTENT_LENGTH=11 /usr/bin/php-cgi";
-
-	return (cgienv);
-}
 
 void CreateResponse::collectData(int newsocket)
 {
-	std::cout << "post method" << std::endl;
+	std::cout << "post method!" << std::endl;
 	int cgiPipe[2];
-	int nReponse;
+	int nReponse = 0;
 	if (pipe(cgiPipe))
 		perror("error from pipe cgi");
+			
+
 	int cgiPid = fork();
-	ft_split()
+
+
 	if (cgiPid == 0)
 	{
+		//child
+		char **cgienvs = ft_split((char *)"last_name=jbach GATEWAY_INTERFACE=CGI/1.1 PATH_INFO=/website/sendDatas/data.php REQUEST_METHOD=POST SCRIPT_FILENAME=./website/sendDatas/data.php SERVER_PROTOCOL=HTTP/1.1 REDIRECT_STATUS=200 CONTENT_TYPE=application/x-www-form-urlencoded CONTENT_LENGTH=11 /usr/bin/php-cgi");
+		char *args[]= {(char *)"/usr/bin/php-cgi", NULL};
 		close(cgiPipe[1]);
 		dup2(cgiPipe[0], newsocket);
 		dup2(nReponse, newsocket);
-		if (execve("/usr/bin/php-cgi", NULL, cgienv))
+		if (execve(args[0], args, cgienvs))
+		{
+			/* unable to execute CGI... */
+    		perror("error execve cgi");
+		// sendString(nRemote,
+		//     "HTTP/1.1 200 OK\r\n"
+		//     "Content-length: 97\r\n"
+		//     "Content-Type: text/html\r\n\r\n"
+		//     "<!doctype html><html><head><title>CGI Error</title></head><body><h1>CGI Error.</h1></body></html>\r\n"
+			// return ;
+		}
 	}
-	// else
+	// else if (cgiPid > 0)
 	// {
+	// 	//parent
+	// 	close(cgiPid[0]);
 
 	// }
 
@@ -119,7 +130,7 @@ void CreateResponse::fillHeaderData()
 	std::string type = _requestData.fileToSend.substr(_requestData.fileToSend.find('.') + 1, _requestData.fileToSend.size());
 	_headerData.contentType = _switchFilesExtension[type];
 	if (_headerData.contentType.size() == 0)
-		_headerData.contentType = _swiaCGIEnvtchFilesExtension["default"];
+		_headerData.contentType = _switchFilesExtension["default"];
 
 	std::string file;
 	std::string line;

@@ -93,9 +93,8 @@ void Socket::waitRequest()
 	{
 		if (tmp_recv == -1)
 			ft_define_error("Error with the message from a socket");
-		
 		buf += a[0];
-		if (a[0] == '\n' )
+		if (a[0] == '\n')
 		{
 			buf.erase(buf.find("\r\n") ,buf.size());
 			_request.push_back(buf);
@@ -103,7 +102,6 @@ void Socket::waitRequest()
 			if (_request[_request.size() - 1].size() == 0 )
 				break;
 		}
-		
 	}	
 }
 
