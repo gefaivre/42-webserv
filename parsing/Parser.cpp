@@ -6,7 +6,7 @@
 /*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/08 14:44:23 by mateus           ###   ########.fr       */
+/*   Updated: 2022/12/12 14:05:38 by mateus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ void	Parser::parseDirective(size_t nextSemiColon, vector<Config *> conf)
 			
 }
 
-void	Parser::getServerConf(void)
+Server	*Parser::getServerConf(void)
 {
 	int i = 0;
 
@@ -161,10 +161,12 @@ void	Parser::getServerConf(void)
 		i++;
 	}
 	server->setupLocations();
+	return (server);
 }
 
 Parser::Parser(char *configName)
 {
+	vector<Server *> servers;
 	_currIdx = 1;
 	_configFile.open(configName);
 	if (!_configFile.is_open())
@@ -174,7 +176,7 @@ Parser::Parser(char *configName)
 	}
 	prepareLine();
 	while (_content.find("server {", _currIdx) == _currIdx)
-		getServerConf();
+		servers.push_back(getServerConf());
 	
 }
 

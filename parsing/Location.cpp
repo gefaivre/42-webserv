@@ -6,7 +6,7 @@
 /*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 14:08:38 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/09 13:19:31 by mateus           ###   ########.fr       */
+/*   Updated: 2022/12/12 14:05:23 by mateus           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,57 +66,6 @@ int		Location::getClientMaxBodySize(void)
 {
 	return (_clientMaxBodySize);
 }
-
-// void	Location::addCgi(string key, string value)
-// {
-// 	if (_cgi.find(key) != _cgi.end())
-// 		cerr << "This cgi is already been handled by: " << _cgi[key] << endl;
-// 	else
-// 		_cgi[key] = value;
-// }
-
-// map<string, string> Location::getCgiMap(void)
-// {
-// 	return (_cgi);
-// }
-
-// string	Location::getCgiValue(string key)
-// {
-// 	if (_cgi.find(key) != _cgi.end())
-// 		return (_cgi[key]);
-// 	else
-// 		return (NULL);
-// }
-
-// void Location::setAutoIndex(bool autoIndex)
-// {
-// 	_autoIndex = autoIndex;
-// }
-
-// bool	Location::getAutoIndex(void)
-// {
-// 	return (_autoIndex);
-// }
-
-// void	Location::setRoot(string root)
-// {
-// 	_root = root;
-// }
-
-// string Location::getRoot(void)
-// {
-// 	return (_root);
-// }
-
-// void	Location::setAcceptedMethods(t_methods methods)
-// {
-// 	_acceptedMethods = methods;
-// }
-
-// t_methods	Location::getAcceptedMethods()
-// {
-// 	return (_acceptedMethods);
-// }
 
 void Location::beSetup(Server *server)
 {
