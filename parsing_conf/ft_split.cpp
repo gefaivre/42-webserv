@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/18 13:42:55 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/13 17:24:43 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/12/14 16:52:45 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ vector<string>	ft_split(string str, char c)
 	return (arr);
 }
 
-char **ft_split(char *str)
+char **ft_split(const char *str)
 {
 	vector<string> arr = ft_split(str, ' ');
 	char **result = (char **) malloc(sizeof(char *) * arr.size());

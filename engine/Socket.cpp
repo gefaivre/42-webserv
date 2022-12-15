@@ -88,19 +88,36 @@ void Socket::waitRequest()
 	std::string buf;
 	_request.clear();
 	ssize_t tmp_recv;
-	
+	int size = 0;
 	while ((tmp_recv = recv(_newsocket, a, 1, 0))) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
 	{
+		std::cout << "test4" << std::endl;
 		if (tmp_recv == -1)
 			ft_define_error("Error with the message from a socket");
 		buf += a[0];
 		if (a[0] == '\n')
 		{
+			const char *c = std::strstr(buf.c_str(), "Content-Length: ");
+			std::cout << "size =" << size << std::endl;
+			if (c && size == 0)
+			{
+				char **len_split = ft_split(c);
+				size = atoi(len_split[1]);
+			}
+			std::cout << "test" << std::endl;
 			buf.erase(buf.find("\r\n") ,buf.size());
+			std::cout << "test1" << std::endl;
 			_request.push_back(buf);
+			std::cout << "test2" << std::endl;
 			buf.clear();
-			if (_request[_request.size() - 1].size() == 0 )
+			std::cout << "test3" << std::endl;
+			if (size == 0 && _request[_request.size() - 1].size() == 0)
+			{
+				std::cout << "salit" << std::endl;
 				break;
+			}
+			if (size)
+				size--;
 		}
 	}	
 }

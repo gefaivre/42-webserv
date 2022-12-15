@@ -4,6 +4,8 @@
 #include "utils.hpp"
 #include "general_includes.hpp"
 
+char **ft_split(const char *str);
+
 class Socket
 {
 
