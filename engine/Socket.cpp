@@ -91,35 +91,44 @@ void Socket::waitRequest()
 	int size = 0;
 	while ((tmp_recv = recv(_newsocket, a, 1, 0))) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
 	{
-		std::cout << "test4" << std::endl;
+		// std::cout << "test4" << std::endl;
+		// std::cout << "buf defo = " << buf << std::endl;
 		if (tmp_recv == -1)
 			ft_define_error("Error with the message from a socket");
 		buf += a[0];
-		if (a[0] == '\n')
+		if (a[0] == '\n' || a[0] == '\0')
 		{
-			const char *c = std::strstr(buf.c_str(), "Content-Length: ");
-			std::cout << "size =" << size << std::endl;
+			const char *c = strstr(buf.c_str(), "Content-Length: ");
+			std::cout << "size = " << size << "---" << "buf = " << buf << std::endl;
 			if (c && size == 0)
 			{
 				char **len_split = ft_split(c);
 				size = atoi(len_split[1]);
+				// std::cout << "size =" << size << std::endl;
 			}
-			std::cout << "test" << std::endl;
+			// std::cout << "test" << std::endl;
 			buf.erase(buf.find("\r\n") ,buf.size());
-			std::cout << "test1" << std::endl;
+			// std::cout << "test1" << std::endl;
+			// std::cout << "AVANT" << a[0] << "---" <<buf << std::endl;
 			_request.push_back(buf);
-			std::cout << "test2" << std::endl;
+			// std::cout << "APRES" << a[0] << "---" <<buf << std::endl;
+			// std::cout << "test2" << std::endl;
 			buf.clear();
-			std::cout << "test3" << std::endl;
-			if (size == 0 && _request[_request.size() - 1].size() == 0)
+			// std::cout << "test3" << std::endl;
+			if (_request[_request.size() - 1].size() == 0 && _request[_request.size() - 1] != "\n")
 			{
-				std::cout << "salit" << std::endl;
+				std::cout << "reuqes = ."<< _request[_request.size() - 1] << "."<< std::endl;
 				break;
 			}
 			if (size)
 				size--;
 		}
-	}	
+		// std::cout<< "a = ." <<a[0]  << "."<< std::endl;
+	}
+	// for (int i = 0; _request[i] != "\0"; i++)
+	// {
+
+	// }
 }
 
 
