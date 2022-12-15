@@ -91,7 +91,6 @@ void Socket::waitRequest()
 	int size = -1;
 	int tmp_switch = 0;
 	bool method_get = false;
-	//et pour get, il ne faut pas de tmp_switch
 	while ((tmp_recv = recv(_newsocket, a, 1, 0))) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
 	{
 		if (tmp_recv == -1)
