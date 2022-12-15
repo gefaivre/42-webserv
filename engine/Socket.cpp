@@ -90,61 +90,43 @@ void Socket::waitRequest()
 	ssize_t tmp_recv;
 	int size = -1;
 	int tmp_switch = 0;
-	//2 pb : pas de \n  la fin et pour get, il ne faut pas de tmp_switch
+	bool method_get = false;
+	//et pour get, il ne faut pas de tmp_switch
 	while ((tmp_recv = recv(_newsocket, a, 1, 0))) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
 	{
-		// std::cout << "test4" << std::endl;
-		// std::cout << "buf defo = " << buf << std::endl;
 		if (tmp_recv == -1)
 			ft_define_error("Error with the message from a socket");
 		buf += a[0];
-		// std::cout << "a[0] = ." << buf << "." << "tmp_switcj = " << tmp_switch<< std::endl;
 		if (a[0] == '\n' || size == 0)
 		{
-			// std::cout << "buf = ." << buf << "."<< std::endl;
+			//find the size of the body
 			const char *c = strstr(buf.c_str(), "Content-Length: ");
-
-			// std::cout << "size = " << size << "---" << "buf = " << buf << std::endl;
 			if (c && size == -1)
 			{
 				char **len_split = ft_split(c);
 				size = atoi(len_split[1]);
-				std::cout << c << "size = " << size<< std::endl;
-				// std::cout << "size =" << size << std::endl;
 			}
-			// std::cout << "before = "<< buf << std::endl;
+			//find the method
+			if (method_get == false && strstr(buf.c_str(), "GET"))
+				method_get = true;
 			if (a[0] == '\n')
 				buf.erase(buf.find("\r\n") ,buf.size());
-			// std::cout << "after = "<< buf << std::endl;
-			// std::cout << "test1" << std::endl;
-			// std::cout << "AVANT" << a[0] << "---" <<buf << std::endl;
 			_request.push_back(buf);
-			// std::cout << "APRES" << a[0] << "---" <<buf << std::endl;
-			// std::cout << "test2" << std::endl;
 			buf.clear();
-			// std::cout << "test3" << std::endl;
 			if (_request[_request.size() - 1].size() == 0 || size == 0)
 			{
-				// std::cout << "reuqes = ."<< _request[_request.size() - 1] << "."<< std::endl;
-				std::cout << "*" << std::endl;
-				if (tmp_switch == 1)
+				if (tmp_switch == 1 || method_get)
 				{
+					tmp_switch = 0;
 					break;
 				}
 				tmp_switch = 1;
 			}
 		}
-		// std::cout << "size = " << size << "tmp_switch = " << tmp_switch  << std::endl;
 		if (size > 0 && tmp_switch == 1)
 			size--;
 		std::cout << a[0];
-		// std::cout << "buf = ." << buf << "." << std::endl;
-		// std::cout<< "a = ." << a[0]  << "."<< std::endl;
 	}
-	// for (int i = 0; _request[i] != "\0"; i++)
-	// {
-
-	// }
 }
 
 
