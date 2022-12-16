@@ -77,7 +77,8 @@ void epolling(Socket socket)
 
 			ParsingRequest parsingRequest(path, autoindex, socket.getRequest());
 
-			CreateResponse createResponse(path, autoindex, parsingRequest.getData());
+			// CreateResponse createResponse(path, autoindex, parsingRequest.getData());
+			CreateResponse createResponse(path, autoindex, parsingRequest.getData(), socket._newsocket);
 
 			sleep(2);
 

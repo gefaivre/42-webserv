@@ -4,6 +4,8 @@
 #include "utils.hpp"
 #include "general_includes.hpp"
 
+char **ft_split(const char *str);
+
 class Socket
 {
 
@@ -23,6 +25,7 @@ public:
 	int getSocketFd() const;
 
 	std::vector<std::string> getRequest() const;
+	int _newsocket;
 
 private:
 	Socket();
@@ -32,7 +35,6 @@ private:
 	void setStruct();
 
 	std::vector<std::string> _request;
-	int _newsocket;
 
 	int _port;
 	int _sockfd;
