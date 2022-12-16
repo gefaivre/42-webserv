@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:29:46 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/30 14:47:40 by mateus           ###   ########.fr       */
+/*   Updated: 2022/12/16 15:50:54 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,8 @@ using namespace std;
 class Server: public Config
 {
 private:
-	int						_port;
-	vector<string>			_name;
 	// bool					_autoIndex;
 	// string					_root;
-	int						_clientMaxBodySize;
 	// string					_cgi;
 	// t_methods				_acceptedMethods;
 	map<string, Location>	_locations;
@@ -44,10 +41,10 @@ public:
 	~Server();
 
 	void			setPort(int port);
-	int				getPort(void);
+	// int				getPort(void);
 	
 	void			setName(vector<string> name);
-	vector<string>	getName(void);
+	// vector<string>	getName(void);
 
 	// void			setAutoIndex(bool autoIndex);
 	// bool			getAutoIndex(void);
@@ -68,6 +65,8 @@ public:
 	bool			locationExist(string key);
 	void			addLocation(Location *location);
 	Location		getLocationByPath(string path);
+
+	void 			setupLocations();
 };
 
 

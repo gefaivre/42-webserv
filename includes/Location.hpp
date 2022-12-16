@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 13:52:17 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/30 14:47:35 by mateus           ###   ########.fr       */
+/*   Updated: 2022/12/16 15:44:55 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include "webserv.h"
 #include "Config.hpp"
 
+class Server;
 using namespace std;
 
 class Location : public Config
@@ -48,6 +49,12 @@ public:
 
 	// void 		setAcceptedMethods(t_methods methods);
 	// t_methods	getAcceptedMethods();
+
+	void			setPort(int port);
+	void			setName(vector<string> name);
+
+	void			setClientMaxBodySize(int clientMaxBodySize);
+	void 			beSetup(Server *server);
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:21:20 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/25 18:41:48 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/12/16 15:26:00 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,12 @@ public:
 
 	void	prepareLine();
 	void	checkHttpContext();
-	void	getServerConf();
 	string	ft_read_file_ignoring_comments();
+	void	parseEndOfContext(int i);
+	Location *parseNewContext(size_t nextOpenBracket, Server *server);
+	void	parseAutoIndex(string directive, vector<Config *> conf);
+	void	parseDirective(size_t nextSemiColon, vector<Config *> conf);
+	Server	*getServerConf(void);
 };
 
 

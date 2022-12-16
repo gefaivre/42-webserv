@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:03 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/30 14:47:16 by mateus           ###   ########.fr       */
+/*   Updated: 2022/12/16 15:49:39 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,14 +21,23 @@ using namespace std;
 
 class Config
 {
-private:
+protected:
 	map<string, string> _cgi;
 	bool				_autoIndex;
 	string				_root;
 	t_methods			_acceptedMethods;
+
+	vector<string> 		*_wasSet;
+	int					_port;
+
+	
+	int						_clientMaxBodySize;
+	vector<string>			_name;
+	
 public:
+
 	Config(/* args */);
-	~Config();
+	virtual ~Config();
 
 	// Acessors:
 	void	addCgi(string key, string value);
@@ -43,6 +52,15 @@ public:
 
 	void 		setAcceptedMethods(t_methods methods);
 	t_methods	getAcceptedMethods();
+
+	virtual void			setPort(int port) = 0;
+	virtual void			setName(vector<string> name) = 0;
+	virtual void			setClientMaxBodySize(int clientMaxBodySize) = 0;
+
+	int						getPort(void);
+	vector<string> 			getName(void);
+	int						getClientMaxBodySize(void);
+	
 };
 
 
