@@ -3,6 +3,9 @@
 - remake parsing request (\r\n problems)
 
 
+faire les fichier erreur
+
+
 
 Header
 \r\n

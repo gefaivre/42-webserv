@@ -20,11 +20,13 @@ public:
 	void sendResponse(std::string str);
 
 	int getPort() const;
+	int getSocketFd() const;
 
 	std::vector<std::string> getRequest() const;
 
 private:
 	Socket();
+	void makeSocketNonBlocking();
 
 	struct sockaddr_in _addr;
 	void setStruct();

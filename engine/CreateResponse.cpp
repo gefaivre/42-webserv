@@ -113,9 +113,9 @@ void CreateResponse::createHeader()
 	_header += " ";
 	_header += _headerData.statusCode;
 	_header += " ";
-	_header += _headerData.statusMessage;
-	_header += " ";
-	_header += _headerData.date + "\r\n";
+	_header += _headerData.statusMessage + "\r\n";
+	// _header += " ";
+	// _header += _headerData.date ;
 	// _header += "Content-Length: " + _headerData.contentLength + "\r\n";
 }
 
@@ -159,6 +159,9 @@ void CreateResponse::BodyIsIndex()
 	_body += "<body>\n<h1>Index of ";
 	_body += _requestData.path;
 	_body += "</h1>\n";
+	_body += "<hr>\n";
+
+	_body += ("<a href= \"" + std::string("../") + "\">" + std::string("../") + "</a></br>\n\r");
 
 	DIR *dir;
 	struct dirent *ent;
@@ -169,10 +172,13 @@ void CreateResponse::BodyIsIndex()
 	while ((ent = readdir (dir)) != NULL)
 	{
 		std::string file(ent->d_name);
-		if (isDirectory(_requestData.fileToSend + file))
-			file += "/";
-		
-		_body += ("<a href= \"" + file + "\">" + file + "</a></br>\n\r");
+		if (file != ".." && file != ".")
+		{
+			if (isDirectory(_requestData.fileToSend + file))
+				file += "/";
+			
+			_body += ("<a href= \"" + file + "\">" + file + "</a></br>\n\r");
+		}
 	}
 	if (closedir(dir) == -1)
 		ft_define_error("Error while closing the directory");

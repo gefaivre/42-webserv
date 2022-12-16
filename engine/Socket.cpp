@@ -21,6 +21,7 @@ Socket::Socket(int port, int domain, int type, int protocol):
 		ft_define_error("Setsockopt error");
 	if( (bind(_sockfd, (struct sockaddr*)&_addr, sizeof(_addr))) == -1)
 		ft_define_error("Bind error");
+	makeSocketNonBlocking();
 	if (listen(_sockfd, SOMAXCONN) == -1)
 		ft_define_error("Listen error");
 }
@@ -70,6 +71,20 @@ void Socket::setStruct()
 	_addr.sin_addr.s_addr = INADDR_ANY;
 	_addr.sin_port = htons(_port); 
 	_addr.sin_family = AF_INET; 
+}
+
+void Socket::makeSocketNonBlocking()
+{
+  int flags;
+
+  	flags = fcntl (_sockfd, F_GETFL, 0);
+  	if (flags == -1)
+      perror ("fcntl");
+
+  	flags |= O_NONBLOCK;
+	if(fcntl (_sockfd, F_SETFL, flags) == -1)
+      perror ("fcntl");
+
 }
 
 
@@ -143,6 +158,12 @@ int Socket::getPort() const
 {
 	return (_port);
 }
+
+int Socket::getSocketFd() const
+{
+	return (_sockfd);
+}
+
 
 std::vector<std::string> Socket::getRequest() const
 {
