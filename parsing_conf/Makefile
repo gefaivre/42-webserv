@@ -17,7 +17,7 @@ OBJS = ${SRCS:.cpp=.o}
 CFLAGS = -Wall -Wextra -Werror -g3 -std=c++98
 CC = c++
 RM = rm -f
-INC_PATH = ./includes_conf/
+INC_PATH = ../includes/
 INCLUDES = $(addprefix -I , $(INC_PATH))
 
 %.o: %.cpp

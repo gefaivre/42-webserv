@@ -1,6 +1,8 @@
-#include "engine/Socket.hpp"
-#include "engine/ParsingRequest.hpp"
-#include "engine/CreateResponse.hpp"
+#include "Socket.hpp"
+#include "ParsingRequest.hpp"
+#include "CreateResponse.hpp"
+#include "Parser.hpp"
+#include "Server.hpp"
 
 #include <sys/epoll.h>
 
@@ -80,8 +82,6 @@ void epolling(Socket socket)
 			// CreateResponse createResponse(path, autoindex, parsingRequest.getData());
 			CreateResponse createResponse(path, autoindex, parsingRequest.getData(), socket._newsocket);
 
-			sleep(2);
-
 			socket.sendResponse(createResponse.getResponse());
 		
 			if(!strncmp(read_buffer, "stop\n", 5))
@@ -100,15 +100,22 @@ void epolling(Socket socket)
 
 
 
-int main(int ac, char **av)
+int main(int argc, char **argv)
 {
-	if (ac != 2)
+	if (argc != 2)
 	{
-		std::cerr << "Usage: ./webserv [port]" << std::endl;
-		return (0);
+		cerr << "Error: bad arguments" << endl;
+		return (1);
 	}
-
-	Socket socket(atoi(av[1]));
+	// string	str1 = "/etc/www/hello/oi/index.html";
+	// string	str2 = "/etc/www/hello/tchau/index.html";
+	// ft_strcmp_fowardslash(str1, str2);
+	(void) argv;
+	Parser *config = new Parser(argv[1]);
+	(void) config;
+	vector<Server *> servers = config->getServers();
+	// std::cout << servers.size() << std::endl;
+	Socket socket(servers[0]->getPort());
 	epolling(socket);
 
 	return (0);

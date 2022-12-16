@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:21:20 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/16 15:26:00 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/12/16 16:47:53 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ private:
 	stack<string>	_context;
 	string			_content;
 	size_t			_currIdx;
-	vector<Server>	_servers;
+	vector<Server *>	_servers;
 	
 public:
 	Parser(void);
@@ -51,6 +51,7 @@ public:
 	void	parseAutoIndex(string directive, vector<Config *> conf);
 	void	parseDirective(size_t nextSemiColon, vector<Config *> conf);
 	Server	*getServerConf(void);
+	vector<Server *>	getServers(void);
 };
 
 

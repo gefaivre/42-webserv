@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/16 15:54:28 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/12/16 16:51:26 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,15 +172,20 @@ Parser::Parser(char *configName)
 	if (!_configFile.is_open())
 	{
 		cerr << "Cannot open file !" << endl;
-		return ;
+		exit (1);
 	}
 	prepareLine();
 	while (_content.find("server {", _currIdx) == _currIdx)
 		servers.push_back(getServerConf());
-	
+	this->_servers = servers;
 }
 
 Parser::~Parser(void)
 {
 	_configFile.close();
+}
+
+vector<Server *>	Parser::getServers(void)
+{
+	return (_servers);
 }

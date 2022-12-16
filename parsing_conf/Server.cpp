@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/16 15:44:44 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/12/16 16:43:00 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 
 Server::Server()
 {
+	Location *location;
+	location = new Location("/");
+	this->addLocation(location);
 }
 
 Server::~Server()

@@ -1,40 +1,46 @@
 NAME= webserv
 
-SRC=	main.cpp \
+SRCS=	main.cpp \
 		engine/utils.cpp \
 		engine/Socket.cpp \
 		engine/CreateResponse.cpp \
 		engine/ParsingRequest.cpp\
-		parsing_conf/ft_split.cpp
+		parsing_conf/Parser.cpp parsing_conf/Server.cpp parsing_conf/Config.cpp\
+		parsing_conf/ft_split.cpp \
+		parsing_conf/Location.cpp \
+		parsing_conf/ft_strcmp_fowardslash.cpp \
+		parsing_conf/ft_remove_invalid_spaces.cpp \
+		parsing_conf/ft_remove_double_spaces.cpp \
+		parsing_conf/ft_wrap_in_spaces.cpp \
+		parsing_conf/ft_wrap_brackets_in_spaces.cpp \
+		parsing_conf/ft_strcmp.cpp \
+		parsing_conf/ft_strncmp.cpp \
+		parsing_conf/ft_starts_with.cpp
 
-INC =	engine/Socket.hpp \
-		engine/CreateResponse.hpp \
-		engine/ParsingRequest.hpp \
-		engine/utils.hpp \
-		engine/general_includes.hpp
-
-CXX=c++
-
-CXXFLAGS= -Wall -Wextra -Werror -g3 -std=c++98
-
-OBJ=$(SRC:.c=.o)
+OBJS_PATH = objects/
+OBJS = ${SRCS:.cpp=.o}
+CFLAGS = -Wall -Wextra -Werror -g3 -std=c++98
+CC = c++
+RM = rm -f
+INC_PATH = ./includes/
+INCLUDES = $(addprefix -I , $(INC_PATH))
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INC)
+	$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDES)
 
-all: $(NAME)
+all: ${NAME}
 
-$(NAME): $(OBJ) 
-	${CXX} $(CXXFLAGS) $(OBJ) -o $(NAME)
-	@echo [$(NAME)]: Created !
+$(NAME): $(OBJS)
+		$(CC) ${CFLAGS} $(OBJS) -o $(NAME)
+
 
 clean:
-	rm -rf *.o
+	${RM} ${OBJS}
 
-fclean:	clean
-	rm -rf $(NAME)
-	@echo "[$(NAME)]: deleted"
+fclean: clean
+	${RM} ${NAME}
+	${RM} -r ${OBJS_PATH}
 
 re: fclean all
 
-.PHONY: all, clean, fclean, re
+.PHONY: all clean fclean re

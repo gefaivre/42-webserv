@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:29:46 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/16 15:50:54 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/12/16 16:16:33 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,3 +72,6 @@ public:
 
 
 #endif
+
+//:8020/all_test/oi/index.html
+//:8020/all_test/oi
