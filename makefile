@@ -1,24 +1,31 @@
 NAME= webserv
 
 SRC=	main.cpp \
-		Socket.cpp \
-		parsing/ft_split.cpp \
-		parsing/Parser.cpp \
-		parsing/Server.cpp
+		engine/utils.cpp \
+		engine/Socket.cpp \
+		engine/CreateResponse.cpp \
+		engine/ParsingRequest.cpp 
 
 
-INC_PATH =	includes/
-INC = $(addprefix -I , $(INC_PATH))
+INC =	engine/Socket.hpp \
+		engine/CreateResponse.hpp \
+		engine/ParsingRequest.hpp \
+		engine/utils.hpp \
+		engine/general_includes.hpp
+
 CXX=c++
 
 CXXFLAGS= -Wall -Wextra -Werror -g3 -std=c++98
 
 OBJ=$(SRC:.c=.o)
-	
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INC)
+
 all: $(NAME)
 
 $(NAME): $(OBJ) 
-	${CXX} $(CXXFLAGS) -o $(NAME) $(OBJ) $(INC)
+	${CXX} $(CXXFLAGS) $(OBJ) -o $(NAME)
 	@echo [$(NAME)]: Created !
 
 clean:
