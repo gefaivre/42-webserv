@@ -1,0 +1,36 @@
+Parsing :
+☐ Request @high
+	Avec les redirection 
+☐ Reponse header @low
+☐ Create default error page @low
+☐ Make form with POST & GET method
+
+Pour les upload : 
+pour POST je lis les paquets reçus jusqu'à détecter la fin du header,
+quand je détecte la fin du header je le parse et cherche un content-length pour voir s'il y a un body,
+si il y a un body tous les paquets qui arrive je les balances dans un fichier tmp que je peux utiliser plus tard si besoin (l'envoyer dans le stdin du cgi par exemple), c'est la manière de faire la plus simple que j'ai trouvé et qui ne surcharge pas la heap 
+
+je le mets dans un fichier tmp que je traite évidemment après,
+par exemple si c'est une image jpg je move le tmp en image.jpg dans l'upload_store,
+si c'est plusieurs images je parse le fichier tmp pour recréer les différentes images, si c'est une requete qui est destinée au cgi je balance directement le fichier tmp dans le stdin du cgi et je le laisse se débrouiller
+
+
+Une connexion établie (sur le port 42 par exemple)  
+qui reçoit une requete avec un host qui correspond pas à son port d'écoute 
+(par exemple tu reçois une requete pour example.org mais la config définit que example.org est 
+defini est servi sur le port 1234) alors tu dois pouvoir envoyer une réponse qui redirige vers 
+le bon port (check 301)
+=> Ds ton serveur s'il y a une connection bonjour tu redirige sur aurevoir
+=> gérer le 301
+
+pour POST :
+juste on balance le body dans l'entree standard du processus CGI
+
+pour cgi :
+echo "datas=hello" | last_name=fleger GATEWAY_INTERFACE=CGI/1.1 
+PATH_INFO=/website/sendDatas/data.php REQUEST_METHOD=POST SCRIPT_FILENAME=./website/sendDatas/data.php 
+SERVER_PROTOCOL=HTTP/1.1 REDIRECT_STATUS=200 CONTENT_TYPE=application/x-www-form-urlencoded CONTENT_LENGTH=11 /usr/bin/php-cgi
+
+Questions :
+N Est-ce qu'on doit faire un fichier .htaccess ?
+Y Est-ce qu'on ne doit pas mettre la date ?

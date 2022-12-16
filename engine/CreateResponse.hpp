@@ -3,14 +3,17 @@
 
 # include "utils.hpp"
 #include "general_includes.hpp"
+#include "Socket.hpp"
 
+
+char **ft_split(char *str);
 
 class CreateResponse
 {
 
 	public:
 
-		CreateResponse(std::string path, bool autoindex, t_requestData requestData);
+		CreateResponse(std::string path, bool autoindex, t_requestData requestData, int newsocket);
 
 		// CreateResponse( CreateResponse const & src );
 		~CreateResponse();
@@ -37,6 +40,8 @@ class CreateResponse
 		std::vector<std::string> _responseHeader;
 		std::map<std::string, std::string> _switchFilesExtension;
 
+		//POST METHOD
+		void collectData(int newsocket);
 
 		void createAndSendResponse();
 		void fillFilesExtension();

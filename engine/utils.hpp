@@ -23,7 +23,7 @@ typedef struct	s_headerData
 	std::string statusMessage;
 	std::string contentLength;
 	std::string contentType;
-	// std::string	date;
+	std::string	date;
 }				t_headerData;
 
 
