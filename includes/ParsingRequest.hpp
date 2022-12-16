@@ -3,13 +3,14 @@
 
 # include "utils.hpp"
 #include "general_includes.hpp"
+#include "Server.hpp"
 
 class ParsingRequest
 {
 
 	public:
 
-		ParsingRequest(std::string path, bool autoindex, std::vector<std::string> request);
+		ParsingRequest(std::vector<std::string> request, Server *server);
 		// ParsingRequest( ParsingRequest const & src );
 		~ParsingRequest();
 
@@ -26,6 +27,11 @@ class ParsingRequest
 		std::vector<std::string> _request;
 
 		t_requestData _requestData;
+
+		Server *_server;
+
+		void setFileToSend404();
+		void setFileToSend403();
 
 
 		void parsingRequest();

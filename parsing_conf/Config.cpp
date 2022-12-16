@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/16 15:53:53 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/12/16 18:02:47 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,8 @@ bool	Config::getAutoIndex(void)
 void	Config::setRoot(string root)
 {
 	_wasSet->push_back("root");
+	if (root.size() != 0 && root[root.size() - 1] != '/')
+		root += '/';
 	_root = root;
 }
 

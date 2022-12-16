@@ -5,7 +5,7 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-CreateResponse::CreateResponse(std::string path, bool autoindex, t_requestData requestData, int newsocket):
+CreateResponse::CreateResponse(std::string path, bool autoindex, t_requestData requestData):
 _path(path), _autoindex(autoindex), _requestData(requestData)
 {
 	fillHeaderData();
@@ -15,7 +15,7 @@ _path(path), _autoindex(autoindex), _requestData(requestData)
 	if (_requestData.methode == "POST")
 	{
 		// std::cout << "new socket = " << newsocket << std::endl;
-		collectData(newsocket);
+		// collectData(newsocket);
 	}
 }
 

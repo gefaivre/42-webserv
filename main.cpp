@@ -39,14 +39,12 @@
 #define READ_SIZE 10
 
 
-void epolling(Socket socket)
+void epolling(Socket socket, Server *server)
 {
 	int running = 1, event_count, i;
 	char read_buffer[READ_SIZE + 1];
 	struct epoll_event event, events[MAX_EVENTS];
 
-	std::string path("www/");
-	bool autoindex = 1;
 
 	int epoll_fd = epoll_create1(0);
 	if (epoll_fd == -1)
@@ -77,10 +75,10 @@ void epolling(Socket socket)
 			socket.waitRequest();
 			// socket.displayRequest();
 
-			ParsingRequest parsingRequest(path, autoindex, socket.getRequest());
+			ParsingRequest parsingRequest(socket.getRequest(), server);
 
 			// CreateResponse createResponse(path, autoindex, parsingRequest.getData());
-			CreateResponse createResponse(path, autoindex, parsingRequest.getData(), socket._newsocket);
+			CreateResponse createResponse("www/", true, parsingRequest.getData());
 
 			socket.sendResponse(createResponse.getResponse());
 		
@@ -116,7 +114,8 @@ int main(int argc, char **argv)
 	vector<Server *> servers = config->getServers();
 	// std::cout << servers.size() << std::endl;
 	Socket socket(servers[0]->getPort());
-	epolling(socket);
+
+	epolling(socket, servers[0]);
 
 	return (0);
 

@@ -3,9 +3,9 @@ server{
 	listen 8042;
 
 	accepted_methods	GET POST DELETE;
-	autoindex on;
+	autoindex off;
 	cgi .php /usr/bin/php-cgi;
-	root /mnt/nfs/homes/gefaivre/Desktop/PH-B_webserv/www;
+	root /mnt/nfs/homes/mgoncalv/Desktop/42-webserv/www;
 }
 server{
 	server_name localhost hello;
@@ -34,6 +34,7 @@ server{
 		accepted_methods	GET POST;
 		autoindex on;
 	}
+	
 	location /all_test/oi {
 		cgi .py /usr/bin/python3.7;
 		cgi .php /usr/bin/php-cgi;

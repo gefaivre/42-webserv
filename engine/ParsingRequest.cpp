@@ -4,10 +4,9 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ParsingRequest::ParsingRequest(std::string path, bool autoindex, std::vector<std::string> request):
-_path(path), _autoindex(autoindex), _request(request)
+ParsingRequest::ParsingRequest( std::vector<std::string> request, Server *server):
+ _request(request), _server(server)
 {
-	std::cout << autoindex << std::endl;
 	parsingRequest();
 	foundFileToSend();
 }
@@ -50,6 +49,30 @@ ParsingRequest::~ParsingRequest()
 ** --------------------------------- METHODS ----------------------------------
 */
 
+void ParsingRequest::setFileToSend404()
+{
+	std::string path;
+	path = _server->getLocationByPath(_requestData.path).getRoot();
+	path += "404.html";
+	if (access(path.c_str(), R_OK) == 0)
+		_requestData.fileToSend = path;
+	else
+		_requestData.fileToSend = "error_pages/404.html";
+}
+
+void ParsingRequest::setFileToSend403()
+{
+	std::string path;
+	path = _server->getLocationByPath(_requestData.path).getRoot();
+	// std::cout << _server->getLocationByPath(_requestData.path).getRoot() << std::endl;
+	path += "403.html";
+	if (access(path.c_str(), R_OK) == 0)
+		_requestData.fileToSend = path;
+	else
+		_requestData.fileToSend = "error_pages/403.html";
+}
+
+
 void ParsingRequest::parsingRequest()
 {
 	for(unsigned long int i = 0; i < _request.size()  ; i++)
@@ -64,18 +87,26 @@ void ParsingRequest::parsingRequest()
 		}
 		// std::cout << "_request = " <<_request[i] << std::endl;
 	}
+	_autoindex = _server->getLocationByPath(_requestData.path).getAutoIndex();
+	std::cout << "auto index = "<< _autoindex << std::endl;
 }
 
 int ParsingRequest::filepermission()
 {
+	std::cout << _requestData.fileToSend << std::endl;
 	int fd;
 	std::cout << _requestData.fileToSend << std::endl;
-	fd = access(_requestData.fileToSend.c_str(), F_OK);
-	if (fd == -1)
-		_requestData.fileToSend = _path + "404.html";
 	fd = access(_requestData.fileToSend.c_str(), R_OK);
 	if (fd == -1 || _autoindex == 0)
-		_requestData.fileToSend = _path + "403.html";
+		setFileToSend403();
+	fd = access(_requestData.fileToSend.c_str(), F_OK);
+	// std::cout << "TESTTTTTTTTTT" << fd << std::endl;
+	if (fd == -1)
+	// {
+		setFileToSend404();
+		// return (0);
+	// }
+		// _requestData.fileToSend = _path + "403.html";
 	return (0);
 }
 
@@ -88,18 +119,22 @@ int ParsingRequest::foundFileToSend()
 	// std::cout << "fileToSend = " << _requestData.fileToSend << std::endl;
 
 	_requestData.isIndex = 0;
+	std::cout << "Root = " << isDirectory(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend) << std::endl;
+	std::cout << "file = " << !fileExist(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend + "index.html")<< std::endl;
+	std::cout << "_autoindex = " << _autoindex<< std::endl;
 	
-	if (_autoindex == 1 && isDirectory(_path + _requestData.fileToSend) && !fileExist(_path + _requestData.fileToSend + "index.html"))
+	if (_autoindex == 1 && isDirectory(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend) && !fileExist(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend + "index.html"))
 	{
-		_requestData.fileToSend = _path + _requestData.fileToSend;
+		_requestData.fileToSend = _server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend;
 		_requestData.isIndex = 1;
 	}
-	else if (isDirectory(_path + _requestData.fileToSend))
-		_requestData.fileToSend = _path + "index.html";
-	else if (_autoindex == 0 && isDirectory(_path + _requestData.fileToSend) && !fileExist(_path + _requestData.fileToSend + "index.html"))
+	else if (isDirectory(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend))
+		_requestData.fileToSend = _server->getLocationByPath(_requestData.path).getRoot() + "index.html";
+	
+	else if (_autoindex == 0 && isDirectory(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend) && !fileExist(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend + "index.html"))
 		filepermission();
 	else
-		_requestData.fileToSend = _path + _requestData.fileToSend;
+		_requestData.fileToSend = _server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend;
 
 	FILE *f = fopen(_requestData.fileToSend.c_str(), "r+");
 	if ( f == NULL)

@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/18 14:02:30 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/16 16:08:40 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/12/16 17:02:31 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void			ft_wrap_in_spaces(string *str);
 void			ft_wrap_brackets_in_spaces(string *str);
 string 			ft_read_file_ignoring_comments(ifstream	_configFile);
 void			ft_wrap_target_in_spaces(string *str, string target);
-bool ft_starts_with(string str, string substring);
-
+bool 			ft_starts_with(string str, string substring);
+int ft_strncmp(string str1, string str2, size_t n);
 #endif
 

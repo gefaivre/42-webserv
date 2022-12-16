@@ -13,7 +13,7 @@ class CreateResponse
 
 	public:
 
-		CreateResponse(std::string path, bool autoindex, t_requestData requestData, int newsocket);
+		CreateResponse(std::string path, bool autoindex, t_requestData requestData);
 
 		// CreateResponse( CreateResponse const & src );
 		~CreateResponse();
