@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/09 13:02:26 by mateus           ###   ########.fr       */
+/*   Updated: 2022/12/16 15:53:53 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ Config::Config()
 
 Config::~Config()
 {
-	delete _wasSet;
+	// delete _wasSet;
 }
 
 void	Config::addCgi(string key, string value)
@@ -75,4 +75,20 @@ void	Config::setAcceptedMethods(t_methods methods)
 t_methods	Config::getAcceptedMethods()
 {
 	return (_acceptedMethods);
+}
+
+int		Config::getPort(void)
+{
+	return (_port);
+}
+
+vector<string> Config::getName(void)
+{
+	return (_name);
+}
+
+
+int		Config::getClientMaxBodySize(void)
+{
+	return (_clientMaxBodySize);
 }

@@ -3,15 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 14:08:38 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/12 14:05:23 by mateus           ###   ########.fr       */
+/*   Updated: 2022/12/16 15:49:30 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Location.hpp"
 #include "Server.hpp"
+
+
+#include <algorithm>
 
 Location::Location(/* args */)
 {
@@ -40,10 +43,7 @@ void	Location::setPort(int port)
 	// Simplesmente nao vai mudar a porta pois a porta é definido somente pelo server
 	// Throw an error
 }
-int		Location::getPort(void)
-{
-	return (_port);
-}
+
 
 void	Location::setName(vector<string> name)
 {
@@ -52,19 +52,10 @@ void	Location::setName(vector<string> name)
 	// Simplesmente nao vai mudar o nome pois o nome é definido somente pelo server
 	// Throw an error
 }
-vector<string> Location::getName(void)
-{
-	return (_name);
-}
 
 void	Location::setClientMaxBodySize(int clientMaxBodySize)
 {
 	(void)clientMaxBodySize;
-}
-
-int		Location::getClientMaxBodySize(void)
-{
-	return (_clientMaxBodySize);
 }
 
 void Location::beSetup(Server *server)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/08 14:32:29 by mateus           ###   ########.fr       */
+/*   Updated: 2022/12/16 15:44:44 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,19 +24,13 @@ void	Server::setPort(int port)
 {
 	_port = port;
 }
-int		Server::getPort(void)
-{
-	return (_port);
-}
+
 
 void	Server::setName(vector<string> name)
 {
 	_name = name;
 }
-vector<string> Server::getName(void)
-{
-	return (_name);
-}
+
 
 // void Server::setAutoIndex(bool autoIndex)
 // {
