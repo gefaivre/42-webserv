@@ -1,35 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   ft_remove_invalid_spaces.cpp                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/14 15:00:52 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/23 15:59:13 by mgoncalv         ###   ########.fr       */
+/*   Created: 2022/11/25 16:10:23 by mgoncalv          #+#    #+#             */
+/*   Updated: 2022/11/29 14:53:57 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Parser.hpp"
-#include "iostream"
+#include <iostream>
 
-// using namespace std;
+using namespace std;
 
-
-
-
-int main(int argc, char **argv)
+void	ft_remove_invalid_spaces(string *str)
 {
-	if (argc != 2)
+	size_t	find;
+
+	find = str->find_first_of("\n\t\v\f\r");
+	while (find != string::npos)
 	{
-		cerr << "Error: bad arguments" << endl;
-		return (1);
+		// str->erase(find, 1);
+		str->replace(find, 1, " ");
+		find = str->find_first_of("\n\t\v\f\r");
 	}
-	// string	str1 = "/etc/www/hello/oi/index.html";
-	// string	str2 = "/etc/www/hello/tchau/index.html";
-	// ft_strcmp_fowardslash(str1, str2);
-	(void) argv;
-	Parser *config = new Parser(argv[1]);
-	(void) config;
-	return (0);
 }

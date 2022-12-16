@@ -7,7 +7,6 @@ server{
 	cgi .php /usr/bin/php-cgi;
 	root /mnt/nfs/homes/gefaivre/Desktop/PH-B_webserv/www;
 }
-
 server{
 	server_name localhost hello;
 	listen 8020;

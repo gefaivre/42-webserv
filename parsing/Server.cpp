@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/23 14:27:44 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/12/16 15:44:44 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,39 +24,33 @@ void	Server::setPort(int port)
 {
 	_port = port;
 }
-int		Server::getPort(void)
-{
-	return (_port);
-}
+
 
 void	Server::setName(vector<string> name)
 {
 	_name = name;
 }
-vector<string> Server::getName(void)
-{
-	return (_name);
-}
 
-void Server::setAutoIndex(bool autoIndex)
-{
-	_autoIndex = autoIndex;
-}
 
-bool	Server::getAutoIndex(void)
-{
-	return (_autoIndex);
-}
+// void Server::setAutoIndex(bool autoIndex)
+// {
+// 	_autoIndex = autoIndex;
+// }
 
-void	Server::setRoot(string root)
-{
-	_root = root;
-}
+// bool	Server::getAutoIndex(void)
+// {
+// 	return (_autoIndex);
+// }
 
-string Server::getRoot(void)
-{
-	return (_root);
-}
+// void	Server::setRoot(string root)
+// {
+// 	_root = root;
+// }
+
+// string Server::getRoot(void)
+// {
+// 	return (_root);
+// }
 
 void	Server::setClientMaxBodySize(int clientMaxBodySize)
 {
@@ -68,25 +62,25 @@ int		Server::getClientMaxBodySize(void)
 	return (_clientMaxBodySize);
 }
 
-void 	Server::setCgi(string cgi)
-{
-	_cgi = cgi;
-}
+// void 	Server::setCgi(string cgi)
+// {
+// 	_cgi = cgi;
+// }
 
-string	Server::getCgi(void)
-{
-	return (_cgi);
-}
+// string	Server::getCgi(void)
+// {
+// 	return (_cgi);
+// }
 
-void	Server::setAcceptedMethods(t_methods methods)
-{
-	_acceptedMethods = methods;
-}
+// void	Server::setAcceptedMethods(t_methods methods)
+// {
+// 	_acceptedMethods = methods;
+// }
 
-t_methods	Server::getAcceptedMethods()
-{
-	return (_acceptedMethods);
-}
+// t_methods	Server::getAcceptedMethods()
+// {
+// 	return (_acceptedMethods);
+// }
 
 bool		Server::locationExist(string key)
 {
@@ -118,4 +112,14 @@ Location	Server::getLocationByPath(string path)
 			loc = it->second;
 	}
 	return loc;
+}
+
+
+void	Server::setupLocations()
+{
+	map<string, Location>::iterator iter;
+	for (iter = _locations.begin(); iter != _locations.end(); iter++)
+	{
+		iter->second.beSetup(this);
+	}
 }

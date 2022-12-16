@@ -6,12 +6,15 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 14:08:38 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/21 15:02:12 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2022/12/16 15:49:30 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Location.hpp"
+#include "Server.hpp"
 
+
+#include <algorithm>
 
 Location::Location(/* args */)
 {
@@ -31,53 +34,51 @@ string	Location::getKey(void)
 	return (_key);
 }
 
-void	Location::addCgi(string key, string value)
+
+
+void	Location::setPort(int port)
 {
-	if (_cgi.find(key) != _cgi.end())
-		cerr << "This cgi is already been handled by: " << _cgi[key] << endl;
-	else
-		_cgi[key] = value;
+	(void)port;
+	// _port = port;
+	// Simplesmente nao vai mudar a porta pois a porta é definido somente pelo server
+	// Throw an error
 }
 
-map<string, string> Location::getCgiMap(void)
+
+void	Location::setName(vector<string> name)
 {
-	return (_cgi);
+	(void) name;
+	// _name = name;
+	// Simplesmente nao vai mudar o nome pois o nome é definido somente pelo server
+	// Throw an error
 }
 
-string	Location::getCgiValue(string key)
+void	Location::setClientMaxBodySize(int clientMaxBodySize)
 {
-	if (_cgi.find(key) != _cgi.end())
-		return (_cgi[key]);
-	else
-		return (NULL);
+	(void)clientMaxBodySize;
 }
 
-void Location::setAutoIndex(bool autoIndex)
+void Location::beSetup(Server *server)
 {
-	_autoIndex = autoIndex;
-}
+	_clientMaxBodySize = server->getClientMaxBodySize();
+	_name = server->getName();
+	_port = server->getPort();
+	// cout << "Location '" << this->_key << "' was setup by server !" << endl;
 
-bool	Location::getAutoIndex(void)
-{
-	return (_autoIndex);
-}
+	//SETUP CGI
+	map<string, string> serverCgi = server->getCgiMap();
+	_cgi.insert(serverCgi.begin(), serverCgi.end());
+	// if (find(_wasSet->begin(), _wasSet->end(), "cgi") == _wasSet->end())
+	// nao usamos pois mesmo se o cgi ja foi colocado no location, o server pode ter outras keys
+	if (find(_wasSet->begin(), _wasSet->end(), "autoIndex") == _wasSet->end())
+		_autoIndex = server->getAutoIndex();
+	if (find(_wasSet->begin(), _wasSet->end(), "root") == _wasSet->end())
+		_root = server->getRoot();
+	if (find(_wasSet->begin(), _wasSet->end(), "acceptedMethods") == _wasSet->end())
+		_acceptedMethods = server->getAcceptedMethods();
 
-void	Location::setRoot(string root)
-{
-	_root = root;
-}
-
-string Location::getRoot(void)
-{
-	return (_root);
-}
-
-void	Location::setAcceptedMethods(t_methods methods)
-{
-	_acceptedMethods = methods;
-}
-
-t_methods	Location::getAcceptedMethods()
-{
-	return (_acceptedMethods);
+	// size_t iter;
+	// cout << _wasSet->size() << endl;
+	// for (iter = 0; iter < _wasSet->size(); iter++)
+	// 	cout << (*_wasSet)[iter] << endl;
 }

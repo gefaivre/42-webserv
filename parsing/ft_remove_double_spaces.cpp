@@ -1,35 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   ft_remove_double_spaces.cpp                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/14 15:00:52 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/23 15:59:13 by mgoncalv         ###   ########.fr       */
+/*   Created: 2022/11/25 16:21:48 by mgoncalv          #+#    #+#             */
+/*   Updated: 2022/11/25 16:30:10 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Parser.hpp"
-#include "iostream"
+#include <iostream>
 
-// using namespace std;
+using namespace std;
 
-
-
-
-int main(int argc, char **argv)
+void	ft_remove_double_spaces(string *str)
 {
-	if (argc != 2)
+	size_t	find;
+
+	find = str->find("  ");
+	while (find != string::npos)
 	{
-		cerr << "Error: bad arguments" << endl;
-		return (1);
+		str->erase(find, 1);
+		find = str->find("  ");
 	}
-	// string	str1 = "/etc/www/hello/oi/index.html";
-	// string	str2 = "/etc/www/hello/tchau/index.html";
-	// ft_strcmp_fowardslash(str1, str2);
-	(void) argv;
-	Parser *config = new Parser(argv[1]);
-	(void) config;
-	return (0);
 }
