@@ -88,7 +88,7 @@ void ParsingRequest::parsingRequest()
 		// std::cout << "_request = " <<_request[i] << std::endl;
 	}
 	_autoindex = _server->getLocationByPath(_requestData.path).getAutoIndex();
-	std::cout << "auto index = "<< _autoindex << std::endl;
+	// std::cout << "auto index = "<< _autoindex << std::endl;
 }
 
 int ParsingRequest::filepermission()
@@ -119,9 +119,9 @@ int ParsingRequest::foundFileToSend()
 	// std::cout << "fileToSend = " << _requestData.fileToSend << std::endl;
 
 	_requestData.isIndex = 0;
-	std::cout << "Root = " << isDirectory(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend) << std::endl;
-	std::cout << "file = " << !fileExist(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend + "index.html")<< std::endl;
-	std::cout << "_autoindex = " << _autoindex<< std::endl;
+	// std::cout << "Root = " << isDirectory(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend) << std::endl;
+	// std::cout << "file = " << !fileExist(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend + "index.html")<< std::endl;
+	// std::cout << "_autoindex = " << _autoindex<< std::endl;
 	
 	if (_autoindex == 1 && isDirectory(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend) && !fileExist(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend + "index.html"))
 	{
@@ -135,7 +135,6 @@ int ParsingRequest::foundFileToSend()
 		filepermission();
 	else
 		_requestData.fileToSend = _server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend;
-
 	FILE *f = fopen(_requestData.fileToSend.c_str(), "r+");
 	if ( f == NULL)
 	{

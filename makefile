@@ -5,6 +5,7 @@ SRCS=	main.cpp \
 		engine/Socket.cpp \
 		engine/CreateResponse.cpp \
 		engine/ParsingRequest.cpp\
+		engine/ft_split_header.cpp\
 		parsing_conf/Parser.cpp parsing_conf/Server.cpp parsing_conf/Config.cpp\
 		parsing_conf/ft_split.cpp \
 		parsing_conf/Location.cpp \
