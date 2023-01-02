@@ -14,7 +14,6 @@ public:
 	Socket(int port, int domain = AF_INET, int type = SOCK_STREAM, int protocol = 0);
 	~Socket();
 
-
 	void waitRequest();
 
 	void displayRequest();
@@ -29,7 +28,7 @@ public:
 
 private:
 	Socket();
-	void makeSocketNonBlocking();
+	void makeSocketNonBlocking(int fd);
 
 	struct sockaddr_in _addr;
 	void setStruct();

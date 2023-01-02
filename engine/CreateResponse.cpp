@@ -19,9 +19,7 @@ _path(path), _autoindex(autoindex), _requestData(requestData)
 	}
 }
 
-// CreateResponse::CreateResponse( const CreateResponse & src )
-// {
-// }
+
 
 
 /*
@@ -44,14 +42,6 @@ CreateResponse::~CreateResponse()
 ** --------------------------------- OVERLOAD ---------------------------------
 */
 
-// CreateResponse &				CreateResponse::operator=( CreateResponse const & rhs )
-// {
-// 	if ( this != &rhs )
-// 	{
-// 		this->_value = rhs.getValue();
-// 	}
-// 	return *this;
-// }
 
 // std::ostream &			operator<<( std::ostream & o, CreateResponse const & i )
 // {
@@ -111,6 +101,8 @@ void CreateResponse::fillFilesExtension()
 {
 	_switchFilesExtension.insert( std::pair<std::string, std::string>("html","text/html"));
 	_switchFilesExtension.insert(std::pair<std::string, std::string>("ico","image/x-icon"));
+	_switchFilesExtension.insert(std::pair<std::string, std::string>("jpg","image/png"));
+	_switchFilesExtension.insert(std::pair<std::string, std::string>("css","text/css"));
 	_switchFilesExtension.insert(std::pair<std::string, std::string>("default","text/html") );
 }
 
@@ -160,6 +152,7 @@ void CreateResponse::createHeader()
 	_header += _headerData.statusCode;
 	_header += " ";
 	_header += _headerData.statusMessage + "\r\n";
+	
 	// _header += " ";
 	// _header += _headerData.date ;
 	// _header += "Content-Length: " + _headerData.contentLength + "\r\n";
@@ -177,7 +170,7 @@ void CreateResponse::BodyIsNotIndex()
 {
 
 
-	_header += "Content-Type: text/html";
+	_header += "Content-Type: " + _headerData.contentType;
 	_header += "\r\n";
 
 	std::string file;

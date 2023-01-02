@@ -11,10 +11,6 @@ ParsingRequest::ParsingRequest( std::vector<std::string> request, Server *server
 	foundFileToSend();
 }
 
-// ParsingRequest::ParsingRequest( const ParsingRequest & src )
-// {
-// }
-
 
 /*
 ** -------------------------------- DESTRUCTOR --------------------------------
@@ -64,7 +60,6 @@ void ParsingRequest::setFileToSend403()
 {
 	std::string path;
 	path = _server->getLocationByPath(_requestData.path).getRoot();
-	// std::cout << _server->getLocationByPath(_requestData.path).getRoot() << std::endl;
 	path += "403.html";
 	if (access(path.c_str(), R_OK) == 0)
 		_requestData.fileToSend = path;
@@ -85,28 +80,20 @@ void ParsingRequest::parsingRequest()
 			_requestData.path = _request[i].substr(first, last - first);
 			_requestData.protocol = _request[i].substr(last + 1, _request[i].size());
 		}
-		// std::cout << "_request = " <<_request[i] << std::endl;
 	}
 	_autoindex = _server->getLocationByPath(_requestData.path).getAutoIndex();
-	std::cout << "auto index = "<< _autoindex << std::endl;
 }
 
 int ParsingRequest::filepermission()
 {
-	std::cout << _requestData.fileToSend << std::endl;
 	int fd;
-	std::cout << _requestData.fileToSend << std::endl;
+
+	fd = access(_requestData.fileToSend.c_str(), F_OK);
+	if (fd == -1)
+		setFileToSend404();
 	fd = access(_requestData.fileToSend.c_str(), R_OK);
 	if (fd == -1 || _autoindex == 0)
 		setFileToSend403();
-	fd = access(_requestData.fileToSend.c_str(), F_OK);
-	// std::cout << "TESTTTTTTTTTT" << fd << std::endl;
-	if (fd == -1)
-	// {
-		setFileToSend404();
-		// return (0);
-	// }
-		// _requestData.fileToSend = _path + "403.html";
 	return (0);
 }
 
@@ -115,13 +102,8 @@ int ParsingRequest::foundFileToSend()
 	_requestData.fileToSend = _requestData.path ;
 	if (_requestData.fileToSend[0] == '/')
 		_requestData.fileToSend.erase(0, 1);
-	// std::cout << "file = " << _requestData.fileToSend[0] << std::endl;
-	// std::cout << "fileToSend = " << _requestData.fileToSend << std::endl;
 
 	_requestData.isIndex = 0;
-	std::cout << "Root = " << isDirectory(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend) << std::endl;
-	std::cout << "file = " << !fileExist(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend + "index.html")<< std::endl;
-	std::cout << "_autoindex = " << _autoindex<< std::endl;
 	
 	if (_autoindex == 1 && isDirectory(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend) && !fileExist(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend + "index.html"))
 	{

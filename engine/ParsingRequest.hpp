@@ -11,10 +11,7 @@ class ParsingRequest
 	public:
 
 		ParsingRequest(std::vector<std::string> request, Server *server);
-		// ParsingRequest( ParsingRequest const & src );
 		~ParsingRequest();
-
-		// ParsingRequest &		operator=( ParsingRequest const & rhs );
 
 		t_requestData getData();
 

@@ -15,10 +15,8 @@ class CreateResponse
 
 		CreateResponse(std::string path, bool autoindex, t_requestData requestData);
 
-		// CreateResponse( CreateResponse const & src );
 		~CreateResponse();
 
-		// CreateResponse &		operator=( CreateResponse const & rhs );
 
 		std::string getResponse() const;
 

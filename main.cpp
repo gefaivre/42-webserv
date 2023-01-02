@@ -1,122 +1,26 @@
-#include "Socket.hpp"
-#include "ParsingRequest.hpp"
-#include "CreateResponse.hpp"
+#include "engine/Socket.hpp"
+#include "engine/ParsingRequest.hpp"
+#include "engine/CreateResponse.hpp"
 #include "Parser.hpp"
 #include "Server.hpp"
-
 #include <sys/epoll.h>
 
-
-// int main(int ac, char **av)
-// {
-// 	if (ac != 2)
-// 	{
-// 		std::cerr << "Usage: ./webserv [port]" << std::endl;
-// 		return (0);
-// 	}
-	
-// 	std::string path("www/");
-// 	bool autoindex = 1;
-
-
-
-// 	Socket socket(atoi(av[1]));
-
-// 	for(;;)
-// 	{
-// 		socket.waitRequest();
-// 		// socket.displayRequest();
-
-// 		ParsingRequest parsingRequest(path, autoindex, socket.getRequest());
-
-// 		CreateResponse createResponse(path, autoindex, parsingRequest.getData());
-
-// 		socket.sendResponse(createResponse.getResponse());
-// 	}
-// }
-
-#define MAX_EVENTS 5
-#define READ_SIZE 10
-
-
-void epolling(Socket socket, Server *server)
-{
-	int running = 1, event_count, i;
-	char read_buffer[READ_SIZE + 1];
-	struct epoll_event event, events[MAX_EVENTS];
-
-
-	int epoll_fd = epoll_create1(0);
-	if (epoll_fd == -1)
-	{
-		fprintf(stderr, "Failed to create epoll file descriptor\n");
-		return;
-	}
-
-	event.events = EPOLLIN | EPOLLET;
-	event.data.fd = socket.getSocketFd();
-	
-	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, socket.getSocketFd(), &event))
-	{
-		fprintf(stderr, "Failed to add file descriptor to epoll\n");
-		close(epoll_fd);
-		return;
-	}
-	
-	while (running)
-	{
-		printf("\nPolling for input...\n");
-		event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, 30000);
-		printf("%d ready events\n", event_count);
-
-
-		for (i = 0; i < event_count; i++)
-		{
-			socket.waitRequest();
-			// socket.displayRequest();
-
-			ParsingRequest parsingRequest(socket.getRequest(), server);
-
-			// CreateResponse createResponse(path, autoindex, parsingRequest.getData());
-			CreateResponse createResponse("www/", true, parsingRequest.getData());
-
-			socket.sendResponse(createResponse.getResponse());
-		
-			if(!strncmp(read_buffer, "stop\n", 5))
-			running = 0;
-		}
-	}
-
-
-
-	if (close(epoll_fd))
-	{
-		fprintf(stderr, "Failed to close epoll file descriptor\n");
-		return;
-	}
-}
-
-
+void epolling(Socket socket, Server *server);
 
 int main(int argc, char **argv)
 {
-	if (argc != 2)
+	if ( argc != 2 )
 	{
-		cerr << "Error: bad arguments" << endl;
+		cerr << "Usage: ./webserv [config file]" << endl;
 		return (1);
 	}
-	// string	str1 = "/etc/www/hello/oi/index.html";
-	// string	str2 = "/etc/www/hello/tchau/index.html";
-	// ft_strcmp_fowardslash(str1, str2);
-	(void) argv;
+
 	Parser *config = new Parser(argv[1]);
-	(void) config;
+
 	vector<Server *> servers = config->getServers();
-	// std::cout << servers.size() << std::endl;
 	Socket socket(servers[0]->getPort());
 
 	epolling(socket, servers[0]);
 
 	return (0);
-
 }

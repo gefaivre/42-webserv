@@ -21,14 +21,10 @@ Socket::Socket(int port, int domain, int type, int protocol):
 		ft_define_error("Setsockopt error");
 	if( (bind(_sockfd, (struct sockaddr*)&_addr, sizeof(_addr))) == -1)
 		ft_define_error("Bind error");
-	makeSocketNonBlocking();
+	fcntl(_sockfd, F_SETFL, O_NONBLOCK);
 	if (listen(_sockfd, SOMAXCONN) == -1)
 		ft_define_error("Listen error");
 }
-
-// Socket::Socket( const Socket & src )
-// {
-// }
 
 
 /*
@@ -45,14 +41,6 @@ Socket::~Socket()
 ** --------------------------------- OVERLOAD ---------------------------------
 */
 
-// Socket &				Socket::operator=( Socket const & rhs )
-// {
-	// if ( this != &rhs )
-	// {	
-	// 	this->_value = rhs.getValue();
-	// }
-// 	return *this;
-// }
 
 std::ostream &			operator<<( std::ostream & o, Socket const & i )
 {
@@ -71,20 +59,6 @@ void Socket::setStruct()
 	_addr.sin_addr.s_addr = INADDR_ANY;
 	_addr.sin_port = htons(_port); 
 	_addr.sin_family = AF_INET; 
-}
-
-void Socket::makeSocketNonBlocking()
-{
-  int flags;
-
-  	flags = fcntl (_sockfd, F_GETFL, 0);
-  	if (flags == -1)
-      perror ("fcntl");
-
-  	flags |= O_NONBLOCK;
-	if(fcntl (_sockfd, F_SETFL, flags) == -1)
-      perror ("fcntl");
-
 }
 
 
@@ -139,7 +113,6 @@ void Socket::waitRequest()
 		}
 		if (size > 0 && tmp_switch == 1)
 			size--;
-		std::cout << a[0];
 	}
 }
 
@@ -165,8 +138,8 @@ void Socket::sendResponse(std::string str)
 
 void Socket::displayRequest()
 {
-	for(long unsigned int i = 0; i < _request.size(); i++)
-		std::cout << _request[i] << std::endl;
+	// for(long unsigned int i = 0; _request[i] != "\n"; i++)
+	std::cout << _request[0] << std::endl;
 }
 
 
