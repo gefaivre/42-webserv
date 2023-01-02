@@ -3,6 +3,7 @@
 
 #include "utils.hpp"
 #include "general_includes.hpp"
+#include <map>
 
 char **ft_split(const char *str);
 
@@ -35,6 +36,7 @@ private:
 	void setStruct();
 
 	std::vector<std::string> _request;
+	std::map<std::string, std::string> _requestmap;
 
 	int _port;
 	int _sockfd;

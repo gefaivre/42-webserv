@@ -136,7 +136,33 @@ void Socket::waitRequest()
 	}
 	_request = ft_split_header(buf);
 	for (size_t i = 0; i < _request.size(); i++)
-		std::cout << " * ." << _request[i] << "."<< std::endl;
+	{
+		size_t colon = _request[i].find(": ");
+		if (colon != std::string::npos)
+		{
+			std::string key = _request[i].substr(0, colon);
+			std::string value = _request[i].substr(colon + 2, _request.size());
+			// std::cout << "KEY:"<< key << "... VALUE:" << value << "..." << std::endl;
+			_requestmap.insert(std::pair<std::string, std::string>(key, value));
+		}
+	}
+	std::map<std::string,std::string>::iterator it;
+	it = _requestmap.find("Content-Length");
+	if (it != _requestmap.end())
+	{
+		int content_lenght = std::atoi(it->second.c_str());
+
+		while ((tmp_recv = recv(_newsocket, &a, 1, 0)) && content_lenght--) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
+		{
+
+			std::cout << a;
+		}
+	}
+	// int content_lenght = ;
+		// std::cout << _request[i] << std::endl;
+
+	// int i = 419;
+	
 		// if (a == '\n')
 		// {
 		// 	// std::cout << "buf = " << std::endl;
@@ -150,7 +176,6 @@ void Socket::waitRequest()
 		// 	ft_continue_reading(a, buf);
 		// 	break;
 		// }
-	std::cout << "hello" << std::endl;
 	// 	while ((tmp_recv = recv(_newsocket, a, 1, 0))) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
 	// {
 	// 	if (tmp_recv == -1)
