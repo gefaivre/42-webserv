@@ -14,6 +14,7 @@ class ParsingRequest
 		~ParsingRequest();
 
 		t_requestData getData();
+		void displayData() const;
 
 	private:
 		ParsingRequest();

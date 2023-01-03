@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
+/*   Server1.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,87 +10,87 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
+#include "Server1.hpp"
 
-Server::Server()
+Server1::Server1()
 {
 	Location *location;
 	location = new Location("/");
 	this->addLocation(location);
 }
 
-Server::~Server()
+Server1::~Server1()
 {
 }
 
-void	Server::setPort(int port)
+void	Server1::setPort(int port)
 {
 	_port = port;
 }
 
 
-void	Server::setName(vector<string> name)
+void	Server1::setName(vector<string> name)
 {
 	_name = name;
 }
 
 
-// void Server::setAutoIndex(bool autoIndex)
+// void Server1::setAutoIndex(bool autoIndex)
 // {
 // 	_autoIndex = autoIndex;
 // }
 
-// bool	Server::getAutoIndex(void)
+// bool	Server1::getAutoIndex(void)
 // {
 // 	return (_autoIndex);
 // }
 
-// void	Server::setRoot(string root)
+// void	Server1::setRoot(string root)
 // {
 // 	_root = root;
 // }
 
-// string Server::getRoot(void)
+// string Server1::getRoot(void)
 // {
 // 	return (_root);
 // }
 
-void	Server::setClientMaxBodySize(int clientMaxBodySize)
+void	Server1::setClientMaxBodySize(int clientMaxBodySize)
 {
 	_clientMaxBodySize = clientMaxBodySize;
 }
 
-int		Server::getClientMaxBodySize(void)
+int		Server1::getClientMaxBodySize(void)
 {
 	return (_clientMaxBodySize);
 }
 
-// void 	Server::setCgi(string cgi)
+// void 	Server1::setCgi(string cgi)
 // {
 // 	_cgi = cgi;
 // }
 
-// string	Server::getCgi(void)
+// string	Server1::getCgi(void)
 // {
 // 	return (_cgi);
 // }
 
-// void	Server::setAcceptedMethods(t_methods methods)
+// void	Server1::setAcceptedMethods(t_methods methods)
 // {
 // 	_acceptedMethods = methods;
 // }
 
-// t_methods	Server::getAcceptedMethods()
+// t_methods	Server1::getAcceptedMethods()
 // {
 // 	return (_acceptedMethods);
 // }
 
-bool		Server::locationExist(string key)
+bool		Server1::locationExist(string key)
 {
 	return (_locations.find(key) != _locations.end());
 }
 
-void		Server::addLocation(Location *location)
+void		Server1::addLocation(Location *location)
 {
 	if (!locationExist(location->getKey()))
 	{
@@ -102,7 +102,7 @@ void		Server::addLocation(Location *location)
 }
 
 
-Location	Server::getLocationByPath(string path)
+Location	Server1::getLocationByPath(string path)
 {
 //contar quantas /partes/ a key de uma location tem em comum com path.
 	int			max = 0;
@@ -118,7 +118,7 @@ Location	Server::getLocationByPath(string path)
 }
 
 
-void	Server::setupLocations()
+void	Server1::setupLocations()
 {
 	map<string, Location>::iterator iter;
 	for (iter = _locations.begin(); iter != _locations.end(); iter++)

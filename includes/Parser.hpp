@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:21:20 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/16 16:47:53 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/01/03 15:51:14 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 
 #include "webserv.h"
 
-#include "Server.hpp"
+#include "Server1.hpp"
 
 using namespace std;
 
@@ -51,7 +51,7 @@ public:
 	void	parseAutoIndex(string directive, vector<Config *> conf);
 	void	parseDirective(size_t nextSemiColon, vector<Config *> conf);
 	Server	*getServerConf(void);
-	vector<Server *>	getServers(void);
+	vector<Server1 *>	getServers(void);
 };
 
 

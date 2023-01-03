@@ -5,7 +5,7 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-CreateResponse::CreateResponse(std::string path, bool autoindex, t_requestData requestData):
+CreateResponse::CreateResponse(std::string path, bool autoindex, t_requestData const requestData):
 _path(path), _autoindex(autoindex), _requestData(requestData)
 {
 	fillHeaderData();
@@ -168,8 +168,6 @@ void CreateResponse::createBody()
 
 void CreateResponse::BodyIsNotIndex()
 {
-
-
 	_header += "Content-Type: " + _headerData.contentType;
 	_header += "\r\n";
 
@@ -229,6 +227,12 @@ void CreateResponse::BodyIsIndex()
 void CreateResponse::joinHeaderBody()
 {
 	_response = _header + "\r\n" + _body;
+}
+
+void CreateResponse::displayHeaderResponse() const
+{
+	std::cout <<  "Response :" <<  std::endl;
+	std::cout << _header << std::endl;
 }
 
 

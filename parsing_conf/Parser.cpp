@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/16 16:51:26 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/01/03 15:43:59 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	Parser::parseEndOfContext(int i)
 		_currIdx += 2;
 }
 
-Location *Parser::parseNewContext(size_t nextOpenBracket, Server *server)
+Location *Parser::parseNewContext(size_t nextOpenBracket, Server1 *server)
 {
 	string		target = "location ";
 	int 		target_length = target.length();
@@ -134,7 +134,7 @@ Server	*Parser::getServerConf(void)
 		
 	vector<Config *> conf;
 	string sTarget = "server {";
-	Server *server = new Server();
+	Server1 *server = new Server1();
 	conf.push_back(server);
 	cout << "server:" << endl;
 	_currIdx += sTarget.length() + 1;
@@ -166,7 +166,7 @@ Server	*Parser::getServerConf(void)
 
 Parser::Parser(char *configName)
 {
-	vector<Server *> servers;
+	vector<Server1 *> servers;
 	_currIdx = 1;
 	_configFile.open(configName);
 	if (!_configFile.is_open())
@@ -185,7 +185,7 @@ Parser::~Parser(void)
 	_configFile.close();
 }
 
-vector<Server *>	Parser::getServers(void)
+vector<Server1*>	Parser::getServers(void)
 {
 	return (_servers);
 }

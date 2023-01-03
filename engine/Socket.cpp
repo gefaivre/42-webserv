@@ -138,8 +138,8 @@ void Socket::sendResponse(std::string str)
 
 void Socket::displayRequest()
 {
-	// for(long unsigned int i = 0; _request[i] != "\n"; i++)
-	std::cout << _request[0] << std::endl;
+	std::cout << "Request : "<< std::endl;
+	std::cout << "\033[33m" << _request[0] << "\033[0m" << std::endl;
 }
 
 

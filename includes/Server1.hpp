@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   Server1.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-# define SERVER_HPP
+#ifndef Server1_HPP
+# define Server1_HPP
 
 #include <iostream>
 #include <vector>
@@ -23,7 +23,7 @@
 
 using namespace std;
 
-class Server: public Config
+class Server1: public Config
 {
 private:
 	// bool					_autoIndex;
@@ -37,8 +37,8 @@ private:
 public:
 
 	//set as private
-	Server();
-	~Server();
+	Server1();
+	~Server1();
 
 	void			setPort(int port);
 	// int				getPort(void);

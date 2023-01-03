@@ -19,6 +19,7 @@ class CreateResponse
 
 
 		std::string getResponse() const;
+		void displayHeaderResponse() const;
 
 	private:
 		CreateResponse();
