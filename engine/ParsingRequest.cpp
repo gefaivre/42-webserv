@@ -4,7 +4,7 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ParsingRequest::ParsingRequest( std::vector<std::string> request, Server *server):
+ParsingRequest::ParsingRequest( std::vector<std::string> request, Server1 *server):
  _request(request), _server(server)
 {
 	parsingRequest();

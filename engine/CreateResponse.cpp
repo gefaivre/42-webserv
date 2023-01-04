@@ -231,7 +231,6 @@ void CreateResponse::joinHeaderBody()
 
 void CreateResponse::displayHeaderResponse() const
 {
-	std::cout <<  "Response :" <<  std::endl;
 	std::cout << _header << std::endl;
 }
 

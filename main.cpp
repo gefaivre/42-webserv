@@ -1,11 +1,11 @@
-#include "engine/Socket.hpp"
+#include "engine/Server.hpp"
 #include "engine/ParsingRequest.hpp"
 #include "engine/CreateResponse.hpp"
 #include "Parser.hpp"
 #include "Server1.hpp"
 #include <sys/epoll.h>
 
-void epolling(Socket socket, Server1 *server);
+void epolling(Server Server, Server1 *serverconf);
 
 int main(int argc, char **argv)
 {
@@ -19,9 +19,9 @@ int main(int argc, char **argv)
 
 	vector<Server1 *> servers = config->getServers();
 
-	Socket socket(servers[0]->getPort());
+	Server server(servers[0]->getPort());
 
-	epolling(socket, servers[0]);
+	epolling(server, servers[0]);
 
 	return (0);
 }

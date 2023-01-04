@@ -2,9 +2,8 @@ NAME= webserv
 
 SRCS=	main.cpp \
 		engine/utils.cpp \
-		engine/Socket.cpp \
-		engine/Client.cpp \
 		engine/Server.cpp \
+		engine/Client.cpp \
 		engine/CreateResponse.cpp \
 		engine/ParsingRequest.cpp\
 		engine/epolling.cpp\

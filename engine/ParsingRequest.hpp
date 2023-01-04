@@ -3,14 +3,14 @@
 
 # include "utils.hpp"
 #include "general_includes.hpp"
-#include "Server.hpp"
+#include "Server1.hpp"
 
 class ParsingRequest
 {
 
 	public:
 
-		ParsingRequest(std::vector<std::string> request, Server *server);
+		ParsingRequest(std::vector<std::string> request, Server1 *server);
 		~ParsingRequest();
 
 		t_requestData getData();
@@ -26,7 +26,7 @@ class ParsingRequest
 
 		t_requestData _requestData;
 
-		Server *_server;
+		Server1 *_server;
 
 		void setFileToSend404();
 		void setFileToSend403();

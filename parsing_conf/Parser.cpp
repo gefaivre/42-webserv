@@ -6,7 +6,7 @@
 /*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/03 15:43:59 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/04 07:59:49 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ void	Parser::parseDirective(size_t nextSemiColon, vector<Config *> conf)
 			
 }
 
-Server	*Parser::getServerConf(void)
+Server1	*Parser::getServerConf(void)
 {
 	int i = 0;
 
@@ -144,7 +144,7 @@ Server	*Parser::getServerConf(void)
 		switch (_content[next])
 		{
 		case '{':
-			conf.push_back(parseNewContext(next,(Server *) conf[0]));
+			conf.push_back(parseNewContext(next,(Server1 *) conf[0]));
 			break;
 		case '}':
 			parseEndOfContext(i);
