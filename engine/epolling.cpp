@@ -6,22 +6,21 @@
 /*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 12:42:44 by gefaivre          #+#    #+#             */
-/*   Updated: 2023/01/04 10:55:24 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/04 15:58:31 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
-#include "Client.hpp"
-#include "ParsingRequest.hpp"
-#include "CreateResponse.hpp"
 #include "Parser.hpp"
 #include <sys/epoll.h>
+#include "Server.hpp"
+#include "Client.hpp"
+
 
 
 #define MAX_EVENTS 5
 #define READ_SIZE 10
 
-void epolling(Server server, Server1 *serverconf)
+void epolling(Server server)
 { 
 	int running = 1, event_count, i;
 	// char read_buffer[READ_SIZE + 1];
@@ -60,8 +59,9 @@ void epolling(Server server, Server1 *serverconf)
 			{
 				if (events[i].events == EPOLLIN)
 				{
-					Client *client = new Client(events[i].data.fd);
+					Client *client = new Client(&server, events[i].data.fd);
 					server.clients.insert(std::pair<int, Client*>(events[i].data.fd, client));
+					
 					server.clients[events[i].data.fd]->readRequest();
 					event.events = EPOLLOUT;
 					event.data.fd = events[i].data.fd;
@@ -70,11 +70,10 @@ void epolling(Server server, Server1 *serverconf)
 				}
 				else if (events[i].events == EPOLLOUT)
 				{
-					ParsingRequest parsingRequest(server.clients[events[i].data.fd]->getRequest(), serverconf);
-					CreateResponse createResponse("www/", true, parsingRequest.getData());
-					createResponse.displayHeaderResponse();
-
-					server.clients[events[i].data.fd]->sendResponse(createResponse.getResponse());
+					
+					server.clients[events[i].data.fd]->createResponse();
+					
+					server.clients[events[i].data.fd]->sendResponse();
 					
 					epoll_ctl(epoll_fd, EPOLL_CTL_DEL, events[i].data.fd, &event);
 				}

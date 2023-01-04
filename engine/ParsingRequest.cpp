@@ -4,7 +4,7 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ParsingRequest::ParsingRequest( std::vector<std::string> request, Server1 *server):
+ParsingRequest::ParsingRequest( std::vector<std::string> request, Server *server):
  _request(request), _server(server)
 {
 	parsingRequest();
@@ -58,14 +58,14 @@ void ParsingRequest::parsingRequest()
 			_requestData.protocol = _request[i].substr(last + 1, _request[i].size());
 		}
 	}
-	_autoindex = _server->getLocationByPath(_requestData.path).getAutoIndex();
+	_autoindex = _server->Mserv->getLocationByPath(_requestData.path).getAutoIndex();
 
 }
 
 void ParsingRequest::setFileToSend404()
 {
 	std::string path;
-	path = _server->getLocationByPath(_requestData.path).getRoot();
+	path = _server->Mserv->getLocationByPath(_requestData.path).getRoot();
 	path += "404.html";
 	if (access(path.c_str(), R_OK) == 0)
 		_requestData.fileToSend = path;
@@ -76,7 +76,7 @@ void ParsingRequest::setFileToSend404()
 void ParsingRequest::setFileToSend403()
 {
 	std::string path;
-	path = _server->getLocationByPath(_requestData.path).getRoot();
+	path = _server->Mserv->getLocationByPath(_requestData.path).getRoot();
 	path += "403.html";
 	if (access(path.c_str(), R_OK) == 0)
 		_requestData.fileToSend = path;
@@ -105,7 +105,7 @@ int ParsingRequest::foundFileToSend()
 	std::string fullPathFile;
 	_requestData.isIndex = 0;
 
-	rootPath = _server->getLocationByPath(_requestData.path).getRoot();
+	rootPath = _server->Mserv->getLocationByPath(_requestData.path).getRoot();
 
 	_requestData.fileToSend = _requestData.path;
 

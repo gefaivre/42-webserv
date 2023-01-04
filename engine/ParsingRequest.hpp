@@ -1,16 +1,17 @@
 #ifndef PARSINGREQUEST_HPP
-# define PARSINGREQUEST_HPP
+#define PARSINGREQUEST_HPP
 
-# include "utils.hpp"
-#include "general_includes.hpp"
-#include "Server1.hpp"
+#include "utils.hpp"
+#include "Server.hpp"
+
+class Server;
 
 class ParsingRequest
 {
 
 	public:
 
-		ParsingRequest(std::vector<std::string> request, Server1 *server);
+		ParsingRequest(std::vector<std::string> request, Server *server);
 		~ParsingRequest();
 
 		t_requestData getData();
@@ -26,7 +27,7 @@ class ParsingRequest
 
 		t_requestData _requestData;
 
-		Server1 *_server;
+		Server *_server;
 
 		void setFileToSend404();
 		void setFileToSend403();
@@ -36,8 +37,6 @@ class ParsingRequest
 		int filepermission();
 
 		int foundFileToSend();
-
-
 
 };
 

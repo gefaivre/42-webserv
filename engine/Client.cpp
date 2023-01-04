@@ -4,8 +4,8 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Client::Client(int clientfd):
-    _clientfd(clientfd)
+Client::Client(Server *server, int clientfd):
+    _clientfd(clientfd), _server(server)
 {
 
 }
@@ -93,9 +93,17 @@ void Client::readRequest()
 	}
 }
 
-void Client::sendResponse(std::string str)
+void Client::createResponse()
 {
-	if (send(_clientfd, str.c_str(), str.size(), 0) == -1)
+    ParsingRequest parsingRequest(_request, _server);
+	CreateResponse createResponse("www/", true, parsingRequest.getData());
+	createResponse.displayHeaderResponse();
+    _response = createResponse.getResponse();
+}
+
+void Client::sendResponse()
+{
+	if (send(_clientfd, _response.c_str(), _response.size(), 0) == -1)
 		ft_define_error("Send error");
 	if (close(_clientfd) == -1)
 		ft_define_error("Close error");

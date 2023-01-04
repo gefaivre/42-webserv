@@ -7,31 +7,38 @@
 #include <string>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <utils.hpp>
+#include "utils.hpp"
+#include "ParsingRequest.hpp"
+#include "CreateResponse.hpp"
+
 
 char **ft_split(const char *str);
+class Server;
+
 
 class Client
 {
 
 	public:
 
-		Client(int clientfd);
+		Client(Server *server, int clientfd);
 		// Client( Client const & src );
 		~Client();
 
 		void displayRequest();
 		void readRequest();
-		void sendResponse(std::string str);
-		
+		void sendResponse();
+		void createResponse();
+
 		std::vector<std::string> getRequest() const;
-
-
 
 	private:
 
 		std::vector<std::string> _request;
+		std::string _response;
+
 		int _clientfd;
+		Server *_server;
 
 
 };
