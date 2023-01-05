@@ -27,7 +27,9 @@ class Client
 		~Client();
 
 		void displayRequest();
+		void displayFullRequest();
 		void readRequest();
+		void readRequest1();
 		void parseHeader(std::string buf);
 		void sendResponse();
 		void createResponse();
@@ -36,12 +38,15 @@ class Client
 
 	private:
 
+		std::string _requestLine;
 		std::vector<std::string> _request;
 		std::map<std::string, std::string> _requestmap;
 		std::string _response;
 
 		int _clientfd;
 		Server *_server;
+
+		int headerIsRead;
 
 
 };

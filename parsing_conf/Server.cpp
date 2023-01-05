@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/05 16:57:45 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/05 17:41:04 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ void Server::newclient(int epoll_fd)
 	event.events = EPOLLIN;
 	event.data.fd = serverfd;
 	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, serverfd, &event);
+	
 	
 }
 
@@ -131,5 +132,16 @@ void	Server::setupLocations()
 int Server::getServerFd() const
 {
 	return (_sockfd);
+}
+
+
+void			Server::setEpollFd(int epollfd)
+{
+	this->_epollfd = epollfd;
+}
+
+int				Server::getEpollFd() const
+{
+	return(this->_epollfd);
 }
 

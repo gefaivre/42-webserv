@@ -7,7 +7,7 @@
 Client::Client(Server *server, int clientfd):
     _clientfd(clientfd), _server(server)
 {
-
+	headerIsRead = 0;
 }
 
 // Client::Client( const Client & src )
@@ -112,13 +112,57 @@ void Client::readRequest()
 		if (tmp_recv == -1)
 			ft_define_error("Error with the message from a socket");
 		buf += a;
-			if (buf.find("\n\r\n") != std::string::npos)
+			if (buf.find("\r\n\r\n") != std::string::npos)
 			{
 				std::cout << "hello" << std::endl;
 				break;
 			}
 	}
 	parseHeader(buf);
+
+}
+
+
+void Client::readRequest1()
+{
+
+	char buf[50];
+	int sizeRead;
+	struct epoll_event event;
+
+	bzero(buf, 50);
+
+	if (headerIsRead == 0)
+	{
+		sizeRead = recv(_clientfd, buf, 49, 0);
+		if (sizeRead == -1)
+			std::cout << "Error recv" << std::endl;
+		_requestLine += std::string(buf);
+		
+		while (_requestLine.find("\r\n") != std::string::npos)
+		{
+			std::string line = _requestLine.substr(0, _requestLine.find("\r\n"));
+			_requestLine.erase(0, _requestLine.find("\r\n") + 2);
+			_request.push_back(line);
+
+		}
+		if ((_request[_request.size() - 1].size() == 0))
+		{
+			event.events = EPOLLOUT;
+			event.data.fd = _clientfd;
+			epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
+			headerIsRead = 1;
+		}
+		// if ("\r\n\r\n")
+		// 	headerIsRead = 1;
+	}
+
+	
+	// else if (parseHeader(buf) != 0)
+	// {
+
+	// }
+
 }
 
 void Client::createResponse()
@@ -140,6 +184,13 @@ void Client::sendResponse()
 void Client::displayRequest()
 {
 	std::cout << "\n" << "\033[33m" << _request[0] << "\033[0m" << std::endl;
+}
+
+void Client::displayFullRequest()
+{
+	std::cout << std::endl;
+	for(size_t i = 0; i < _request.size(); i++)
+		std::cout << "\033[33m" << _request[i] << "\033[0m" << std::endl;
 }
 
 /*

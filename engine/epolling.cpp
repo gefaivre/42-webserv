@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 12:42:44 by gefaivre          #+#    #+#             */
-/*   Updated: 2023/01/05 16:37:28 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/05 18:35:37 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,10 @@ void epolling(Server server)
 		fprintf(stderr, "Failed to create epoll file descriptor\n");
 		return;
 	}
+	server.setEpollFd(epoll_fd);
 
 	event.events = EPOLLIN;
 	event.data.fd = server.getServerFd();
-
-	std::cout << "Server fd = " << server.getServerFd() << std::endl;
 	
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server.getServerFd(), &event))
 	{
@@ -50,11 +49,8 @@ void epolling(Server server)
 	
 	while (running)
 	{
-		std::cout << "Wait for polling" << std::endl;
 		event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
-		std::cout << "After epoll" << std::endl;
 		
-
 		for (i = 0; i < event_count; i++)
 		{
 
@@ -66,23 +62,24 @@ void epolling(Server server)
 			{
 				if (events[i].events == EPOLLIN)
 				{
-					Client *client = new Client(&server, events[i].data.fd);
-					server.clients.insert(std::pair<int, Client*>(events[i].data.fd, client));
+					if (server.clients.find(events[i].data.fd) == server.clients.end())
+					{	
+						Client *client = new Client(&server, events[i].data.fd);
+						server.clients.insert(std::pair<int, Client*>(events[i].data.fd, client));
+					}
 					
-					server.clients[events[i].data.fd]->readRequest();
-					event.events = EPOLLOUT;
-					event.data.fd = events[i].data.fd;
-					epoll_ctl(epoll_fd, EPOLL_CTL_MOD, events[i].data.fd, &event);
-					server.clients[events[i].data.fd]->displayRequest();
+					server.clients[events[i].data.fd]->readRequest1();
 				}
 				else if (events[i].events == EPOLLOUT)
 				{
-					
+					server.clients[events[i].data.fd]->displayRequest();
 					server.clients[events[i].data.fd]->createResponse();
 					
 					server.clients[events[i].data.fd]->sendResponse();
 					
 					epoll_ctl(epoll_fd, EPOLL_CTL_DEL, events[i].data.fd, &event);
+					delete server.clients[events[i].data.fd];
+					server.clients.erase(server.clients.find(events[i].data.fd));
 				}
 					
 			}
