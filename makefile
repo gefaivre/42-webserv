@@ -7,6 +7,7 @@ SRCS=	main.cpp \
 		engine/CreateResponse.cpp \
 		engine/ParsingRequest.cpp\
 		engine/epolling.cpp\
+		engine/ft_split_header.cpp\
 		parsing_conf/Parser.cpp parsing_conf/Server1.cpp parsing_conf/Config.cpp\
 		parsing_conf/ft_split.cpp \
 		parsing_conf/Location.cpp \

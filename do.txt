@@ -42,3 +42,10 @@ Age: 7 -->
 ParsingRequest :
 
 set bool isIndex;
+
+
+
+HEADER\r\n
+\r\n
+BODY
+\r\n

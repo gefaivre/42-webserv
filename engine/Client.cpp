@@ -47,50 +47,78 @@ Client::~Client()
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
+int	ft_find_content_lenght(std::map<std::string, std::string> _requestmap)
+{
+	std::map<std::string,std::string>::iterator it;
+	it = _requestmap.find("Content-Length");
+	int content_lenght = 0;
+	if (it != _requestmap.end())
+	{
+		content_lenght = std::atoi(it->second.c_str());
+
+		// while ((tmp_recv = recv(_newsocket, &a, 1, 0)) && content_lenght--) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
+		// {
+		// 	std::cout << a;
+		// }
+	}
+	return (content_lenght);
+}
+
+std::string	ft_find_boundary(std::map<std::string, std::string> _requestmap, int content_lenght)
+{
+	std::string boundary;
+	size_t pos_equal = 0;
+	std::map<std::string,std::string>::iterator it;
+	if (content_lenght > 0)
+	{
+		it = _requestmap.find("Content-Type");
+		if (it != _requestmap.end())
+		{
+			pos_equal = it->second.find_last_of('=');
+			std::cout << "equal = " << pos_equal << std::endl;
+		}
+	}
+	return (boundary);
+}
+
+
+void Client::parseHeader(std::string buf)
+{
+	_request = ft_split_header(buf);
+	for (size_t i = 0; i < _request.size(); i++)
+	{
+		size_t colon = _request[i].find(": ");
+		if (colon != std::string::npos)
+		{
+			std::string key = _request[i].substr(0, colon);
+			std::string value = _request[i].substr(colon + 2, _request.size());
+			_requestmap.insert(std::pair<std::string, std::string>(key, value));
+		}
+	}
+	int content_lenght = ft_find_content_lenght(_requestmap);
+	std::string boundary = ft_find_boundary(_requestmap, content_lenght);
+	
+}
 
 void Client::readRequest()
 {
-	char a[1] = {0};
+	char a = 0;
 	std::string buf;
 	_request.clear();
+	// size_t last_newline;
 	ssize_t tmp_recv;
-	int size = -1;
-	int tmp_switch = 0;
-	bool method_get = false;
-	while ((tmp_recv = recv(_clientfd, a, 1, 0))) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
+	while ((tmp_recv = recv(_clientfd, &a, 1, 0))) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
 	{
 		if (tmp_recv == -1)
 			ft_define_error("Error with the message from a socket");
-		buf += a[0];
-		if (a[0] == '\n' || size == 0)
-		{
-			//find the size of the body
-			const char *c = strstr(buf.c_str(), "Content-Length: ");
-			if (c && size == -1)
+		buf += a;
+			if (buf.find("\n\r\n") != std::string::npos)
 			{
-				char **len_split = ft_split(c);
-				size = atoi(len_split[1]);
+				std::cout << "hello" << std::endl;
+				break;
 			}
-			//find the method
-			if (method_get == false && strstr(buf.c_str(), "GET"))
-				method_get = true;
-			if (a[0] == '\n')
-				buf.erase(buf.find("\r\n") ,buf.size());
-			_request.push_back(buf);
-			buf.clear();
-			if (_request[_request.size() - 1].size() == 0 || size == 0)
-			{
-				if (tmp_switch == 1 || method_get)
-				{
-					tmp_switch = 0;
-					break;
-				}
-				tmp_switch = 1;
-			}
-		}
-		if (size > 0 && tmp_switch == 1)
-			size--;
 	}
+	parseHeader(buf);
 }
 
 void Client::createResponse()

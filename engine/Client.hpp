@@ -13,6 +13,7 @@
 
 
 char **ft_split(const char *str);
+std::vector<std::string>	ft_split_header(std::string str);
 class Server;
 
 
@@ -27,6 +28,7 @@ class Client
 
 		void displayRequest();
 		void readRequest();
+		void parseHeader(std::string buf);
 		void sendResponse();
 		void createResponse();
 
@@ -35,6 +37,7 @@ class Client
 	private:
 
 		std::vector<std::string> _request;
+		std::map<std::string, std::string> _requestmap;
 		std::string _response;
 
 		int _clientfd;
