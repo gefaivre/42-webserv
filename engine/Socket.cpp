@@ -1,5 +1,6 @@
 #include "Socket.hpp"
 #include "webserv.h"
+#include <string>
 
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
@@ -101,8 +102,42 @@ void	ft_continue_reading(char a, std::string buf)
 	std::cout << buf;
 }
 
+int	ft_find_content_lenght(std::map<std::string, std::string> _requestmap)
+{
+	std::map<std::string,std::string>::iterator it;
+	it = _requestmap.find("Content-Length");
+	int content_lenght = 0;
+	if (it != _requestmap.end())
+	{
+		content_lenght = std::atoi(it->second.c_str());
 
-void Socket::parseHeader(std::string buf, char a, ssize_t tmp_recv)
+		// while ((tmp_recv = recv(_newsocket, &a, 1, 0)) && content_lenght--) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
+		// {
+		// 	std::cout << a;
+		// }
+	}
+	return (content_lenght);
+}
+
+std::string	ft_find_boundary(std::map<std::string, std::string> _requestmap, int content_lenght)
+{
+	std::string boundary;
+	size_t pos_equal = 0;
+	std::map<std::string,std::string>::iterator it;
+	if (content_lenght > 0)
+	{
+		it = _requestmap.find("Content-Type");
+		if (it != _requestmap.end())
+		{
+			pos_equal = it->second.find_last_of('=');
+			std::cout << "equal = " << pos_equal << std::endl;
+		}
+	}
+	return (boundary);
+}
+
+
+void Socket::parseHeader(std::string buf)
 {
 	_request = ft_split_header(buf);
 	for (size_t i = 0; i < _request.size(); i++)
@@ -115,15 +150,9 @@ void Socket::parseHeader(std::string buf, char a, ssize_t tmp_recv)
 			_requestmap.insert(std::pair<std::string, std::string>(key, value));
 		}
 	}
-	std::map<std::string,std::string>::iterator it;
-	it = _requestmap.find("Content-Length");
-	if (it != _requestmap.end())
-	{
-		int content_lenght = std::atoi(it->second.c_str());
-
-		while ((tmp_recv = recv(_newsocket, &a, 1, 0)) && content_lenght--) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
-			std::cout << a;
-	}
+	int content_lenght = ft_find_content_lenght(_requestmap);
+	std::string boundary = ft_find_boundary(_requestmap, content_lenght);
+	
 }
 
 void Socket::waitRequest()
@@ -149,7 +178,7 @@ void Socket::waitRequest()
 				break;
 			}
 	}
-	parseHeader(buf, a, tmp_recv);
+	parseHeader(buf);
 }
 
 
