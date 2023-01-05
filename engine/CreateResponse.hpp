@@ -2,8 +2,6 @@
 # define CREATERESPONSE_HPP
 
 # include "utils.hpp"
-#include "general_includes.hpp"
-#include "Socket.hpp"
 
 
 char **ft_split(char *str);
@@ -15,12 +13,11 @@ class CreateResponse
 
 		CreateResponse(std::string path, bool autoindex, t_requestData requestData);
 
-		// CreateResponse( CreateResponse const & src );
 		~CreateResponse();
 
-		// CreateResponse &		operator=( CreateResponse const & rhs );
 
 		std::string getResponse() const;
+		void displayHeaderResponse() const;
 
 	private:
 		CreateResponse();

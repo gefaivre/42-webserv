@@ -11,10 +11,6 @@ ParsingRequest::ParsingRequest( std::vector<std::string> request, Server *server
 	foundFileToSend();
 }
 
-// ParsingRequest::ParsingRequest( const ParsingRequest & src )
-// {
-// }
-
 
 /*
 ** -------------------------------- DESTRUCTOR --------------------------------
@@ -49,6 +45,23 @@ ParsingRequest::~ParsingRequest()
 ** --------------------------------- METHODS ----------------------------------
 */
 
+void ParsingRequest::parsingRequest()
+{
+	for(unsigned long int i = 0; i < _request.size()  ; i++)
+	{
+		if (_request.size() > 0 && i == 0)
+		{
+			_requestData.methode = _request[i].substr(0, _request[i].find(" ", 0));
+			unsigned int first = _requestData.methode.size() + 1;
+			unsigned int last = _request[i].find(" ", first);
+			_requestData.path = _request[i].substr(first, last - first);
+			_requestData.protocol = _request[i].substr(last + 1, _request[i].size());
+		}
+	}
+	_autoindex = _server->getLocationByPath(_requestData.path).getAutoIndex();
+
+}
+
 void ParsingRequest::setFileToSend404()
 {
 	std::string path;
@@ -64,7 +77,6 @@ void ParsingRequest::setFileToSend403()
 {
 	std::string path;
 	path = _server->getLocationByPath(_requestData.path).getRoot();
-	// std::cout << _server->getLocationByPath(_requestData.path).getRoot() << std::endl;
 	path += "403.html";
 	if (access(path.c_str(), R_OK) == 0)
 		_requestData.fileToSend = path;
@@ -73,78 +85,82 @@ void ParsingRequest::setFileToSend403()
 }
 
 
-void ParsingRequest::parsingRequest()
-{
-	for(unsigned long int i = 0; i < _request.size()  ; i++)
-	{
-		if (_request.size() > 0 && i == 0)
-		{
-			_requestData.methode = _request[i].substr(0, _request[i].find(" ", 0));
-			unsigned int first = _requestData.methode.size() + 1;
-			unsigned int last = _request[i].find(" ", first);
-			_requestData.path = _request[i].substr(first, last - first);
-			_requestData.protocol = _request[i].substr(last + 1, _request[i].size());
-		}
-		// std::cout << "_request = " <<_request[i] << std::endl;
-	}
-	_autoindex = _server->getLocationByPath(_requestData.path).getAutoIndex();
-	// std::cout << "auto index = "<< _autoindex << std::endl;
-}
 
 int ParsingRequest::filepermission()
 {
-	std::cout << _requestData.fileToSend << std::endl;
 	int fd;
-	std::cout << _requestData.fileToSend << std::endl;
+
+	fd = access(_requestData.fileToSend.c_str(), F_OK);
+	if (fd == -1)
+		setFileToSend404();
 	fd = access(_requestData.fileToSend.c_str(), R_OK);
 	if (fd == -1 || _autoindex == 0)
 		setFileToSend403();
-	fd = access(_requestData.fileToSend.c_str(), F_OK);
-	// std::cout << "TESTTTTTTTTTT" << fd << std::endl;
-	if (fd == -1)
-	// {
-		setFileToSend404();
-		// return (0);
-	// }
-		// _requestData.fileToSend = _path + "403.html";
 	return (0);
 }
 
 int ParsingRequest::foundFileToSend()
 {
-	_requestData.fileToSend = _requestData.path ;
+	std::string rootPath;
+	std::string fullPathFile;
+	_requestData.isIndex = 0;
+
+	rootPath = _server->getLocationByPath(_requestData.path).getRoot();
+
+	_requestData.fileToSend = _requestData.path;
+
 	if (_requestData.fileToSend[0] == '/')
 		_requestData.fileToSend.erase(0, 1);
-	// std::cout << "file = " << _requestData.fileToSend[0] << std::endl;
-	// std::cout << "fileToSend = " << _requestData.fileToSend << std::endl;
 
-	_requestData.isIndex = 0;
-	// std::cout << "Root = " << isDirectory(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend) << std::endl;
-	// std::cout << "file = " << !fileExist(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend + "index.html")<< std::endl;
-	// std::cout << "_autoindex = " << _autoindex<< std::endl;
+	_requestData.fileToSend = rootPath + _requestData.fileToSend ;
+	fullPathFile = _requestData.fileToSend;
+
 	
-	if (_autoindex == 1 && isDirectory(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend) && !fileExist(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend + "index.html"))
+	if (_autoindex == 1 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
 	{
-		_requestData.fileToSend = _server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend;
+		// std::cout << "--1--" << std::endl;
+		_requestData.fileToSend = fullPathFile;
 		_requestData.isIndex = 1;
 	}
-	else if (isDirectory(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend))
-		_requestData.fileToSend = _server->getLocationByPath(_requestData.path).getRoot() + "index.html";
-	
-	else if (_autoindex == 0 && isDirectory(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend) && !fileExist(_server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend + "index.html"))
+	else if (isDirectory(fullPathFile))
+	{
+		// std::cout << "--2--" << std::endl;
+		_requestData.fileToSend = rootPath + "index.html";
+	}
+	else if (_autoindex == 0 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
+	{
+		// std::cout << "--3--" << std::endl;
 		filepermission();
+	}
 	else
-		_requestData.fileToSend = _server->getLocationByPath(_requestData.path).getRoot() + _requestData.fileToSend;
-	FILE *f = fopen(_requestData.fileToSend.c_str(), "r+");
+	{
+		// std::cout << "--4--" << std::endl;
+		_requestData.fileToSend = fullPathFile;
+	}
+
+	FILE *f = fopen(fullPathFile.c_str(), "r+");
 	if ( f == NULL)
 	{
 		if (_autoindex == 1 && errno == 21)
 			return (1);
+		std::cout << "can't open " << fullPathFile << std::endl;
 		filepermission();
 	}
 	else
 		fclose(f);
 	return (0);
+}
+
+
+void ParsingRequest::displayData() const
+{
+	std::cout << "Request Data :" << std::endl;
+	std::cout << "methode \t= " 				<< _requestData.methode << std::endl;
+	std::cout << "protocol \t= " 			<< _requestData.protocol << std::endl;
+	// std::cout << "Connection = "			<< _requestData.Connection << std::endl;
+	std::cout << "path \t\t= "					<< _requestData.path << std::endl;
+	std::cout << "fileToSend \t= "			<< _requestData.fileToSend << std::endl;
+	std::cout << "isIndex \t= " 				<< _requestData.isIndex << std::endl;
 }
 
 

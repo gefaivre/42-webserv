@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/16 16:51:26 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/01/05 16:14:28 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,7 +185,7 @@ Parser::~Parser(void)
 	_configFile.close();
 }
 
-vector<Server *>	Parser::getServers(void)
+vector<Server*>	Parser::getServers(void)
 {
 	return (_servers);
 }

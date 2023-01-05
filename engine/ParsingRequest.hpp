@@ -1,9 +1,10 @@
 #ifndef PARSINGREQUEST_HPP
-# define PARSINGREQUEST_HPP
+#define PARSINGREQUEST_HPP
 
-# include "utils.hpp"
-#include "general_includes.hpp"
+#include "utils.hpp"
 #include "Server.hpp"
+
+class Server;
 
 class ParsingRequest
 {
@@ -11,12 +12,10 @@ class ParsingRequest
 	public:
 
 		ParsingRequest(std::vector<std::string> request, Server *server);
-		// ParsingRequest( ParsingRequest const & src );
 		~ParsingRequest();
 
-		// ParsingRequest &		operator=( ParsingRequest const & rhs );
-
 		t_requestData getData();
+		void displayData() const;
 
 	private:
 		ParsingRequest();
@@ -38,8 +37,6 @@ class ParsingRequest
 		int filepermission();
 
 		int foundFileToSend();
-
-
 
 };
 

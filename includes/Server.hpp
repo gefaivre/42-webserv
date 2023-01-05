@@ -3,68 +3,66 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:29:46 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/16 16:16:33 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/01/05 17:40:55 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-# define SERVER_HPP
+#ifndef Server_HPP
+# define Server_HPP
 
 #include <iostream>
+#include <string>
 #include <vector>
 #include "webserv.h"
 #include <map>
 #include "Config.hpp"
-
 #include "Location.hpp"
+#include <sys/epoll.h>
+#include "../engine/utils.hpp"
+#include "../includes/Server.hpp"
 
-using namespace std;
+char **ft_split(const char *str);
+class Client;
 
 class Server: public Config
 {
 private:
-	// bool					_autoIndex;
-	// string					_root;
-	// string					_cgi;
-	// t_methods				_acceptedMethods;
+
 	map<string, Location>	_locations;
+	int _sockfd;
+	struct sockaddr_in _addr;
+	int _epollfd;
 		
 
 	
 public:
 
-	//set as private
 	Server();
 	~Server();
 
+	void 			setStruct();
 	void			setPort(int port);
-	// int				getPort(void);
 	
-	void			setName(vector<string> name);
-	// vector<string>	getName(void);
+	void			setName(std::vector<string> name);
 
-	// void			setAutoIndex(bool autoIndex);
-	// bool			getAutoIndex(void);
-
-	// void			setRoot(string root);
-	// string			getRoot(void);
+	void 			newclient(int epoll_fd);
+	std::map<int, Client *> 		clients;
+	void 			setSocket();
+	
+	void			setEpollFd(int epollfd);
+	int				getEpollFd() const;
 
 	void			setClientMaxBodySize(int clientMaxBodySize);
 	int				getClientMaxBodySize(void);
 
-	// void			setCgi(string cgi);
-	// string			getCgi(void);
+	int 			getServerFd() const;
 
-	// void 			setAcceptedMethods(t_methods methods);
-	// t_methods		getAcceptedMethods();
-
-
-	bool			locationExist(string key);
+	bool			locationExist(std::string key);
 	void			addLocation(Location *location);
-	Location		getLocationByPath(string path);
+	Location		getLocationByPath(std::string path);
 
 	void 			setupLocations();
 };
@@ -72,6 +70,3 @@ public:
 
 
 #endif
-
-//:8020/all_test/oi/index.html
-//:8020/all_test/oi
