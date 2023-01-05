@@ -102,6 +102,30 @@ void	ft_continue_reading(char a, std::string buf)
 }
 
 
+void Socket::parseHeader(std::string buf, char a, ssize_t tmp_recv)
+{
+	_request = ft_split_header(buf);
+	for (size_t i = 0; i < _request.size(); i++)
+	{
+		size_t colon = _request[i].find(": ");
+		if (colon != std::string::npos)
+		{
+			std::string key = _request[i].substr(0, colon);
+			std::string value = _request[i].substr(colon + 2, _request.size());
+			_requestmap.insert(std::pair<std::string, std::string>(key, value));
+		}
+	}
+	std::map<std::string,std::string>::iterator it;
+	it = _requestmap.find("Content-Length");
+	if (it != _requestmap.end())
+	{
+		int content_lenght = std::atoi(it->second.c_str());
+
+		while ((tmp_recv = recv(_newsocket, &a, 1, 0)) && content_lenght--) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
+			std::cout << a;
+	}
+}
+
 void Socket::waitRequest()
 {
 	socklen_t addrlen = sizeof(_addr);
@@ -119,100 +143,13 @@ void Socket::waitRequest()
 		if (tmp_recv == -1)
 			ft_define_error("Error with the message from a socket");
 		buf += a;
-		// if (buf.find("\n\r\n") != std::string::npos)
-		// if (a == '\n')
-		// {
-		// 	last_newline = buf.size();
-		// 	buf.erase(buf.find("\r\n") ,buf.size());
-		// 	_request.push_back(buf.substr(last_newline, ));
-		// 	buf.clear();
 			if (buf.find("\n\r\n") != std::string::npos)
 			{
 				std::cout << "hello" << std::endl;
 				break;
 			}
-		// }
-		// std::cout << a;
 	}
-	_request = ft_split_header(buf);
-	for (size_t i = 0; i < _request.size(); i++)
-	{
-		size_t colon = _request[i].find(": ");
-		if (colon != std::string::npos)
-		{
-			std::string key = _request[i].substr(0, colon);
-			std::string value = _request[i].substr(colon + 2, _request.size());
-			// std::cout << "KEY:"<< key << "... VALUE:" << value << "..." << std::endl;
-			_requestmap.insert(std::pair<std::string, std::string>(key, value));
-		}
-	}
-	std::map<std::string,std::string>::iterator it;
-	it = _requestmap.find("Content-Length");
-	if (it != _requestmap.end())
-	{
-		int content_lenght = std::atoi(it->second.c_str());
-
-		while ((tmp_recv = recv(_newsocket, &a, 1, 0)) && content_lenght--) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
-		{
-
-			std::cout << a;
-		}
-	}
-	// int content_lenght = ;
-		// std::cout << _request[i] << std::endl;
-
-	// int i = 419;
-	
-		// if (a == '\n')
-		// {
-		// 	// std::cout << "buf = " << std::endl;
-		// 	if (a == '\n')
-		// 		buf.erase(buf.find("\r\n") ,buf.size());
-		// 	_request.push_back(buf);
-		// 	buf.clear();
-		// }
-		// if (_request[_request.size() - 1].size() == 0 )
-		// {
-		// 	ft_continue_reading(a, buf);
-		// 	break;
-		// }
-	// 	while ((tmp_recv = recv(_newsocket, a, 1, 0))) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
-	// {
-	// 	if (tmp_recv == -1)
-	// 		ft_define_error("Error with the message from a socket");
-	// 	buf += a[0];
-	// 	if (a[0] == '\n' || size == 0)
-	// 	{
-	// 		//find the size of the body
-	// 		const char *c = strstr(buf.c_str(), "Content-Length: ");
-	// 		if (c && size == -1)
-	// 		{
-	// 			char **len_split = ft_split(c);
-	// 			size = atoi(len_split[1]);
-	// 			std::cout << "size = " << size << std::endl;
-	// 		}
-	// 		//find the method
-	// 		if (method_get == false && strstr(buf.c_str(), "GET"))
-	// 			method_get = true;
-	// 		if (a[0] == '\n')
-	// 			buf.erase(buf.find("\r\n") ,buf.size());
-	// 		_request.push_back(buf);
-	// 		buf.clear();
-	// 		if (_request[_request.size() - 1].size() == 0 || size == 0)
-	// 		{
-	// 			std::cout << "size = " << size << std::endl;
-	// 			if (tmp_switch == 1 || method_get)
-	// 			{
-	// 				tmp_switch = 0;
-	// 				break;
-	// 			}
-	// 			tmp_switch = 1;
-	// 		}
-	// 	}
-	// 	if (size > 0 && tmp_switch == 1)
-	// 		size--;
-	// 	std::cout << a[0];
-	// }
+	parseHeader(buf, a, tmp_recv);
 }
 
 

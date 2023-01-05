@@ -17,6 +17,8 @@ public:
 
 
 	void waitRequest();
+	void parseHeader(std::string buf, char a, ssize_t tmp_recv);
+	void parseBody();
 
 	void displayRequest();
 
