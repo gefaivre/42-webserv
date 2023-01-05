@@ -4,10 +4,10 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Server::Server()
+OldServer::OldServer()
 {}
 
-Server::Server(int port, Server1 *Mserv):
+OldServer::OldServer(int port, Server *Mserv):
 	Mserv(Mserv), _port(port)
 {
 	setStruct();
@@ -31,7 +31,7 @@ Server::Server(int port, Server1 *Mserv):
 ** -------------------------------- DESTRUCTOR --------------------------------
 */
 
-Server::~Server()
+OldServer::~OldServer()
 {
 	close(_sockfd);
 }
@@ -53,7 +53,7 @@ Server::~Server()
 ** --------------------------------- METHODS ----------------------------------
 */
 
-void Server::setStruct()
+void OldServer::setStruct()
 {
 	memset((char *)&_addr, 0, sizeof(_addr));
 	_addr.sin_addr.s_addr = INADDR_ANY;
@@ -62,18 +62,18 @@ void Server::setStruct()
 }
 
 
-void Server::newclient(int epoll_fd)
+void OldServer::newclient(int epoll_fd)
 {
-	int newsocket;
+	int serverfd;
 	struct epoll_event event;
 	socklen_t addrlen = sizeof(_addr);
 
-	newsocket = accept(this->getServerFd(), (struct sockaddr *)&_addr, &addrlen);
-	if (newsocket == -1)
+	serverfd = accept(this->getServerFd(), (struct sockaddr *)&_addr, &addrlen);
+	if (serverfd == -1)
 		ft_define_error("Error the connection with the socket was not established");
 	event.events = EPOLLIN;
-	event.data.fd = newsocket;
-	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, newsocket, &event);
+	event.data.fd = serverfd;
+	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, serverfd, &event);
 	
 }
 
@@ -100,12 +100,12 @@ void Server::newclient(int epoll_fd)
 ** --------------------------------- ACCESSOR ---------------------------------
 */
 
-int Server::getPort() const
+int OldServer::getPort() const
 {
 	return (_port);
 }
 
-int Server::getServerFd() const
+int OldServer::getServerFd() const
 {
 	return (_sockfd);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   epolling.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 12:42:44 by gefaivre          #+#    #+#             */
-/*   Updated: 2023/01/04 15:58:31 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/05 16:37:28 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ void epolling(Server server)
 	struct epoll_event event, events[MAX_EVENTS];
 
 
+
 	int epoll_fd = epoll_create1(0);
 	if (epoll_fd == -1)
 	{
@@ -36,6 +37,8 @@ void epolling(Server server)
 
 	event.events = EPOLLIN;
 	event.data.fd = server.getServerFd();
+
+	std::cout << "Server fd = " << server.getServerFd() << std::endl;
 	
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server.getServerFd(), &event))
 	{
@@ -43,10 +46,14 @@ void epolling(Server server)
 		close(epoll_fd);
 		return;
 	}
+
 	
 	while (running)
 	{
+		std::cout << "Wait for polling" << std::endl;
 		event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
+		std::cout << "After epoll" << std::endl;
+		
 
 		for (i = 0; i < event_count; i++)
 		{

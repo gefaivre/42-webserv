@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/04 07:59:49 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/05 16:14:28 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	Parser::parseEndOfContext(int i)
 		_currIdx += 2;
 }
 
-Location *Parser::parseNewContext(size_t nextOpenBracket, Server1 *server)
+Location *Parser::parseNewContext(size_t nextOpenBracket, Server *server)
 {
 	string		target = "location ";
 	int 		target_length = target.length();
@@ -127,14 +127,14 @@ void	Parser::parseDirective(size_t nextSemiColon, vector<Config *> conf)
 			
 }
 
-Server1	*Parser::getServerConf(void)
+Server	*Parser::getServerConf(void)
 {
 	int i = 0;
 
 		
 	vector<Config *> conf;
 	string sTarget = "server {";
-	Server1 *server = new Server1();
+	Server *server = new Server();
 	conf.push_back(server);
 	cout << "server:" << endl;
 	_currIdx += sTarget.length() + 1;
@@ -144,7 +144,7 @@ Server1	*Parser::getServerConf(void)
 		switch (_content[next])
 		{
 		case '{':
-			conf.push_back(parseNewContext(next,(Server1 *) conf[0]));
+			conf.push_back(parseNewContext(next,(Server *) conf[0]));
 			break;
 		case '}':
 			parseEndOfContext(i);
@@ -166,7 +166,7 @@ Server1	*Parser::getServerConf(void)
 
 Parser::Parser(char *configName)
 {
-	vector<Server1 *> servers;
+	vector<Server *> servers;
 	_currIdx = 1;
 	_configFile.open(configName);
 	if (!_configFile.is_open())
@@ -185,7 +185,7 @@ Parser::~Parser(void)
 	_configFile.close();
 }
 
-vector<Server1*>	Parser::getServers(void)
+vector<Server*>	Parser::getServers(void)
 {
 	return (_servers);
 }

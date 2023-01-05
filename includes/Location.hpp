@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 13:52:17 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/04 08:03:33 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/05 16:14:28 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include "webserv.h"
 #include "Config.hpp"
 
-class Server1;
+class Server;
 using namespace std;
 
 class Location : public Config
@@ -54,7 +54,7 @@ public:
 	void			setName(vector<string> name);
 
 	void			setClientMaxBodySize(int clientMaxBodySize);
-	void 			beSetup(Server1 *server);
+	void 			beSetup(Server *server);
 };
 
 #endif

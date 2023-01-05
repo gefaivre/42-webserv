@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 14:08:38 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/04 08:02:45 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/05 16:14:28 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Location.hpp"
-#include "Server1.hpp"
+#include "Server.hpp"
 
 
 #include <algorithm>
@@ -58,7 +58,7 @@ void	Location::setClientMaxBodySize(int clientMaxBodySize)
 	(void)clientMaxBodySize;
 }
 
-void Location::beSetup(Server1 *server)
+void Location::beSetup(Server *server)
 {
 	_clientMaxBodySize = server->getClientMaxBodySize();
 	_name = server->getName();

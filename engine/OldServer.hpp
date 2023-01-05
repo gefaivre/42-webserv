@@ -3,19 +3,19 @@
 
 #include <sys/epoll.h>
 #include "utils.hpp"
-#include "../includes/Server1.hpp"
+#include "../includes/Server.hpp"
 
 char **ft_split(const char *str);
 
 class Client;
 
-class Server
+class OldServer
 {
 
 public:
 
-	Server(int port, Server1 *Mserv);
-	~Server();
+	OldServer(int port, Server *Mserv);
+	~OldServer();
 
 	int getPort() const;
 	int getServerFd() const;
@@ -25,21 +25,16 @@ public:
 
 	int _newsocket;
 
-	Server1 *Mserv;
-
-
-
+	// Server *Mserv;
 
 private:
-	Server();
+	OldServer();
 
 	struct sockaddr_in _addr;
 	void setStruct();
 
 	int _port;
 	int _sockfd;
-
-	std::string _currentDirectory;
 };
 
 std::ostream &			operator<<( std::ostream & o, Server const & i );
