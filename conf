@@ -5,5 +5,5 @@ server{
 	accepted_methods	GET POST DELETE;
 	autoindex on;
 	cgi .php /usr/bin/php-cgi;
-	root /mnt/nfs/homes/jbach/Documents/gefaivreB/www;
+	root /mnt/nfs/homes/gefaivre/Desktop/42-webserv/www;
 }

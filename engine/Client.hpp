@@ -28,6 +28,7 @@ class Client
 
 		void displayRequest();
 		void displayFullRequest();
+		void displayFullBody();
 		void readRequest();
 		void readRequest1();
 		void parseHeader(std::string buf);
@@ -41,12 +42,19 @@ class Client
 		std::string _requestLine;
 		std::vector<std::string> _request;
 		std::map<std::string, std::string> _requestmap;
+		std::string _requestBody;
 		std::string _response;
 
 		int _clientfd;
 		Server *_server;
 
-		int headerIsRead;
+		bool _headerIsRead;
+		bool _firstTimeBody;
+		size_t _bodyContentLenght;
+
+		size_t findContentLenght();
+		void transformRequestVectorToMap();
+		size_t findBodyContentLenght();
 
 
 };
