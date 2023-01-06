@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
+/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/05 17:41:04 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/06 19:12:46 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void Server::newclient(int epoll_fd)
 	serverfd = accept(this->getServerFd(), (struct sockaddr *)&_addr, &addrlen);
 	if (serverfd == -1)
 		ft_define_error("Error the connection with the socket was not established");
-	event.events = EPOLLIN;
+	event.events = EPOLLIN ;
 	event.data.fd = serverfd;
 	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, serverfd, &event);
 	

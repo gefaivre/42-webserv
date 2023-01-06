@@ -49,7 +49,7 @@ void ParsingRequest::parsingRequest()
 {
 	for(unsigned long int i = 0; i < _request.size()  ; i++)
 	{
-		if (_request.size() > 0 && i == 0)
+		if (i == 0)
 		{
 			_requestData.methode = _request[i].substr(0, _request[i].find(" ", 0));
 			unsigned int first = _requestData.methode.size() + 1;
@@ -65,7 +65,7 @@ void ParsingRequest::parsingRequest()
 void ParsingRequest::setFileToSend404()
 {
 	std::string path;
-	path = _server->getLocationByPath(_requestData.path).getRoot();
+	path = _server->getLocationByPath("/" + _requestData.path).getRoot();
 	path += "404.html";
 	if (access(path.c_str(), R_OK) == 0)
 		_requestData.fileToSend = path;
@@ -76,7 +76,7 @@ void ParsingRequest::setFileToSend404()
 void ParsingRequest::setFileToSend403()
 {
 	std::string path;
-	path = _server->getLocationByPath(_requestData.path).getRoot();
+	path = _server->getLocationByPath("/" +_requestData.path).getRoot();
 	path += "403.html";
 	if (access(path.c_str(), R_OK) == 0)
 		_requestData.fileToSend = path;
@@ -107,10 +107,11 @@ int ParsingRequest::foundFileToSend()
 
 	rootPath = _server->getLocationByPath(_requestData.path).getRoot();
 
+	if (_requestData.path[0] == '/')
+		_requestData.path.erase(0, 1);
+
 	_requestData.fileToSend = _requestData.path;
 
-	if (_requestData.fileToSend[0] == '/')
-		_requestData.fileToSend.erase(0, 1);
 
 	_requestData.fileToSend = rootPath + _requestData.fileToSend ;
 	fullPathFile = _requestData.fileToSend;
@@ -143,7 +144,6 @@ int ParsingRequest::foundFileToSend()
 	{
 		if (_autoindex == 1 && errno == 21)
 			return (1);
-		std::cout << "can't open " << fullPathFile << std::endl;
 		filepermission();
 	}
 	else

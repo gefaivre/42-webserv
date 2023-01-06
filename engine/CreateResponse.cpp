@@ -5,8 +5,8 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-CreateResponse::CreateResponse(std::string path, bool autoindex, t_requestData const requestData):
-_path(path), _autoindex(autoindex), _requestData(requestData)
+CreateResponse::CreateResponse(Server *server, t_requestData const requestData):
+	_server(server), _requestData(requestData)
 {
 	fillHeaderData();
 	createHeader();
@@ -109,8 +109,10 @@ void CreateResponse::fillFilesExtension()
 void CreateResponse::fillHeaderData()
 {
 	fillFilesExtension();
+	std::string path = _server->getLocationByPath("/" + _requestData.path).getRoot();
+	
 	_headerData.protocol = _requestData.protocol;
-	if (_requestData.fileToSend == _path + "404.html")
+	if ((_requestData.fileToSend == path + "404.html") && (path + _requestData.path != _requestData.fileToSend))
 	{
 		_headerData.statusCode = "404";
 		_headerData.statusMessage = "Not Found";
@@ -169,6 +171,8 @@ void CreateResponse::createBody()
 void CreateResponse::BodyIsNotIndex()
 {
 	_header += "Content-Type: " + _headerData.contentType;
+	_header += "\r\n";
+	_header += "Connection: closed";
 	_header += "\r\n";
 
 	std::string file;
@@ -234,6 +238,11 @@ void CreateResponse::displayHeaderResponse() const
 	std::cout << _header << std::endl;
 }
 
+void CreateResponse::displayFullResponse() const
+{
+	std::cout << _header << std::endl;
+	std::cout << _body << std::endl;
+}
 
 
 /*

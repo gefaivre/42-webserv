@@ -1,8 +1,10 @@
 #ifndef CREATERESPONSE_HPP
 # define CREATERESPONSE_HPP
 
-# include "utils.hpp"
+#include "utils.hpp"
+#include "Server.hpp"
 
+class Server;
 
 char **ft_split(char *str);
 
@@ -11,19 +13,22 @@ class CreateResponse
 
 	public:
 
-		CreateResponse(std::string path, bool autoindex, t_requestData requestData);
+		CreateResponse(Server *server, t_requestData requestData);
 
 		~CreateResponse();
 
 
 		std::string getResponse() const;
 		void displayHeaderResponse() const;
+		void displayFullResponse() const;
 
 	private:
 		CreateResponse();
 
 		std::string _path;
 		bool 		_autoindex;
+
+		Server *_server;
 
 		t_requestData _requestData;
 

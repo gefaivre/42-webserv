@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
+/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:29:46 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/05 17:40:55 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/06 18:49:04 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,9 @@ public:
 	void			setName(std::vector<string> name);
 
 	void 			newclient(int epoll_fd);
+	
 	std::map<int, Client *> 		clients;
+
 	void 			setSocket();
 	
 	void			setEpollFd(int epollfd);

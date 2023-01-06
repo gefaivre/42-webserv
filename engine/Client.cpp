@@ -4,6 +4,11 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
+Client::Client()
+{
+
+}
+
 Client::Client(Server *server, int clientfd):
     _clientfd(clientfd), _server(server)
 {
@@ -12,9 +17,12 @@ Client::Client(Server *server, int clientfd):
 	this->_bodyContentLenght = 0;
 }
 
-// Client::Client( const Client & src )
-// {
-// }
+Client::Client( const Client & src ) : _clientfd(src._clientfd), _server(src._server)
+{
+	this->_headerIsRead = false;
+	this->_firstTimeBody = true;
+	this->_bodyContentLenght = 0;
+}
 
 
 /*
@@ -30,14 +38,24 @@ Client::~Client()
 ** --------------------------------- OVERLOAD ---------------------------------
 */
 
-// Client &				Client::operator=( Client const & rhs )
-// {
-// 	//if ( this != &rhs )
-// 	//{
-// 		//this->_value = rhs.getValue();
-// 	//}
-// 	return *this;
-// }
+Client &				Client::operator=( Client const & rhs )
+{
+	if ( this != &rhs )
+	{
+		this->_requestLine = rhs._requestLine;
+		this->_request = rhs._request;
+		this->_requestmap = rhs._requestmap;
+		this->_requestBody = rhs._requestBody;
+		this->_response = rhs._response;
+
+		this->_clientfd = rhs._clientfd;
+		this->_server = rhs._server;
+		this->_headerIsRead = rhs._headerIsRead;
+		this->_firstTimeBody = rhs._firstTimeBody ;
+		this->_isKeepAlive = rhs._isKeepAlive;
+	}
+	return *this;
+}
 
 // std::ostream &			operator<<( std::ostream & o, Client const & i )
 // {
@@ -55,6 +73,14 @@ size_t Client::findBodyContentLenght()
 	return (atoi(_requestmap[std::string("Content-Length")].c_str()));
 }
 
+void Client::setKeepAlive()
+{
+	if (_requestmap[std::string("Connection")] == std::string("keep-alive"))
+		_isKeepAlive = true;
+	else
+		_isKeepAlive = false;
+}
+
 void Client::transformRequestVectorToMap()
 {
 	for (size_t i = 1; i < _request.size(); i++)
@@ -69,12 +95,24 @@ void Client::transformRequestVectorToMap()
 	}
 }
 
+void Client::EndOfRead()
+{
+	struct epoll_event event;
+
+	event.events = EPOLLOUT;
+	event.data.fd = _clientfd;
+	epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
+	setKeepAlive();
+
+
+}
+
 void Client::readRequest1()
 {
 
 	char buf[50];
 	int sizeRead;
-	struct epoll_event event;
+	
 
 	bzero(buf, 50);
 
@@ -98,9 +136,7 @@ void Client::readRequest1()
 			_bodyContentLenght = findBodyContentLenght();
 			if(_bodyContentLenght == 0)
 			{
-				event.events = EPOLLOUT;
-				event.data.fd = _clientfd;
-				epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
+				EndOfRead();
 			}
 			_headerIsRead = true;
 		}
@@ -115,9 +151,7 @@ void Client::readRequest1()
 		}
 		if (_requestBody.size() == _bodyContentLenght)
 		{
-			event.events = EPOLLOUT;
-			event.data.fd = _clientfd;
-			epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
+			EndOfRead();
 		}
 	}
 }
@@ -125,17 +159,53 @@ void Client::readRequest1()
 void Client::createResponse()
 {
     ParsingRequest parsingRequest(_request, _server);
-	CreateResponse createResponse("www/", true, parsingRequest.getData());
+	CreateResponse createResponse(_server, parsingRequest.getData());
 	createResponse.displayHeaderResponse();
+	// createResponse.displayFullResponse();
     _response = createResponse.getResponse();
+}
+
+void Client::resetClient()
+{
+	std::cout << RED << "RESET CLIENT" << reset << std::endl;
+
+	_requestLine.clear();
+	_request.clear();
+	_requestmap.clear();
+	_requestBody.clear();
+	_response.clear();
+	_headerIsRead = false;
+	_firstTimeBody = false;
+	_bodyContentLenght = 0;
+	_isKeepAlive = false;
 }
 
 void Client::sendResponse()
 {
+	struct epoll_event event;
+
+	std::cout << GRN << _response << reset << std::endl;
+
 	if (send(_clientfd, _response.c_str(), _response.size(), 0) == -1)
 		ft_define_error("Send error");
-	if (close(_clientfd) == -1)
-		ft_define_error("Close error");
+
+	if (!this->_isKeepAlive)
+	{
+		epoll_ctl(_server->getEpollFd(), EPOLL_CTL_DEL, _clientfd, &event);
+		_server->clients.erase(_server->clients.find(_clientfd));
+		if (close(_clientfd) == -1)
+			ft_define_error("Close error");
+	}
+	else
+	{
+		resetClient();
+
+		event.events = EPOLLIN;
+		event.data.fd = _clientfd;
+		epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
+	}
+
+	std::cout << "after send response" << std::endl;
 }
 
 void Client::displayRequest()

@@ -19,11 +19,12 @@ class Server;
 
 class Client
 {
-
 	public:
 
+		Client();
 		Client(Server *server, int clientfd);
-		// Client( Client const & src );
+		Client( Client const & src );
+		Client &operator=( Client const & rhs );
 		~Client();
 
 		void displayRequest();
@@ -46,15 +47,21 @@ class Client
 		std::string _response;
 
 		int _clientfd;
-		Server *_server;
+		Server * _server;
 
 		bool _headerIsRead;
 		bool _firstTimeBody;
 		size_t _bodyContentLenght;
 
+
 		size_t findContentLenght();
 		void transformRequestVectorToMap();
 		size_t findBodyContentLenght();
+		void setKeepAlive();
+		bool _isKeepAlive;
+
+		void EndOfRead();
+		void resetClient();
 
 
 };
