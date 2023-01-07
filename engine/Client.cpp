@@ -104,12 +104,12 @@ void Client::EndOfRead()
 	epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
 	setKeepAlive();
 
-
 }
 
-void Client::readRequest1()
+int Client::readRequest1()
 {
 
+	std::cout << "READ REQUEST" << std::endl;
 	char buf[50];
 	int sizeRead;
 	
@@ -121,6 +121,10 @@ void Client::readRequest1()
 		sizeRead = recv(_clientfd, buf, 49, 0);
 		if (sizeRead == -1)
 			std::cout << "Error recv" << std::endl;
+		if (sizeRead == 0)
+		{
+			return (0);
+		}
 		_requestLine += std::string(buf);
 		
 		while (_requestLine.find("\r\n") != std::string::npos)
@@ -129,7 +133,7 @@ void Client::readRequest1()
 			_requestLine.erase(0, _requestLine.find("\r\n") + 2);
 			_request.push_back(line);
 		}
-		if ((_request[_request.size() - 1].size() == 0))
+		if (_request.size() != 0 && (_request[_request.size() - 1].size() == 0))
 		{
 			_requestBody += _requestLine;
 			transformRequestVectorToMap();
@@ -148,12 +152,14 @@ void Client::readRequest1()
 			if (sizeRead == -1)
 				std::cout << "Error recv" << std::endl;
 			_requestBody.insert(_requestBody.size(), buf, sizeRead);
+			std::cout << buf << std::endl;
 		}
 		if (_requestBody.size() == _bodyContentLenght)
 		{
 			EndOfRead();
 		}
 	}
+	return (1);
 }
 
 void Client::createResponse()
@@ -184,8 +190,6 @@ void Client::sendResponse()
 {
 	struct epoll_event event;
 
-	std::cout << GRN << _response << reset << std::endl;
-
 	if (send(_clientfd, _response.c_str(), _response.size(), 0) == -1)
 		ft_define_error("Send error");
 
@@ -204,8 +208,6 @@ void Client::sendResponse()
 		event.data.fd = _clientfd;
 		epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
 	}
-
-	std::cout << "after send response" << std::endl;
 }
 
 void Client::displayRequest()

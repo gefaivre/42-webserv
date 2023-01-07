@@ -31,7 +31,7 @@ class Client
 		void displayFullRequest();
 		void displayFullBody();
 		void readRequest();
-		void readRequest1();
+		int readRequest1();
 		void parseHeader(std::string buf);
 		void sendResponse();
 		void createResponse();

@@ -3,6 +3,7 @@
 
 #include "utils.hpp"
 #include "Server.hpp"
+#include <string>
 
 class Server;
 

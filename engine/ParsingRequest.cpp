@@ -110,12 +110,10 @@ int ParsingRequest::foundFileToSend()
 	if (_requestData.path[0] == '/')
 		_requestData.path.erase(0, 1);
 
-	_requestData.fileToSend = _requestData.path;
-
-
-	_requestData.fileToSend = rootPath + _requestData.fileToSend ;
+	_requestData.fileToSend = rootPath + _requestData.path ;
 	fullPathFile = _requestData.fileToSend;
 
+	// std::cout << fullPathFile << std::endl;
 	
 	if (_autoindex == 1 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
 	{
@@ -139,9 +137,11 @@ int ParsingRequest::foundFileToSend()
 		_requestData.fileToSend = fullPathFile;
 	}
 
+
 	FILE *f = fopen(fullPathFile.c_str(), "r+");
 	if ( f == NULL)
 	{
+		std::cout << "Can't Open" << std::endl;
 		if (_autoindex == 1 && errno == 21)
 			return (1);
 		filepermission();

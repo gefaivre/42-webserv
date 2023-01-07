@@ -172,8 +172,8 @@ void CreateResponse::BodyIsNotIndex()
 {
 	_header += "Content-Type: " + _headerData.contentType;
 	_header += "\r\n";
-	_header += "Connection: closed";
-	_header += "\r\n";
+	// _header += "Connection: closed";
+	// _header += "\r\n";
 
 	std::string file;
 	std::string line;
@@ -230,6 +230,9 @@ void CreateResponse::BodyIsIndex()
 
 void CreateResponse::joinHeaderBody()
 {
+	_header += "Content-Length: " + itos(_body.size());
+	_header += "\r\n";
+
 	_response = _header + "\r\n" + _body;
 }
 

@@ -49,7 +49,6 @@ void epolling(Server server)
 	
 	while (running)
 	{
-		std::cout << "before epoll wait" << std::endl;
 		event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
 		
 		
@@ -58,7 +57,7 @@ void epolling(Server server)
 
 			if (events[i].data.fd == server.getServerFd())
 			{
-				std::cout << "----------SERVER EVENT" << std::endl;
+				// std::cout << "----------SERVER EVENT" << std::endl;
 				server.newclient(epoll_fd);
 			}
 			else if (events[i].events == EPOLLHUP)
@@ -72,7 +71,7 @@ void epolling(Server server)
 			}
 			else if (events[i].events == EPOLLIN)
 			{
-				std::cout << "----------EPOLLIN EVENT" << std::endl;
+				// std::cout << "----------EPOLLIN EVENT" << std::endl;
 
 				if (server.clients.find(events[i].data.fd) == server.clients.end())
 				{
@@ -80,31 +79,24 @@ void epolling(Server server)
 					server.clients.insert(std::pair<int, Client *>(events[i].data.fd, &client));
 				}
 				
-				server.clients[events[i].data.fd]->readRequest1();
+				if (server.clients[events[i].data.fd]->readRequest1() == -1)
+				{
+					std::cout << "Read request == 0 so delet eclient" << std::endl;
+					epoll_ctl(server.getEpollFd(), EPOLL_CTL_DEL, events[i].data.fd, &event);
+					if (close(events[i].data.fd) == -1)
+						ft_define_error("Close error");
+					server.clients.erase(server.clients.find(events[i].data.fd));
+				}
 			}
 			else if (events[i].events == EPOLLOUT)
 			{
-				std::cout << "----------EPOLLOUT EVENT" << std::endl;
+				// std::cout << "----------EPOLLOUT EVENT" << std::endl;
 
 				server.clients[events[i].data.fd]->displayRequest();
 				server.clients[events[i].data.fd]->createResponse();
 				
 				server.clients[events[i].data.fd]->sendResponse();
 			}		
-			// socket.waitRequest();
-			// socket.displayRequest();
-
-			// ParsingRequest parsingRequest(socket.getRequest(), server);
-			// parsingRequest.displayData();
-
-			// CreateResponse createResponse("www/", true, parsingRequest.getData());
-			// createResponse.displayHeaderResponse();
-
-
-			// socket.sendResponse(createResponse.getResponse());
-		
-			// if(!strncmp(read_buffer, "stop\n", 5))
-			// running = 0;
 		}
 		bzero(events, MAX_EVENTS);
 	}

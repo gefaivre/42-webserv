@@ -109,5 +109,7 @@ int isDirectory(std::string file_path);
 
 int	ft_define_error(string str);
 
+std::string itos(int nb);
+
 
 #endif

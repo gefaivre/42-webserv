@@ -36,3 +36,11 @@ int	ft_define_error(string str)
 	cout << strerror(errno) << endl;
 	return(errno);
 }
+
+std::string itos(int nb)
+{
+	std::stringstream strs;
+	strs << nb;
+	std::string temp_str = strs.str();
+	return (temp_str);
+}
