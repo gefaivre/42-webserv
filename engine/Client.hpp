@@ -45,12 +45,17 @@ class Client
 		std::vector<std::string> _request;
 		std::map<std::string, std::string> _requestmap;
 		std::string _requestBody;
-		std::string _response;
+
+		std::string _headerResponse;
+		std::string _bodyResponse;
+
+		CreateResponse *_createResponse;
 
 		int _clientfd;
 		Server * _server;
 
 		bool _isSend;
+		bool _headerIsSend;
 
 		bool _headerIsRead;
 		bool _firstTimeBody;

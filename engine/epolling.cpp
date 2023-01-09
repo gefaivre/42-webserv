@@ -6,7 +6,7 @@
 /*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 12:42:44 by gefaivre          #+#    #+#             */
-/*   Updated: 2023/01/09 15:40:16 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/09 18:06:41 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,36 +46,29 @@ void epolling(Server server)
 		return;
 	}
 
-	
 	while (running)
 	{
 		event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
 		for (i = 0; i < event_count; i++)
 		{
-
-			std::cout << "client fd\t=\t" << events[i].data.fd << std::endl;
-
 			if (events[i].data.fd == server.getServerFd())
 			{
-				// std::cout << "----------SERVER EVENT" << std::endl;
+				std::cout << "----------SERVER EVENT" << std::endl;
 				server.newclient(epoll_fd);
 			}
 			else if (events[i].events & (EPOLLHUP | EPOLLRDHUP))
 			{
 				std::cout << RED << "EPOLLHUP" << reset << std::endl;
-				
 				server.deleteClient(events[i].data.fd);
 			}
 			else if (events[i].events & EPOLLIN)
 			{
 				std::cout << "----------EPOLLIN EVENT" << std::endl;
-				
 				server.clients[events[i].data.fd]->readRequest1();
 			}
 			else if (events[i].events & EPOLLOUT)
 			{
 				std::cout << "----------EPOLLOUT EVENT" << std::endl;
-					
 				if (server.clients[events[i].data.fd]->sendResponse() == 0)
 					server.deleteClient(events[i].data.fd);
 			}		

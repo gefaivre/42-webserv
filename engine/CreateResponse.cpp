@@ -5,13 +5,12 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-CreateResponse::CreateResponse(Server *server, t_requestData const requestData):
-	_server(server), _requestData(requestData)
+CreateResponse::CreateResponse(Server *server,std::map<std::string, std::string> &requestMap, t_requestData const requestData):
+	_server(server), _requestData(requestData), _requestMap(requestMap)
 {
+	fillFilesExtension();
 	fillHeaderData();
 	createHeader();
-	createBody();
-	joinHeaderBody();
 	if (_requestData.methode == "POST")
 	{
 		// std::cout << "new socket = " << newsocket << std::endl;
@@ -108,7 +107,8 @@ void CreateResponse::fillFilesExtension()
 
 void CreateResponse::fillHeaderData()
 {
-	fillFilesExtension();
+	struct stat sb;
+
 	std::string path = _server->getLocationByPath("/" + _requestData.path).getRoot();
 	
 	_headerData.protocol = _requestData.protocol;
@@ -127,23 +127,15 @@ void CreateResponse::fillHeaderData()
 	if (_headerData.contentType.size() == 0)
 		_headerData.contentType = _switchFilesExtension["default"];
 
-	std::string file;
-	std::string line;
-	std::ifstream myfile;
+	if (_requestMap[std::string("Connection")] == std::string("keep-alive"))
+		_headerData.connection = std::string("keep-alive");
+	else
+		_headerData.connection = std::string("close");
 
-	myfile.open(_requestData.fileToSend.c_str(), std::ifstream::in);
-	while ( std::getline(myfile,line) )
-	{
-		if (file.size() != 0)
-			file += '\n';
-		file += line;
-	}
-	myfile.close();
-	// std::time_t time_now = std::time(0);
-	// _headerData.date = time_now;
-	std::stringstream oui;
-	oui << file.size();
-	oui >> _headerData.contentLength;
+	if (stat(_requestData.fileToSend.c_str(), &sb) == -1)
+		std::cout << "fillHeaderData : error stat" << std::endl;
+	else
+		_headerData.contentLength = itos(sb.st_size);
 }
 
 void CreateResponse::createHeader()
@@ -154,41 +146,38 @@ void CreateResponse::createHeader()
 	_header += _headerData.statusCode;
 	_header += " ";
 	_header += _headerData.statusMessage + "\r\n";
+	_header += "Content-length:  " + _headerData.contentLength + "\r\n";
 	_header += "Content-Type:  " + _headerData.contentType + "\r\n";
-	_header += "Connection: keep-alive\r\n";
-
-	// _header += "Content-Length: " + _headerData.contentLength + "\r\n";
+	_header += "Connection: " + _headerData.connection + "\r\n";
 }
 
-void CreateResponse::createBody()
+void CreateResponse::createBody(bool firstTimeRead)
 {
 	if (_requestData.isIndex)
-		BodyIsIndex();
+		BodyIsIndex(firstTimeRead);
 	else
-		BodyIsNotIndex();
+		BodyIsNotIndex(firstTimeRead);
 }
 
-void CreateResponse::BodyIsNotIndex()
+void CreateResponse::BodyIsNotIndex(bool firstTimeRead)
 {
-	std::string file;
-	std::string line;
-	std::ifstream myfile;
-
-	myfile.open(_requestData.fileToSend.c_str(), std::ifstream::in);
-	while ( std::getline(myfile,line) )
+	char buf[READING_BUFFER];
+	bzero(buf, READING_BUFFER);
+	if (firstTimeRead)
 	{
-		if (file.size() != 0)
-			file += '\n';
-		file += line;
+		size_t ret;
+		_FILEtoRead = fopen(_requestData.fileToSend.c_str(), "r");
 	}
-	myfile.close();
 
-	_body += file;
+	fread(buf, 1, READING_BUFFER, _FILEtoRead);
+
+	_body = std::string(buf);
 }
 
 
-void CreateResponse::BodyIsIndex()
+void CreateResponse::BodyIsIndex(bool firstTimeRead)
 {
+	(void)firstTimeRead;
 	_body += "<!DOCTYPE html>\n<html>\n<head>\n<title> Index of ";
 	_body += _requestData.path;
 	_body += "</title>\n</head>";
@@ -223,13 +212,6 @@ void CreateResponse::BodyIsIndex()
 	_body += "\n\r";
 }
 
-void CreateResponse::joinHeaderBody()
-{
-	_header += "Content-Length: " + itos(_body.size());
-	_header += "\r\n";
-
-	_response = _header + "\r\n" + _body;
-}
 
 void CreateResponse::displayHeaderResponse() const
 {
@@ -247,9 +229,13 @@ void CreateResponse::displayFullResponse() const
 ** --------------------------------- ACCESSOR ---------------------------------
 */
 
-std::string CreateResponse::getResponse() const
+std::string CreateResponse::getHeaderResponse() const
 {
-	return(_response);
+	return(_header);
+}
+std::string CreateResponse::getBodyResponse() const
+{
+	return(_body);
 }
 
 

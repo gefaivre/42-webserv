@@ -14,6 +14,7 @@ Client::Client(Server *server, int clientfd) : _clientfd(clientfd), _server(serv
 	this->_firstTimeBody = true;
 	this->_bodyContentLenght = 0;
 	this->_isSend = false;
+	this->_headerIsSend = false;
 }
 
 Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._server)
@@ -22,6 +23,8 @@ Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._serve
 	this->_firstTimeBody = true;
 	this->_bodyContentLenght = 0;
 	this->_isSend = false;
+	this->_headerIsSend = false;
+
 }
 
 /*
@@ -45,7 +48,6 @@ Client &Client::operator=(Client const &rhs)
 		this->_request = rhs._request;
 		this->_requestmap = rhs._requestmap;
 		this->_requestBody = rhs._requestBody;
-		this->_response = rhs._response;
 
 		this->_clientfd = rhs._clientfd;
 		this->_server = rhs._server;
@@ -96,33 +98,33 @@ void Client::transformRequestVectorToMap()
 void Client::EndOfRead()
 {
 	struct epoll_event event;
-
 	event.events = EPOLLOUT | EPOLLRDHUP;
 	event.data.fd = _clientfd;
 	epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
+
 	setKeepAlive();
 	displayRequest();
 	createResponse();
+
+	
 }
 
 int Client::readRequest1()
 {
 
 	std::cout << "READ REQUEST CLIENT FD = "  << _clientfd << std::endl;
-	char buf[1000];
+	char buf[READING_BUFFER];
 	int sizeRead;
 
-	bzero(buf, 1000);
+	bzero(buf, READING_BUFFER);
 
 	if (_headerIsRead == false)
 	{
-		sizeRead = recv(_clientfd, buf, 1000, 0);
+		sizeRead = recv(_clientfd, buf, READING_BUFFER, 0);
 		if (sizeRead == -1)
 			std::cout << "Error recv" << std::endl;
 		if (sizeRead == 0)
-		{
 			return (0);
-		}
 		_requestLine += std::string(buf);
 
 		while (_requestLine.find("\r\n") != std::string::npos)
@@ -145,7 +147,7 @@ int Client::readRequest1()
 	}
 	else if (_bodyContentLenght)
 	{
-		if ((sizeRead = recv(_clientfd, buf, 1000, 0)) != 0)
+		if ((sizeRead = recv(_clientfd, buf, READING_BUFFER, 0)) != 0)
 		{
 			if (sizeRead == -1)
 				std::cout << "Error recv" << std::endl;
@@ -163,11 +165,19 @@ int Client::readRequest1()
 
 void Client::createResponse()
 {
-	ParsingRequest parsingRequest(_request, _server);
-	CreateResponse createResponse(_server, parsingRequest.getData());
-	createResponse.displayHeaderResponse();
-	// createResponse.displayFullResponse();
-	_response = createResponse.getResponse();
+	if (_firstTimeBody == true)
+	{
+		ParsingRequest parsingRequest(_request, _server);
+		_createResponse = new CreateResponse(_server, _requestmap, parsingRequest.getData());
+		_createResponse->displayHeaderResponse();
+		// createResponse.displayFullResponse();
+		_headerResponse = _createResponse->getHeaderResponse();
+		_createResponse->displayHeaderResponse();
+	}
+	else
+	{
+		_headerResponse = _createResponse->getBodyResponse();
+	}
 }
 
 void Client::resetClient()
@@ -178,29 +188,38 @@ void Client::resetClient()
 	_request.clear();
 	_requestmap.clear();
 	_requestBody.clear();
-	_response.clear();
 	_headerIsRead = false;
 	_firstTimeBody = false;
 	_bodyContentLenght = 0;
 	_isKeepAlive = false;
 	_isSend = false;
+	_headerIsSend = false;
+
 }
 
 int Client::sendResponse()
 {
 	struct epoll_event event;
+	int ret;
 
 	if (_isSend == false)
 	{
-		int max_size = _response.size() > 1000 ? 1000 : _response.size();
+		if (_headerIsSend == false)
+		{
+			int max_size = _headerResponse.size() > SENDING_BUFFER ? SENDING_BUFFER : _headerResponse.size();
 
-		if ((send(_clientfd, _response.data(), max_size, 0)) == -1)
-			ft_define_error("Send error");
+			if ((ret = send(_clientfd, _headerResponse.data(), max_size, 0)) == -1)
+				ft_define_error("Send error");
+			else
+				_headerResponse = _headerResponse.substr(ret);
+
+			if (_headerResponse.size() == 0)
+				_headerIsSend = true;
+		}
 		else
-			_response.erase(0, max_size);
-
-		if (_response.size() == 0)
-			_isSend = true;
+		{
+			
+		}
 	}
 	else
 	{
