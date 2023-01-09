@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   epolling.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 12:42:44 by gefaivre          #+#    #+#             */
-/*   Updated: 2023/01/06 19:13:06 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/09 11:37:02 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ void epolling(Server server)
 					server.clients.insert(std::pair<int, Client *>(events[i].data.fd, &client));
 				}
 				
-				if (server.clients[events[i].data.fd]->readRequest1() == -1)
+				if (server.clients[events[i].data.fd]->readRequest() == -1)
 				{
 					std::cout << "Read request == 0 so delet eclient" << std::endl;
 					epoll_ctl(server.getEpollFd(), EPOLL_CTL_DEL, events[i].data.fd, &event);
@@ -90,9 +90,10 @@ void epolling(Server server)
 			}
 			else if (events[i].events == EPOLLOUT)
 			{
-				// std::cout << "----------EPOLLOUT EVENT" << std::endl;
+				std::cout << "----------EPOLLOUT EVENT" << std::endl;
 
-				server.clients[events[i].data.fd]->displayRequest();
+				// server.clients[events[i].data.fd]->displayFullBody();
+				server.clients[events[i].data.fd]->saveFile();
 				server.clients[events[i].data.fd]->createResponse();
 				
 				server.clients[events[i].data.fd]->sendResponse();

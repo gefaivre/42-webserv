@@ -106,7 +106,7 @@ void Client::EndOfRead()
 
 }
 
-int Client::readRequest1()
+int Client::readRequest()
 {
 
 	std::cout << "READ REQUEST" << std::endl;
@@ -159,6 +159,7 @@ int Client::readRequest1()
 			EndOfRead();
 		}
 	}
+	// displayFullBody();
 	return (1);
 }
 
@@ -225,6 +226,31 @@ void Client::displayFullRequest()
 void Client::displayFullBody()
 {
 	std::cout << _requestBody << std::endl;
+}
+
+void Client::transformBodyStringtoMap()
+{
+	std::cout << "--- TRANSFORM ---" << std::endl;
+	// std::cout << _requestBody << std::endl;
+	for (size_t i = 1; i < _requestBody.size(); i++)
+	{
+		std::cout << i << std::endl;
+		// size_t colon = _request[i].find(": ");
+		// if (colon != std::string::npos)
+		// {
+		// 	std::string key = _request[i].substr(0, colon);
+		// 	std::string value = _request[i].substr(colon + 2, _request.size());
+		// 	_requestmap.insert(std::pair<std::string, std::string>(key, value));
+		// }
+	}
+}
+
+void Client::saveFile()
+{
+	std::cout << "Save file = " << std::endl;
+	// char *save;
+	// save = strstr(_requestBody, "Content-Disposition");
+	// std::cout << save << std::endl;
 }
 
 

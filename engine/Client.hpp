@@ -30,8 +30,8 @@ class Client
 		void displayRequest();
 		void displayFullRequest();
 		void displayFullBody();
-		void readRequest();
-		int readRequest1();
+		void saveFile();
+		int readRequest();
 		void parseHeader(std::string buf);
 		void sendResponse();
 		void createResponse();
@@ -56,6 +56,7 @@ class Client
 
 		size_t findContentLenght();
 		void transformRequestVectorToMap();
+		void transformBodyStringtoMap();
 		size_t findBodyContentLenght();
 		void setKeepAlive();
 		bool _isKeepAlive;
