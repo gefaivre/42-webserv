@@ -322,9 +322,9 @@ void Client::saveFile()
 	{
 		//open a file in write mode
 		ofstream outfile;
-		outfile.open(it_name->second.c_str());
+		outfile.open(it_name->second.c_str(), ios::trunc);
 		//write the string
-		outfile << it_file->second.substr(2, it_file->second.size() - 4);
+		outfile << it_file->second.substr(2, it_file->second.size() - 3);
 		outfile.close();
 	}
 }
