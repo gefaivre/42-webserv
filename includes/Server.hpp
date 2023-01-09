@@ -6,7 +6,7 @@
 /*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:29:46 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/06 18:49:04 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/09 15:20:44 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include <sys/epoll.h>
 #include "../engine/utils.hpp"
 #include "../includes/Server.hpp"
+#include "../engine/Client.hpp"
 
 char **ft_split(const char *str);
 class Client;
@@ -66,6 +67,7 @@ public:
 	void			addLocation(Location *location);
 	Location		getLocationByPath(std::string path);
 
+	void 			deleteClient(int fd);
 	void 			setupLocations();
 };
 

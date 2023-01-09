@@ -33,8 +33,9 @@ class Client
 		void readRequest();
 		int readRequest1();
 		void parseHeader(std::string buf);
-		void sendResponse();
+		int	 sendResponse();
 		void createResponse();
+
 
 		std::vector<std::string> getRequest() const;
 
@@ -48,6 +49,8 @@ class Client
 
 		int _clientfd;
 		Server * _server;
+
+		bool _isSend;
 
 		bool _headerIsRead;
 		bool _firstTimeBody;

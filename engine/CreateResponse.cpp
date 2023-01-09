@@ -154,9 +154,9 @@ void CreateResponse::createHeader()
 	_header += _headerData.statusCode;
 	_header += " ";
 	_header += _headerData.statusMessage + "\r\n";
-	
-	// _header += " ";
-	// _header += _headerData.date ;
+	_header += "Content-Type:  " + _headerData.contentType + "\r\n";
+	_header += "Connection: keep-alive\r\n";
+
 	// _header += "Content-Length: " + _headerData.contentLength + "\r\n";
 }
 
@@ -170,11 +170,6 @@ void CreateResponse::createBody()
 
 void CreateResponse::BodyIsNotIndex()
 {
-	_header += "Content-Type: " + _headerData.contentType;
-	_header += "\r\n";
-	// _header += "Connection: closed";
-	// _header += "\r\n";
-
 	std::string file;
 	std::string line;
 	std::ifstream myfile;

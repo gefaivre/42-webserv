@@ -6,7 +6,7 @@
 /*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/06 19:12:46 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/09 15:26:49 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,18 +56,35 @@ void Server::setStruct()
 
 void Server::newclient(int epoll_fd)
 {
-	int serverfd;
+	int clientfd;
 	struct epoll_event event;
 	socklen_t addrlen = sizeof(_addr);
 
-	serverfd = accept(this->getServerFd(), (struct sockaddr *)&_addr, &addrlen);
-	if (serverfd == -1)
+	clientfd = accept(this->getServerFd(), (struct sockaddr *)&_addr, &addrlen);
+	if (clientfd == -1)
 		ft_define_error("Error the connection with the socket was not established");
-	event.events = EPOLLIN ;
-	event.data.fd = serverfd;
-	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, serverfd, &event);
+	event.events = EPOLLIN | EPOLLRDHUP;
+	event.data.fd = clientfd;
+	std::cout << "NEWCLIENT FD = " << clientfd << std::endl;
+	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, clientfd, &event);
 	
-	
+	Client *client = new Client(this, clientfd);
+	clients.insert(std::pair<int, Client *>(clientfd, client));
+}
+
+void Server::deleteClient(int clientfd) {
+	epoll_ctl(getEpollFd(), EPOLL_CTL_DEL, clientfd, NULL);
+	if (close(clientfd) == -1)
+		ft_define_error("Close error");
+	std::map<int, Client *>::iterator it = clients.find(clientfd);
+	if (it != clients.end())
+	{
+		if (it->second)
+			delete it->second;
+		clients.erase(it);
+	}
+	else
+		std::cout << GRN << "Le client existe pas" << reset << std::endl;
 }
 
 void	Server::setPort(int port)

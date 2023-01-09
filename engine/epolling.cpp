@@ -6,7 +6,7 @@
 /*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 12:42:44 by gefaivre          #+#    #+#             */
-/*   Updated: 2023/01/06 19:13:06 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/09 15:40:16 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,52 +50,34 @@ void epolling(Server server)
 	while (running)
 	{
 		event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
-		
-		
 		for (i = 0; i < event_count; i++)
 		{
+
+			std::cout << "client fd\t=\t" << events[i].data.fd << std::endl;
 
 			if (events[i].data.fd == server.getServerFd())
 			{
 				// std::cout << "----------SERVER EVENT" << std::endl;
 				server.newclient(epoll_fd);
 			}
-			else if (events[i].events == EPOLLHUP)
+			else if (events[i].events & (EPOLLHUP | EPOLLRDHUP))
 			{
 				std::cout << RED << "EPOLLHUP" << reset << std::endl;
 				
-				epoll_ctl(server.getEpollFd(), EPOLL_CTL_DEL, events[i].data.fd, &event);
-				if (close(events[i].data.fd) == -1)
-					ft_define_error("Close error");
-				server.clients.erase(server.clients.find(events[i].data.fd));
+				server.deleteClient(events[i].data.fd);
 			}
-			else if (events[i].events == EPOLLIN)
+			else if (events[i].events & EPOLLIN)
 			{
-				// std::cout << "----------EPOLLIN EVENT" << std::endl;
-
-				if (server.clients.find(events[i].data.fd) == server.clients.end())
-				{
-					Client client = Client(&server, events[i].data.fd);
-					server.clients.insert(std::pair<int, Client *>(events[i].data.fd, &client));
-				}
+				std::cout << "----------EPOLLIN EVENT" << std::endl;
 				
-				if (server.clients[events[i].data.fd]->readRequest1() == -1)
-				{
-					std::cout << "Read request == 0 so delet eclient" << std::endl;
-					epoll_ctl(server.getEpollFd(), EPOLL_CTL_DEL, events[i].data.fd, &event);
-					if (close(events[i].data.fd) == -1)
-						ft_define_error("Close error");
-					server.clients.erase(server.clients.find(events[i].data.fd));
-				}
+				server.clients[events[i].data.fd]->readRequest1();
 			}
-			else if (events[i].events == EPOLLOUT)
+			else if (events[i].events & EPOLLOUT)
 			{
-				// std::cout << "----------EPOLLOUT EVENT" << std::endl;
-
-				server.clients[events[i].data.fd]->displayRequest();
-				server.clients[events[i].data.fd]->createResponse();
-				
-				server.clients[events[i].data.fd]->sendResponse();
+				std::cout << "----------EPOLLOUT EVENT" << std::endl;
+					
+				if (server.clients[events[i].data.fd]->sendResponse() == 0)
+					server.deleteClient(events[i].data.fd);
 			}		
 		}
 		bzero(events, MAX_EVENTS);
