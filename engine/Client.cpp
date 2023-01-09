@@ -89,7 +89,7 @@ void Client::transformRequestVectorToMap()
 		if (colon != std::string::npos)
 		{
 			std::string key = _request[i].substr(0, colon);
-			std::string value = _request[i].substr(colon + 2, _request.size());
+			std::string value = _request[i].substr(colon + 2, _request[i].size());
 			_requestmap.insert(std::pair<std::string, std::string>(key, value));
 		}
 	}
@@ -228,29 +228,107 @@ void Client::displayFullBody()
 	std::cout << _requestBody << std::endl;
 }
 
+std::string	Client::ft_find_boundary()
+{
+	std::cout << BRED <<  "--- BOUNDARY ---" << WHT << std::endl;
+	std::string boundary;
+	size_t pos_equal = 0;
+	std::map<std::string,std::string>::iterator it;
+	// std::map<std::string,std::string>::const_iterator it;
+	// std::map<std::string,std::string>::const_iterator ite = _requestmap.end(); 
+	// for (it = _requestmap.begin(); it != ite; ++it)
+	// {
+	// 	std::cout << "REQUEST = " << it->first << " ** " << it->second << std::endl;
+	// }
+		it = _requestmap.find("Content-Type");
+		if (it != _requestmap.end())
+		{
+			pos_equal = it->second.find_last_of('=');
+			boundary = it->second.substr(pos_equal + 1);
+		}
+	return (boundary);
+}
+
+std::string findBodyKey(std::vector<std::string> vector, size_t i)
+{
+	std::string key;
+	if (vector[i].find("Content-Disposition") != std::string::npos)
+	{
+		size_t colon_equal = vector[i].find("=");
+		size_t size_type = 0;
+		if (colon_equal != std::string::npos)
+		{
+			for (int tmp = colon_equal + 2; vector[i][tmp] != '\"'; tmp++)
+				size_type++;
+			key = vector[i].substr((colon_equal + 2),size_type);
+		}
+	}
+	return (key);
+}
+std::string findBodyValue(std::vector<std::string> vector, size_t i, std::string value, std::string key)
+{
+	size_t colon_r = vector[i].find("\r");
+	if (colon_r != std::string::npos)
+	{
+		if (colon_r == 0)
+			vector[i].clear();
+	}
+	size_t content_type = vector[i].find("Content-Type");
+	if (content_type != std::string::npos)
+		vector[i].clear();
+	value = vector[i];
+	// (void) key;
+	if (key == "file")
+		std::cout << vector
+	// 	value += "\n";
+	return (value);
+}
+
 void Client::transformBodyStringtoMap()
 {
-	std::cout << "--- TRANSFORM ---" << std::endl;
-	// std::cout << _requestBody << std::endl;
-	for (size_t i = 1; i < _requestBody.size(); i++)
+	std::string value;
+	std::string key;
+    std::vector<std::string> vector;
+	vector = ft_split_vector_string(_requestBody, '\n');
+	std::string boundary = ft_find_boundary();
+	for (size_t i = 1; i < vector.size(); i++)
 	{
-		std::cout << i << std::endl;
-		// size_t colon = _request[i].find(": ");
-		// if (colon != std::string::npos)
-		// {
-		// 	std::string key = _request[i].substr(0, colon);
-		// 	std::string value = _request[i].substr(colon + 2, _request.size());
-		// 	_requestmap.insert(std::pair<std::string, std::string>(key, value));
-		// }
+		size_t colon_boundary = vector[i].find(boundary);
+		if (colon_boundary == std::string::npos)
+		{
+			if (vector[i].find("Content-Disposition") != std::string::npos)
+				key = findBodyKey(vector, i);
+			else
+				value += findBodyValue(vector, i, value, key);
+		}
+		else
+		{
+			// std::cout << "key = " << key << "&& value = " << value << std::endl;
+			_requestmapBody.insert(std::pair<std::string, std::string>(key, value));
+			value.clear();
+			key.clear();
+		}
 	}
+
 }
 
 void Client::saveFile()
 {
 	std::cout << "Save file = " << std::endl;
-	// char *save;
-	// save = strstr(_requestBody, "Content-Disposition");
-	// std::cout << save << std::endl;
+	transformBodyStringtoMap();
+	std::map<std::string,std::string>::iterator it_file;
+	std::map<std::string,std::string>::iterator it_name;
+	it_file = _requestmapBody.find("file");
+	it_name = _requestmapBody.find("name");
+	if (it_file != _requestmapBody.end())
+	{
+		//open a file in write mode
+		ofstream outfile;
+		outfile.open(it_name->second.c_str());
+		//write the string
+		outfile << it_file->second;
+		outfile.close();
+	}
 }
 
 

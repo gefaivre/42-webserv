@@ -44,6 +44,7 @@ class Client
 		std::vector<std::string> _request;
 		std::map<std::string, std::string> _requestmap;
 		std::string _requestBody;
+		std::map<std::string, std::string> _requestmapBody;
 		std::string _response;
 
 		int _clientfd;
@@ -53,9 +54,10 @@ class Client
 		bool _firstTimeBody;
 		size_t _bodyContentLenght;
 
-
-		size_t findContentLenght();
+		size_t	findContentLenght();
 		void transformRequestVectorToMap();
+		void transformBodyVectorToMap();
+		std::string	ft_find_boundary();
 		void transformBodyStringtoMap();
 		size_t findBodyContentLenght();
 		void setKeepAlive();
