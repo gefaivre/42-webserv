@@ -275,12 +275,10 @@ std::string findBodyValue(std::vector<std::string> vector, size_t i, std::string
 	}
 	size_t content_type = vector[i].find("Content-Type");
 	if (content_type != std::string::npos)
-		vector[i].clear();
+		vector[i].clear();		
 	value = vector[i];
-	// (void) key;
 	if (key == "file")
-		std::cout << vector
-	// 	value += "\n";
+		value += "\n";
 	return (value);
 }
 
@@ -326,7 +324,7 @@ void Client::saveFile()
 		ofstream outfile;
 		outfile.open(it_name->second.c_str());
 		//write the string
-		outfile << it_file->second;
+		outfile << it_file->second.substr(2, it_file->second.size() - 4);
 		outfile.close();
 	}
 }
