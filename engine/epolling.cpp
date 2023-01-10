@@ -6,7 +6,7 @@
 /*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 12:42:44 by gefaivre          #+#    #+#             */
-/*   Updated: 2023/01/10 14:39:29 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/10 18:48:03 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,70 +15,87 @@
 #include "Server.hpp"
 #include "Client.hpp"
 
-
-
 #define MAX_EVENTS 5
 #define READ_SIZE 10
 
-void epolling(Server server)
+void epolling(vector<Server *> servers)
 { 
 	int running = 1, event_count, i;
-	// char read_buffer[READ_SIZE + 1];
-	struct epoll_event event, events[MAX_EVENTS];
+	struct epoll_event events[MAX_EVENTS];
 
 
 
-	int epoll_fd = epoll_create1(0);
-	if (epoll_fd == -1)
-	{
-		fprintf(stderr, "Failed to create epoll file descriptor\n");
-		return;
-	}
-	server.setEpollFd(epoll_fd);
 
-	event.events = EPOLLIN;
-	event.data.fd = server.getServerFd();
 	
-	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server.getServerFd(), &event))
+	for (size_t i = 0; i < servers.size(); i++)
 	{
-		fprintf(stderr, "Failed to add file descriptor to epoll\n");
-		close(epoll_fd);
-		return;
+		struct epoll_event event;
+		
+		int epoll_fd = epoll_create1(0);
+		if (epoll_fd == -1)
+		{
+			fprintf(stderr, "Failed to create epoll file descriptor\n");
+			return;
+		}
+	
+		servers[i]->setEpollFd(epoll_fd);
+		servers[i]->setSocket();
+	
+		event.events = EPOLLIN;
+		event.data.fd = servers[i]->getServerFd();
+
+		std::cout << "serverfd = " << servers[i]->getServerFd() << std::endl;
+		
+		if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, servers[i]->getServerFd(), &event))
+		{
+			fprintf(stderr, "Failed to add file descriptor to epoll\n");
+			std::cout << "errno = " << errno << std::endl;
+			close(epoll_fd);
+			return;
+		}
 	}
 
 	while (running)
 	{
-		event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
-		for (i = 0; i < event_count; i++)
+		for (size_t s = 0; s < servers.size(); s++)
 		{
-			if (events[i].data.fd == server.getServerFd())
-			{
-				std::cout << "----------SERVER EVENT" << std::endl;
-				server.newclient(epoll_fd);
+			event_count = epoll_wait(servers[s]->getEpollFd(), events, MAX_EVENTS, 0);
+			for (i = 0; i < event_count; i++)
+			{	
+			
+				if (events[i].data.fd == servers[s]->getServerFd())
+				{
+					std::cout << "----------SERVER EVENT" << std::endl;
+					servers[s]->newclient(servers[s]->getEpollFd());
+				}
+				else if (events[i].events & (EPOLLHUP | EPOLLRDHUP))
+				{
+					std::cout << RED << "EPOLLHUP" << reset << std::endl;
+					servers[s]->deleteClient(events[i].data.fd);
+				}
+				else if (events[i].events & EPOLLIN)
+				{
+					std::cout << "----------EPOLLIN EVENT" << std::endl;
+					servers[s]->clients[events[i].data.fd]->readRequest1();
+				}
+				else if (events[i].events & EPOLLOUT)
+				{
+					std::cout << "----------EPOLLOUT EVENT" << std::endl;
+					if (servers[s]->clients[events[i].data.fd]->sendResponse() == 0)
+						servers[s]->deleteClient(events[i].data.fd);
+				}		
 			}
-			else if (events[i].events & (EPOLLHUP | EPOLLRDHUP))
-			{
-				std::cout << RED << "EPOLLHUP" << reset << std::endl;
-				server.deleteClient(events[i].data.fd);
-			}
-			else if (events[i].events & EPOLLIN)
-			{
-				// std::cout << "----------EPOLLIN EVENT" << std::endl;
-				server.clients[events[i].data.fd]->readRequest1();
-			}
-			else if (events[i].events & EPOLLOUT)
-			{
-				// std::cout << "----------EPOLLOUT EVENT" << std::endl;
-				if (server.clients[events[i].data.fd]->sendResponse() == 0)
-					server.deleteClient(events[i].data.fd);
-			}		
+			bzero(events, MAX_EVENTS);
+			if (s == servers.size())
+				s = 0;
 		}
-		bzero(events, MAX_EVENTS);
 	}
-
-	if (close(epoll_fd))
+	for (size_t s = 0; s < servers.size(); i++)
 	{
-		fprintf(stderr, "Failed to close epoll file descriptor\n");
-		return;
+		if (close(servers[s]->getServerFd()))
+		{
+			fprintf(stderr, "Failed to close epoll file descriptor\n");
+			return;
+		}
 	}
 }

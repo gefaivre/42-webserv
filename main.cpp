@@ -4,7 +4,7 @@
 #include "Parser.hpp"
 #include <sys/epoll.h>
 
-void epolling(Server Server);
+void epolling(vector<Server *> servers);
 
 int main(int argc, char **argv)
 {
@@ -18,9 +18,8 @@ int main(int argc, char **argv)
 
 	vector<Server *> servers = config->getServers();
 
-	servers[0]->setSocket();
 
-	epolling(*servers[0]);
+	epolling(servers);
 
 	return (0);
 }

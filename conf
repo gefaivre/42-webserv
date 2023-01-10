@@ -7,3 +7,12 @@ server{
 	cgi .php /usr/bin/php-cgi;
 	root /mnt/nfs/homes/gefaivre/Desktop/42-webserv/www;
 }
+server{
+	server_name server_test2;
+	listen 8043;
+
+	accepted_methods	GET POST DELETE;
+	autoindex on;
+	cgi .php /usr/bin/php-cgi;
+	root /mnt/nfs/homes/gefaivre/Desktop/42-webserv/www;
+}
