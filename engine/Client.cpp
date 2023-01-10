@@ -320,12 +320,16 @@ void Client::saveFile()
 	it_name = _requestmapBody.find("name");
 	if (it_file != _requestmapBody.end())
 	{
+		std::cout <<YEL <<  "FILE = " << it_name->second<< WHT<< std::endl;
 		//open a file in write mode
 		ofstream outfile;
-		outfile.open(it_name->second.c_str(), ios::trunc);
+		std::string new_path = "new_files/";
+		mkdir(new_path.c_str(), 0777);
+		outfile.open(new_path.append(it_name->second).c_str());
 		//write the string
 		outfile << it_file->second.substr(2, it_file->second.size() - 3);
 		outfile.close();
+		_requestmapBody.clear();
 	}
 }
 
