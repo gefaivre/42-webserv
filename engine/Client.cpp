@@ -310,6 +310,24 @@ void Client::transformBodyStringtoMap()
 
 }
 
+std::string Client::verifyCgi()
+{
+	std::cout << "** verifyCgi **" << std::endl;
+
+	std::map<std::string,std::string>::iterator it;
+	std::string format;
+	size_t pos_equal = 0;
+	it = _requestmap.find("Referer");
+	if (it != _requestmap.end())
+	{
+		pos_equal = it->second.find_last_of('.');
+		format = it->second.substr(pos_equal + 1);
+		std::cout << format << std::endl;
+		std::cout << "server = " << _server->getCgiValue(format)<< std::endl;
+	}
+	return (format);
+}
+
 void Client::saveFile()
 {
 	std::cout << "Save file = " << std::endl;

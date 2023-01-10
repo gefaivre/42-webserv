@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 12:42:44 by gefaivre          #+#    #+#             */
-/*   Updated: 2023/01/09 14:11:03 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/10 11:51:07 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,8 @@ void epolling(Server server)
 				std::cout << "----------EPOLLOUT EVENT" << std::endl;
 
 				server.clients[events[i].data.fd]->displayFullBody();
+				server.clients[events[i].data.fd]->verifyCgi();
+				
 				server.clients[events[i].data.fd]->saveFile();
 				server.clients[events[i].data.fd]->createResponse();
 				

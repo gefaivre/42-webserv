@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/16 18:02:47 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/01/10 12:00:46 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ map<string, string> Config::getCgiMap(void)
 
 string	Config::getCgiValue(string key)
 {
+	std::cout << "key = " << key<< std::endl;
 	if (_cgi.find(key) != _cgi.end())
 		return (_cgi[key]);
 	else

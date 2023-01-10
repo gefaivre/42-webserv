@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:29:46 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/06 18:49:04 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/10 11:48:06 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,6 @@ private:
 	int _sockfd;
 	struct sockaddr_in _addr;
 	int _epollfd;
-		
-
 	
 public:
 
