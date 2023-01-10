@@ -56,6 +56,7 @@ class Client
 		bool _firstTimeBody;
 		size_t _bodyContentLenght;
 
+		std::string _cgiResponse;
 		size_t	findContentLenght();
 		void transformRequestVectorToMap();
 		void transformBodyVectorToMap();

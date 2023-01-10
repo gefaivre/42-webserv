@@ -4,11 +4,13 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ParsingRequest::ParsingRequest( std::vector<std::string> request, Server *server):
+ParsingRequest::ParsingRequest( std::vector<std::string> request, Server *server, bool isCgi):
  _request(request), _server(server)
 {
+	_requestData.isCgi = isCgi;
 	parsingRequest();
 	foundFileToSend();
+	// std::cout << RED "NEW = "<< _requestData._cgiResponse << WHT << std::endl;
 }
 
 

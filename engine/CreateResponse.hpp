@@ -44,8 +44,6 @@ class CreateResponse
 		std::map<std::string, std::string> _switchFilesExtension;
 
 		//POST METHOD
-		void collectData(int newsocket);
-
 		void createAndSendResponse();
 		void fillFilesExtension();
 		void fillHeaderData();
@@ -54,6 +52,7 @@ class CreateResponse
 		std::string _header;
 
 		void createBody();
+		void BodyIsCgi();
 		void BodyIsNotIndex();
 		void BodyIsIndex();
 		std::string _body;

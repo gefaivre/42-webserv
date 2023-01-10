@@ -168,11 +168,11 @@ int Client::readRequest()
 
 void Client::createResponse()
 {
-    ParsingRequest parsingRequest(_request, _server);
+	ParsingRequest parsingRequest(_request, _server, _cgiResponse.empty());
 	CreateResponse createResponse(_server, parsingRequest.getData());
 	createResponse.displayHeaderResponse();
 	// createResponse.displayFullResponse();
-    _response = createResponse.getResponse();
+	_response = createResponse.getResponse();
 }
 
 void Client::resetClient()
@@ -316,29 +316,37 @@ int Client::workCgi(std::string format, std::string requestFile)
 {
 	pid_t pid;
     int fd[2];
-	std::string answer_form = _requestBody;
-	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(_server->getRoot().append(requestFile).c_str()), NULL};
+    int fd_out[2];
+	char buf[1024];
+	std::string requestFileRoot = _server->getRoot().append(requestFile);
+	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *header[] = {
-	(char *) "SCRIPT_FILENAME=/mnt/nfs/homes/jbach/Documents/Ecole42New/test.php",
+	(char *) "SCRIPT_FILENAME=/mnt/nfs/homes/jbach/Documents/websev0901/www/form.php",
 	(char *) "REQUEST_METHOD=POST",
 	(char *)"CONTENT_TYPE=application/x-www-form-urlencoded",
-	(char *)"CONTENT_LENGTH=60",
+	(char *)"CONTENT_LENGTH=500",
 	(char *) "REDIRECT_STATUS=200",
 	(char *) NULL
 	};
+
    	pipe(fd);
-	write(fd[1], answer_form.c_str(), answer_form.length());
+	pipe(fd_out);
+	write(fd[1], _requestBody.c_str(), _requestBody.length());
 	close(fd[1]);
-	if ((pid = fork()) < 0) 
+	if ((pid = fork()) < 0)
 	{
+		std::cout << "SALUT1" << std::endl;
 		perror("fork");
 		return EXIT_FAILURE;
-	} 
+	}
 	else if (!pid) 
 	{ 
 		/* child */
+		std::cout << "SALUT2" << std::endl;
 		dup2(fd[0], STDIN_FILENO);
 		close(fd[0]);
+		dup2(fd_out[1], STDOUT_FILENO);
+		close(fd_out[0]);
 		execve(args[0], args, header);
 		perror("exec");
 		return EXIT_FAILURE;
@@ -349,7 +357,18 @@ int Client::workCgi(std::string format, std::string requestFile)
 		close(fd[0]);
 		while (waitpid(-1, NULL, WUNTRACED) != -1)
 			;
+		int n = read(fd_out[0], buf, 1024);
+		if (n < 0)
+		{
+			perror("read");
+           	exit(EXIT_FAILURE);
+        } else
+		{
+            buf[n] = '\0';
+			_cgiResponse.append(buf);
+		}
 	}
+	std::cout << "_cgiResponse = " << _cgiResponse<< std::endl;
 	return (1);
 }
 
@@ -371,9 +390,11 @@ void Client::verifyCgi()
 		pos_slash = _request[0].find_first_of('/');
 		format = _request[0].substr(pos_point + 1, pos_space - (pos_point + 1));
 		requestFile = _request[0].substr(pos_slash + 1, pos_space - (pos_slash + 1));
+		std::cout << "Request file = " <<  _server->getCgiValue(format) << std::endl;
+		std::cout << "format = " << format << std::endl;
 		try {
 			std::cout << "server = " << _server->getCgiValue(format) << std::endl;
-			workCgi(format, requestFile);
+			workCgi(_server->getCgiValue(format), requestFile);
 		}
 		catch(std::exception e)
 		{
@@ -386,6 +407,7 @@ void Client::saveFile()
 {
 	std::cout << "Save file = " << std::endl;
 	transformBodyStringtoMap();
+
 	std::map<std::string,std::string>::iterator it_file;
 	std::map<std::string,std::string>::iterator it_name;
 	it_file = _requestmapBody.find("file");
@@ -403,6 +425,7 @@ void Client::saveFile()
 		outfile.close();
 		_requestmapBody.clear();
 	}
+	std::cout << "Save file 2 = " << std::endl;
 }
 
 

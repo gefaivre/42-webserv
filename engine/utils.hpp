@@ -87,6 +87,8 @@ typedef struct	s_requestData
 	std::string Connection;
 	std::string path;
 	std::string	fileToSend;
+	std::string _cgiResponse;
+	bool		isCgi;
 	bool		isIndex;
 
 }				t_requestData;

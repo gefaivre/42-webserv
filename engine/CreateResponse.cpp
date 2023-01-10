@@ -9,14 +9,13 @@ CreateResponse::CreateResponse(Server *server, t_requestData const requestData):
 	_server(server), _requestData(requestData)
 {
 	fillHeaderData();
-	createHeader();
+	// if (cgi)
+	// {}
+	// else
+	// {}
 	createBody();
+	createHeader();
 	joinHeaderBody();
-	if (_requestData.methode == "POST")
-	{
-		// std::cout << "new socket = " << newsocket << std::endl;
-		// collectData(newsocket);
-	}
 }
 
 
@@ -53,49 +52,6 @@ CreateResponse::~CreateResponse()
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
-
-
-void CreateResponse::collectData(int newsocket)
-{
-	(void)newsocket;
-	std::cout << "post method!" << std::endl;
-	// int cgiPipe[2];
-	// int nReponse = 0;
-	// if (pipe(cgiPipe))
-	// 	perror("error from pipe cgi");
-			
-
-	// int cgiPid = fork();
-
-
-	// if (cgiPid == 0)
-	// {
-	// 	//child
-	// 	char **cgienvs = ft_split((char *)"last_name=jbach GATEWAY_INTERFACE=CGI/1.1 PATH_INFO=/website/sendDatas/data.php REQUEST_METHOD=POST SCRIPT_FILENAME=./website/sendDatas/data.php SERVER_PROTOCOL=HTTP/1.1 REDIRECT_STATUS=200 CONTENT_TYPE=application/x-www-form-urlencoded CONTENT_LENGTH=11 /usr/bin/php-cgi");
-	// 	char *args[]= {(char *)"/usr/bin/php-cgi", NULL};
-	// 	close(cgiPipe[1]);
-	// 	dup2(cgiPipe[0], newsocket);
-	// 	dup2(nReponse, newsocket);
-	// 	if (execve(args[0], args, cgienvs))
-	// 	{
-	// 		/* unable to execute CGI... */
-    // 		perror("error execve cgi");
-	// 	// sendString(nRemote,
-	// 	//     "HTTP/1.1 200 OK\r\n"
-	// 	//     "Content-length: 97\r\n"
-	// 	//     "Content-Type: text/html\r\n\r\n"
-	// 	//     "<!doctype html><html><head><title>CGI Error</title></head><body><h1>CGI Error.</h1></body></html>\r\n"
-	// 		// return ;
-	// 	}
-	// }
-	// else if (cgiPid > 0)
-	// {
-	// 	//parent
-	// 	close(cgiPid[0]);
-
-	// }
-
-}
 
 void CreateResponse::fillFilesExtension()
 {
@@ -160,10 +116,17 @@ void CreateResponse::createHeader()
 	// _header += "Content-Length: " + _headerData.contentLength + "\r\n";
 }
 
+void CreateResponse::BodyIsCgi()
+{
+	std::cout << "***" << std::endl;
+}
+
 void CreateResponse::createBody()
 {
 	if (_requestData.isIndex)
 		BodyIsIndex();
+	else if (_requestData.isCgi)
+		BodyIsCgi();
 	else
 		BodyIsNotIndex();
 }
