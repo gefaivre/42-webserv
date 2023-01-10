@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/05 16:14:28 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/10 13:15:51 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,11 @@ void	Parser::parseDirective(size_t nextSemiColon, vector<Config *> conf)
 					conf.back()->setRoot(directive.substr(5));
 				else if (ft_starts_with(directive, "client_max_body_size "))
 					conf.back()->setClientMaxBodySize(atoi(directive.substr(21).c_str()));
+				else if (ft_starts_with(directive, "cgi "))
+				{
+					vector<string> key_value = ft_split(directive.substr(5), ' ');
+					conf.back()->addCgi(key_value[0], key_value[1]);
+				}
 				else if (ft_starts_with(directive, "accepted_methods "))
 				{
 					vector<string> acMethods = ft_split(directive.substr(17), ' ');

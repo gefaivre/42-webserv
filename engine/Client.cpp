@@ -309,23 +309,65 @@ void Client::transformBodyStringtoMap()
 	}
 
 }
+void Client::workCgi(std::string format, std::string requestFile)
+{
+	pid_t pid;
+    int fd[2];
+	std::string answer_form = _requestBody;
+	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(_server->getRoot().append(requestFile).c_str()), NULL};
+   	pipe(fd);
+	// write(fd[1], answer_form.c_str(), answer_form.length());
+	// close(fd[1]);
+	// if ((pid = fork()) < 0) 
+	// {
+	// 	perror("fork");
+	// 	return EXIT_FAILURE;
+	// } 
+	// else if (!pid) 
+	// { 
+	// 	/* child */
+	// 	dup2(fd[0], STDIN_FILENO);
+	// 	close(fd[0]);
+	// 	execve(args[0], args, header);
+	// 	perror("exec");
+	// 	return EXIT_FAILURE;
+	// } 
+	// else 
+	// { 
+	// 	/* parent */
+	// 	close(fd[0]);
+	// 	while (waitpid(-1, NULL, WUNTRACED) != -1)
+	// 		;
+	// }
+}
 
-std::string Client::verifyCgi()
+void Client::verifyCgi()
 {
 	std::cout << "** verifyCgi **" << std::endl;
 
-	std::map<std::string,std::string>::iterator it;
 	std::string format;
-	size_t pos_equal = 0;
-	it = _requestmap.find("Referer");
-	if (it != _requestmap.end())
+	std::string requestFile;
+	size_t pos_space = 0;
+	size_t pos_slash = 0;
+	size_t pos_point = 0;
+	size_t postIndex = _request[0].find("POST");
+
+	if (postIndex != std::string::npos)
 	{
-		pos_equal = it->second.find_last_of('.');
-		format = it->second.substr(pos_equal + 1);
-		std::cout << format << std::endl;
-		std::cout << "server = " << _server->getCgiValue(format)<< std::endl;
+		pos_point = _request[0].find_first_of('.');
+		pos_space = _request[0].find_last_of(' ');
+		pos_slash = _request[0].find_first_of('/');
+		format = _request[0].substr(pos_point + 1, pos_space - (pos_point + 1));
+		requestFile = _request[0].substr(pos_slash + 1, pos_space - (pos_slash + 1));
+		try {
+			std::cout << "server = " << _server->getCgiValue(format) << std::endl;
+			workCgi(format, requestFile);
+		}
+		catch(std::exception e)
+		{
+			std::cout << "CGI NOT FOUND!" << std::endl;
+		}
 	}
-	return (format);
 }
 
 void Client::saveFile()

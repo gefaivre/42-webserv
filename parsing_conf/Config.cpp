@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/10 12:00:46 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/10 13:24:04 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,14 @@ map<string, string> Config::getCgiMap(void)
 
 string	Config::getCgiValue(string key)
 {
-	std::cout << "key = " << key<< std::endl;
+	// std::cout << "_cgi.find(key) = " << _cgi.find(key) << std::endl;
 	if (_cgi.find(key) != _cgi.end())
+	{
+		std::cout << "SALUT" << std::endl;
 		return (_cgi[key]);
+	}
 	else
-		return (NULL);
+		throw (std::exception());
 }
 
 void Config::setAutoIndex(bool autoIndex)
