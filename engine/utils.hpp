@@ -5,7 +5,7 @@
 #include "general_includes.hpp"
 using namespace std;
 
-#define READING_BUFFER 1000
+#define SENDING_BUFFER 1000
 #define READING_BUFFER 1000
 
 //Regular text

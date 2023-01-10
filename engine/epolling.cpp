@@ -6,7 +6,7 @@
 /*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 12:42:44 by gefaivre          #+#    #+#             */
-/*   Updated: 2023/01/09 18:06:41 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/10 14:39:29 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,12 @@ void epolling(Server server)
 			}
 			else if (events[i].events & EPOLLIN)
 			{
-				std::cout << "----------EPOLLIN EVENT" << std::endl;
+				// std::cout << "----------EPOLLIN EVENT" << std::endl;
 				server.clients[events[i].data.fd]->readRequest1();
 			}
 			else if (events[i].events & EPOLLOUT)
 			{
-				std::cout << "----------EPOLLOUT EVENT" << std::endl;
+				// std::cout << "----------EPOLLOUT EVENT" << std::endl;
 				if (server.clients[events[i].data.fd]->sendResponse() == 0)
 					server.deleteClient(events[i].data.fd);
 			}		

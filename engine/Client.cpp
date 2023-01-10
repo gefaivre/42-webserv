@@ -14,7 +14,7 @@ Client::Client(Server *server, int clientfd) : _clientfd(clientfd), _server(serv
 	this->_firstTimeBody = true;
 	this->_bodyContentLenght = 0;
 	this->_isSend = false;
-	this->_headerIsSend = false;
+	this->_moverSave = 0;
 }
 
 Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._server)
@@ -23,7 +23,8 @@ Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._serve
 	this->_firstTimeBody = true;
 	this->_bodyContentLenght = 0;
 	this->_isSend = false;
-	this->_headerIsSend = false;
+	this->_moverSave = 0;
+
 
 }
 
@@ -54,6 +55,8 @@ Client &Client::operator=(Client const &rhs)
 		this->_headerIsRead = rhs._headerIsRead;
 		this->_firstTimeBody = rhs._firstTimeBody;
 		this->_isKeepAlive = rhs._isKeepAlive;
+		this->_moverSave = rhs._moverSave;
+
 	}
 	return *this;
 }
@@ -165,19 +168,12 @@ int Client::readRequest1()
 
 void Client::createResponse()
 {
-	if (_firstTimeBody == true)
-	{
-		ParsingRequest parsingRequest(_request, _server);
-		_createResponse = new CreateResponse(_server, _requestmap, parsingRequest.getData());
-		_createResponse->displayHeaderResponse();
-		// createResponse.displayFullResponse();
-		_headerResponse = _createResponse->getHeaderResponse();
-		_createResponse->displayHeaderResponse();
-	}
-	else
-	{
-		_headerResponse = _createResponse->getBodyResponse();
-	}
+	ParsingRequest parsingRequest(_request, _server);
+	CreateResponse createResponse(_server, _requestmap, parsingRequest.getData());
+	createResponse.displayHeaderResponse();
+	// createResponse.displayFullResponse();
+	_response = createResponse.getResponse();
+
 }
 
 void Client::resetClient()
@@ -193,7 +189,8 @@ void Client::resetClient()
 	_bodyContentLenght = 0;
 	_isKeepAlive = false;
 	_isSend = false;
-	_headerIsSend = false;
+	_moverSave = 0;
+
 
 }
 
@@ -201,25 +198,21 @@ int Client::sendResponse()
 {
 	struct epoll_event event;
 	int ret;
+	size_t mover = _moverSave * SENDING_BUFFER;
+	size_t responseSize = _response.size() - mover;
+
 
 	if (_isSend == false)
 	{
-		if (_headerIsSend == false)
-		{
-			int max_size = _headerResponse.size() > SENDING_BUFFER ? SENDING_BUFFER : _headerResponse.size();
+		int max_size = responseSize > SENDING_BUFFER ? SENDING_BUFFER : responseSize;
 
-			if ((ret = send(_clientfd, _headerResponse.data(), max_size, 0)) == -1)
-				ft_define_error("Send error");
-			else
-				_headerResponse = _headerResponse.substr(ret);
+		if ((ret = send(_clientfd, &_response[mover], max_size, 0)) == -1)
+			ft_define_error("Send error");
 
-			if (_headerResponse.size() == 0)
-				_headerIsSend = true;
-		}
+		if (ret < SENDING_BUFFER || mover > _response.size())
+			_isSend = true;
 		else
-		{
-			
-		}
+			_moverSave++;
 	}
 	else
 	{

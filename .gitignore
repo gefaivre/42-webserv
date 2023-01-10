@@ -2,3 +2,4 @@ webserv
 .vscode/
 *.o
 */*.o
+www/Download_file/*

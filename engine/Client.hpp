@@ -46,16 +46,14 @@ class Client
 		std::map<std::string, std::string> _requestmap;
 		std::string _requestBody;
 
-		std::string _headerResponse;
-		std::string _bodyResponse;
-
-		CreateResponse *_createResponse;
+		std::string _response;
 
 		int _clientfd;
 		Server * _server;
 
 		bool _isSend;
-		bool _headerIsSend;
+		size_t _moverSave;
+		char * _responsePointer;
 
 		bool _headerIsRead;
 		bool _firstTimeBody;

@@ -9,8 +9,10 @@ CreateResponse::CreateResponse(Server *server,std::map<std::string, std::string>
 	_server(server), _requestData(requestData), _requestMap(requestMap)
 {
 	fillFilesExtension();
+	createBody();
 	fillHeaderData();
 	createHeader();
+
 	if (_requestData.methode == "POST")
 	{
 		// std::cout << "new socket = " << newsocket << std::endl;
@@ -107,8 +109,6 @@ void CreateResponse::fillFilesExtension()
 
 void CreateResponse::fillHeaderData()
 {
-	struct stat sb;
-
 	std::string path = _server->getLocationByPath("/" + _requestData.path).getRoot();
 	
 	_headerData.protocol = _requestData.protocol;
@@ -132,10 +132,7 @@ void CreateResponse::fillHeaderData()
 	else
 		_headerData.connection = std::string("close");
 
-	if (stat(_requestData.fileToSend.c_str(), &sb) == -1)
-		std::cout << "fillHeaderData : error stat" << std::endl;
-	else
-		_headerData.contentLength = itos(sb.st_size);
+	_headerData.contentLength = itos(_body.size());
 }
 
 void CreateResponse::createHeader()
@@ -151,33 +148,51 @@ void CreateResponse::createHeader()
 	_header += "Connection: " + _headerData.connection + "\r\n";
 }
 
-void CreateResponse::createBody(bool firstTimeRead)
+void CreateResponse::createBody()
 {
 	if (_requestData.isIndex)
-		BodyIsIndex(firstTimeRead);
+		BodyIsIndex();
 	else
-		BodyIsNotIndex(firstTimeRead);
+		BodyIsNotIndex();
 }
 
-void CreateResponse::BodyIsNotIndex(bool firstTimeRead)
+#include <ctime>
+
+void CreateResponse::BodyIsNotIndex()
 {
-	char buf[READING_BUFFER];
-	bzero(buf, READING_BUFFER);
-	if (firstTimeRead)
+
+	time_t current_time;
+  	current_time = time(NULL);
+	
+	std::string line;
+	std::ifstream myfile;
+
+	myfile.open(_requestData.fileToSend.c_str(), std::ifstream::in);
+	while ( std::getline(myfile,line) )
 	{
-		size_t ret;
-		_FILEtoRead = fopen(_requestData.fileToSend.c_str(), "r");
+		if (_body.size() != 0)
+			_body += '\n';
+		_body += line;
 	}
+	myfile.close();
 
-	fread(buf, 1, READING_BUFFER, _FILEtoRead);
 
-	_body = std::string(buf);
+
+    // std::ifstream file(_requestData.fileToSend.c_str(), std::ifstream::in);
+	// if (file.good())
+	// {
+	// 	_body.insert(_body.begin(), std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
+	// 	file.close();
+	// }
+	// else
+	// 	std::cout << "can' t open file in create body" << std::endl;
+
+	std::cout << "Seconde for read file = " << BYEL << time(NULL) - current_time << reset << std::endl;
 }
 
 
-void CreateResponse::BodyIsIndex(bool firstTimeRead)
+void CreateResponse::BodyIsIndex()
 {
-	(void)firstTimeRead;
 	_body += "<!DOCTYPE html>\n<html>\n<head>\n<title> Index of ";
 	_body += _requestData.path;
 	_body += "</title>\n</head>";
@@ -233,6 +248,11 @@ std::string CreateResponse::getHeaderResponse() const
 {
 	return(_header);
 }
+std::string CreateResponse::getResponse() const
+{
+	return(_header + "\r\n" + _body);
+}
+
 std::string CreateResponse::getBodyResponse() const
 {
 	return(_body);

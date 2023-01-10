@@ -54,9 +54,9 @@ class CreateResponse
 		void createHeader();
 		std::string _header;
 
-		void createBody(bool firstTimeRead);
-		void BodyIsNotIndex(bool firstTimeRead);
-		void BodyIsIndex(bool firstTimeRead);
+		void createBody();
+		void BodyIsNotIndex();
+		void BodyIsIndex();
 		std::string _body;
 		FILE *_FILEtoRead;
 
