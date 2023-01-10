@@ -1,4 +1,7 @@
 #include "Client.hpp"
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/wait.h>
 
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
@@ -309,36 +312,45 @@ void Client::transformBodyStringtoMap()
 	}
 
 }
-void Client::workCgi(std::string format, std::string requestFile)
+int Client::workCgi(std::string format, std::string requestFile)
 {
 	pid_t pid;
     int fd[2];
 	std::string answer_form = _requestBody;
 	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(_server->getRoot().append(requestFile).c_str()), NULL};
+	char *header[] = {
+	(char *) "SCRIPT_FILENAME=/mnt/nfs/homes/jbach/Documents/Ecole42New/test.php",
+	(char *) "REQUEST_METHOD=POST",
+	(char *)"CONTENT_TYPE=application/x-www-form-urlencoded",
+	(char *)"CONTENT_LENGTH=60",
+	(char *) "REDIRECT_STATUS=200",
+	(char *) NULL
+	};
    	pipe(fd);
-	// write(fd[1], answer_form.c_str(), answer_form.length());
-	// close(fd[1]);
-	// if ((pid = fork()) < 0) 
-	// {
-	// 	perror("fork");
-	// 	return EXIT_FAILURE;
-	// } 
-	// else if (!pid) 
-	// { 
-	// 	/* child */
-	// 	dup2(fd[0], STDIN_FILENO);
-	// 	close(fd[0]);
-	// 	execve(args[0], args, header);
-	// 	perror("exec");
-	// 	return EXIT_FAILURE;
-	// } 
-	// else 
-	// { 
-	// 	/* parent */
-	// 	close(fd[0]);
-	// 	while (waitpid(-1, NULL, WUNTRACED) != -1)
-	// 		;
-	// }
+	write(fd[1], answer_form.c_str(), answer_form.length());
+	close(fd[1]);
+	if ((pid = fork()) < 0) 
+	{
+		perror("fork");
+		return EXIT_FAILURE;
+	} 
+	else if (!pid) 
+	{ 
+		/* child */
+		dup2(fd[0], STDIN_FILENO);
+		close(fd[0]);
+		execve(args[0], args, header);
+		perror("exec");
+		return EXIT_FAILURE;
+	} 
+	else 
+	{ 
+		/* parent */
+		close(fd[0]);
+		while (waitpid(-1, NULL, WUNTRACED) != -1)
+			;
+	}
+	return (1);
 }
 
 void Client::verifyCgi()
