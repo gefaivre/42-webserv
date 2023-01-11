@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:29:46 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/10 11:48:06 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/11 15:15:31 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include <sys/epoll.h>
 #include "../engine/utils.hpp"
 #include "../includes/Server.hpp"
+#include "../engine/Client.hpp"
 
 char **ft_split(const char *str);
 class Client;
@@ -64,6 +65,7 @@ public:
 	void			addLocation(Location *location);
 	Location		getLocationByPath(std::string path);
 
+	void 			deleteClient(int fd);
 	void 			setupLocations();
 };
 

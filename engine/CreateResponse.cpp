@@ -5,10 +5,11 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-CreateResponse::CreateResponse(Server *server, t_requestData const requestData):
-	_server(server), _requestData(requestData)
+CreateResponse::CreateResponse(Server *server,std::map<std::string, std::string> &requestMap, t_requestData const requestData):
+	_server(server), _requestData(requestData), _requestMap(requestMap)
 {
-	std::cout << "CHO = " << _requestData._cgiResponse << std::endl;
+	fillFilesExtension();
+	createBody();
 	fillHeaderData();
 	// if (cgi)
 	// {}
@@ -16,7 +17,12 @@ CreateResponse::CreateResponse(Server *server, t_requestData const requestData):
 	// {}
 	createBody();
 	createHeader();
-	joinHeaderBody();
+
+	if (_requestData.methode == "POST")
+	{
+		// std::cout << "new socket = " << newsocket << std::endl;
+		// collectData(newsocket);
+	}
 }
 
 
@@ -65,7 +71,6 @@ void CreateResponse::fillFilesExtension()
 
 void CreateResponse::fillHeaderData()
 {
-	fillFilesExtension();
 	std::string path = _server->getLocationByPath("/" + _requestData.path).getRoot();
 	
 	_headerData.protocol = _requestData.protocol;
@@ -84,23 +89,12 @@ void CreateResponse::fillHeaderData()
 	if (_headerData.contentType.size() == 0)
 		_headerData.contentType = _switchFilesExtension["default"];
 
-	std::string file;
-	std::string line;
-	std::ifstream myfile;
+	if (_requestMap[std::string("Connection")] == std::string("keep-alive"))
+		_headerData.connection = std::string("keep-alive");
+	else
+		_headerData.connection = std::string("close");
 
-	myfile.open(_requestData.fileToSend.c_str(), std::ifstream::in);
-	while ( std::getline(myfile,line) )
-	{
-		if (file.size() != 0)
-			file += '\n';
-		file += line;
-	}
-	myfile.close();
-	// std::time_t time_now = std::time(0);
-	// _headerData.date = time_now;
-	std::stringstream oui;
-	oui << file.size();
-	oui >> _headerData.contentLength;
+	_headerData.contentLength = itos(_body.size());
 }
 
 void CreateResponse::createHeader()
@@ -111,9 +105,14 @@ void CreateResponse::createHeader()
 	_header += _headerData.statusCode;
 	_header += " ";
 	_header += _headerData.statusMessage + "\r\n";
-	// _header += " ";
-	// _header += _headerData.date ;
-	// _header += "Content-Length: " + _headerData.contentLength + "\r\n";
+	_header += "Content-length:  " + _headerData.contentLength + "\r\n";
+	_header += "Content-Type:  " + _headerData.contentType + "\r\n";
+	_header += "Connection: " + _headerData.connection + "\r\n";
+}
+
+void CreateResponse::BodyIsCgi()
+{
+	_body = _requestData._cgiResponse;
 }
 
 void CreateResponse::BodyIsCgi()
@@ -131,27 +130,38 @@ void CreateResponse::createBody()
 		BodyIsNotIndex();
 }
 
+#include <ctime>
+
 void CreateResponse::BodyIsNotIndex()
 {
-	_header += "Content-Type: " + _headerData.contentType;
-	_header += "\r\n";
-	// _header += "Connection: closed";
-	// _header += "\r\n";
 
-	std::string file;
+	time_t current_time;
+  	current_time = time(NULL);
+	
 	std::string line;
 	std::ifstream myfile;
 
 	myfile.open(_requestData.fileToSend.c_str(), std::ifstream::in);
 	while ( std::getline(myfile,line) )
 	{
-		if (file.size() != 0)
-			file += '\n';
-		file += line;
+		if (_body.size() != 0)
+			_body += '\n';
+		_body += line;
 	}
 	myfile.close();
 
-	_body += file;
+
+
+    // std::ifstream file(_requestData.fileToSend.c_str(), std::ifstream::in);
+	// if (file.good())
+	// {
+	// 	_body.insert(_body.begin(), std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
+	// 	file.close();
+	// }
+	// else
+	// 	std::cout << "can' t open file in create body" << std::endl;
+
+	std::cout << "Seconde for read file = " << BYEL << time(NULL) - current_time << reset << std::endl;
 }
 
 
@@ -191,13 +201,6 @@ void CreateResponse::BodyIsIndex()
 	_body += "\n\r";
 }
 
-void CreateResponse::joinHeaderBody()
-{
-	_header += "Content-Length: " + itos(_body.size());
-	_header += "\r\n";
-
-	_response = _header + "\r\n" + _body;
-}
 
 void CreateResponse::displayHeaderResponse() const
 {
@@ -215,9 +218,18 @@ void CreateResponse::displayFullResponse() const
 ** --------------------------------- ACCESSOR ---------------------------------
 */
 
+std::string CreateResponse::getHeaderResponse() const
+{
+	return(_header);
+}
 std::string CreateResponse::getResponse() const
 {
-	return(_response);
+	return(_header + "\r\n" + _body);
+}
+
+std::string CreateResponse::getBodyResponse() const
+{
+	return(_body);
 }
 
 

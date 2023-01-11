@@ -14,12 +14,14 @@ class CreateResponse
 
 	public:
 
-		CreateResponse(Server *server, t_requestData requestData);
+		CreateResponse(Server *server,std::map<std::string, std::string> &requestMap, t_requestData requestData);
 
 		~CreateResponse();
 
 
 		std::string getResponse() const;
+		std::string getHeaderResponse() const;
+		std::string getBodyResponse() const;
 		void displayHeaderResponse() const;
 		void displayFullResponse() const;
 
@@ -34,7 +36,7 @@ class CreateResponse
 		t_requestData _requestData;
 
 		
-
+		std::map<std::string, std::string> _requestMap;
 
 
 		
@@ -44,7 +46,8 @@ class CreateResponse
 		std::map<std::string, std::string> _switchFilesExtension;
 
 		//POST METHOD
-		void createAndSendResponse();
+		void collectData(int newsocket);
+
 		void fillFilesExtension();
 		void fillHeaderData();
 
@@ -56,11 +59,7 @@ class CreateResponse
 		void BodyIsNotIndex();
 		void BodyIsIndex();
 		std::string _body;
-
-
-		void joinHeaderBody();
-
-		std::string _response;
+		FILE *_FILEtoRead;
 
 
 };

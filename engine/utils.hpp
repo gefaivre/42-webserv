@@ -5,6 +5,9 @@
 #include "general_includes.hpp"
 using namespace std;
 
+#define SENDING_BUFFER 1000
+#define READING_BUFFER 1000
+
 //Regular text
 #define BLK "\e[0;30m"
 #define RED "\e[0;31m"
@@ -101,11 +104,14 @@ typedef struct	s_headerData
 	std::string contentLength;
 	std::string contentType;
 	std::string	date;
+	std::string	connection;
 }				t_headerData;
 
 
 
 int fileExist(std::string file_path);
+
+std::vector<std::string>	ft_split_vector_string(std::string str, char c);
 
 int isDirectory(std::string file_path);
 
