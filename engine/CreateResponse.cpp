@@ -111,7 +111,6 @@ void CreateResponse::createHeader()
 	_header += _headerData.statusCode;
 	_header += " ";
 	_header += _headerData.statusMessage + "\r\n";
-	
 	// _header += " ";
 	// _header += _headerData.date ;
 	// _header += "Content-Length: " + _headerData.contentLength + "\r\n";
@@ -119,14 +118,11 @@ void CreateResponse::createHeader()
 
 void CreateResponse::BodyIsCgi()
 {
-	std::cout << "***" << std::endl;
 	_body = _requestData._cgiResponse;
 }
 
 void CreateResponse::createBody()
 {
-	std::cout << "IS index = " << _requestData.isIndex << std::endl;
-	std::cout << "IS CGI = " << _requestData.isCgi << std::endl;
 	if (_requestData.isIndex)
 		BodyIsIndex();
 	else if (_requestData.isCgi)
