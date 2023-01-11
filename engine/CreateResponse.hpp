@@ -55,6 +55,7 @@ class CreateResponse
 		std::string _header;
 
 		void createBody();
+		void BodyIsCgi();
 		void BodyIsNotIndex();
 		void BodyIsIndex();
 		std::string _body;

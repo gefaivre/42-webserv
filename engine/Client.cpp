@@ -15,6 +15,7 @@ Client::Client(Server *server, int clientfd) : _clientfd(clientfd), _server(serv
 	this->_bodyContentLenght = 0;
 	this->_isSend = false;
 	this->_moverSave = 0;
+	this->_cgiResponse.clear();
 }
 
 Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._server)
@@ -24,6 +25,7 @@ Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._serve
 	this->_bodyContentLenght = 0;
 	this->_isSend = false;
 	this->_moverSave = 0;
+	this->_cgiResponse.clear();
 
 
 }
@@ -56,6 +58,7 @@ Client &Client::operator=(Client const &rhs)
 		this->_firstTimeBody = rhs._firstTimeBody;
 		this->_isKeepAlive = rhs._isKeepAlive;
 		this->_moverSave = rhs._moverSave;
+		this->_cgiResponse = rhs._cgiResponse;
 
 	}
 	return *this;
@@ -107,6 +110,8 @@ void Client::EndOfRead()
 
 	setKeepAlive();
 	displayRequest();
+	verifyCgi();
+	saveFile();	
 	createResponse();
 
 	
@@ -168,7 +173,7 @@ int Client::readRequest1()
 
 void Client::createResponse()
 {
-	ParsingRequest parsingRequest(_request, _server);
+	ParsingRequest parsingRequest(_request, _server, _cgiResponse);
 	CreateResponse createResponse(_server, _requestmap, parsingRequest.getData());
 	createResponse.displayHeaderResponse();
 	// createResponse.displayFullResponse();
@@ -232,6 +237,210 @@ int Client::sendResponse()
 }
 
 
+std::string	Client::ft_find_boundary()
+{
+	std::cout << BRED <<  "--- BOUNDARY ---" << WHT << std::endl;
+	std::string boundary;
+	size_t pos_equal = 0;
+	std::map<std::string,std::string>::iterator it;
+	// std::map<std::string,std::string>::const_iterator it;
+	// std::map<std::string,std::string>::const_iterator ite = _requestmap.end(); 
+	// for (it = _requestmap.begin(); it != ite; ++it)
+	// {
+	// 	std::cout << "REQUEST = " << it->first << " ** " << it->second << std::endl;
+	// }
+		it = _requestmap.find("Content-Type");
+		if (it != _requestmap.end())
+		{
+			pos_equal = it->second.find_last_of('=');
+			boundary = it->second.substr(pos_equal + 1);
+		}
+	return (boundary);
+}
+
+std::string findBodyKey(std::vector<std::string> vector, size_t i)
+{
+	std::string key;
+	if (vector[i].find("Content-Disposition") != std::string::npos)
+	{
+		size_t colon_equal = vector[i].find("=");
+		size_t size_type = 0;
+		if (colon_equal != std::string::npos)
+		{
+			for (int tmp = colon_equal + 2; vector[i][tmp] != '\"'; tmp++)
+				size_type++;
+			key = vector[i].substr((colon_equal + 2),size_type);
+		}
+	}
+	return (key);
+}
+std::string findBodyValue(std::vector<std::string> vector, size_t i, std::string value, std::string key)
+{
+	size_t colon_r = vector[i].find("\r");
+	if (colon_r != std::string::npos)
+	{
+		if (colon_r == 0)
+			vector[i].clear();
+	}
+	size_t content_type = vector[i].find("Content-Type");
+	if (content_type != std::string::npos)
+		vector[i].clear();		
+	value = vector[i];
+	if (key == "file")
+		value += "\n";
+	return (value);
+}
+
+void Client::transformBodyStringtoMap()
+{
+	std::string value;
+	std::string key;
+    std::vector<std::string> vector;
+	vector = ft_split_vector_string(_requestBody, '\n');
+	std::string boundary = ft_find_boundary();
+	for (size_t i = 1; i < vector.size(); i++)
+	{
+		size_t colon_boundary = vector[i].find(boundary);
+		if (colon_boundary == std::string::npos)
+		{
+			if (vector[i].find("Content-Disposition") != std::string::npos)
+				key = findBodyKey(vector, i);
+			else
+				value += findBodyValue(vector, i, value, key);
+		}
+		else
+		{
+			// std::cout << "key = " << key << "&& value = " << value << std::endl;
+			_requestmapBody.insert(std::pair<std::string, std::string>(key, value));
+			value.clear();
+			key.clear();
+		}
+	}
+
+}
+int Client::workCgi(std::string format, std::string requestFile)
+{
+	std::cout << "_requestBody\t=\t" << _requestBody << std::endl;
+	pid_t pid;
+    int fd[2];
+    int fd_out[2];
+	char buf[1024];
+	// _cgiResponse.clear();
+	std::string requestFileRoot = _server->getRoot().append(requestFile);
+	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
+	char *header[] = {
+	(char *) "SCRIPT_FILENAME=/mnt/nfs/homes/gefaivre/Desktop/gefaivre/www/form.php",
+	(char *) "REQUEST_METHOD=POST",
+	(char *)"CONTENT_TYPE=application/x-www-form-urlencoded",
+	(char *)"CONTENT_LENGTH=500",
+	(char *) "REDIRECT_STATUS=200",
+	(char *) NULL
+	};
+
+   	pipe(fd);
+	pipe(fd_out);
+	write(fd[1], _requestBody.c_str(), _requestBody.length());
+	close(fd[1]);
+
+	if ((pid = fork()) < 0)
+	{
+		perror("fork");
+		return EXIT_FAILURE;
+	}
+	else if (!pid) 
+	{ 
+		/* child */
+		dup2(fd[0], STDIN_FILENO);
+		close(fd[0]);
+		dup2(fd_out[1], STDOUT_FILENO);
+		close(fd_out[0]);
+		execve(args[0], args, header);
+		perror("exec");
+		return EXIT_FAILURE;
+	} 
+	else 
+	{ 
+		/* parent */
+		close(fd[0]);
+		close(fd_out[1]);
+		while (waitpid(-1, NULL, WUNTRACED) != -1)
+			;
+		std::cout << "Before read" << std::endl;
+		int n = read(fd_out[0], buf, 1024);
+		if (n < 0)
+		{
+			
+			std::cout << "Error read" << std::endl;
+			perror("read");
+           	exit(EXIT_FAILURE);
+        } else
+		{
+            buf[n] = '\0';
+			_cgiResponse.append(buf);
+			std::cout << _cgiResponse << std::endl;
+		}
+	}
+	return (1);
+}
+
+void Client::verifyCgi()
+{
+	std::cout << "** verifyCgi **" << std::endl;
+
+	std::string format;
+	std::string requestFile;
+	size_t pos_space = 0;
+	size_t pos_slash = 0;
+	size_t pos_point = 0;
+	size_t postIndex = _request[0].find("POST");
+
+
+	if (postIndex != std::string::npos)
+	{
+		pos_point = _request[0].find_first_of('.');
+		pos_space = _request[0].find_last_of(' ');
+		pos_slash = _request[0].find_first_of('/');
+		format = _request[0].substr(pos_point + 1, pos_space - (pos_point + 1));
+		requestFile = _request[0].substr(pos_slash + 1, pos_space - (pos_slash + 1));
+		std::cout << "Request file = " <<  _server->getCgiValue(format) << std::endl;
+		std::cout << "format = " << format << std::endl;
+		try {
+			std::cout << "server = " << _server->getCgiValue(format) << std::endl;
+			workCgi(_server->getCgiValue(format), requestFile);
+		}
+		catch(std::exception e)
+		{
+			std::cout << "CGI NOT FOUND!" << std::endl;
+		}
+	}
+}
+
+void Client::saveFile()
+{
+	std::cout << "Save file = " << std::endl;
+	transformBodyStringtoMap();
+
+	std::map<std::string,std::string>::iterator it_file;
+	std::map<std::string,std::string>::iterator it_name;
+	it_file = _requestmapBody.find("file");
+	it_name = _requestmapBody.find("name");
+	if (it_file != _requestmapBody.end())
+	{
+		std::cout <<YEL <<  "FILE = " << it_name->second<< WHT<< std::endl;
+		//open a file in write mode
+		ofstream outfile;
+		std::string new_path = "new_files/";
+		mkdir(new_path.c_str(), 0777);
+		outfile.open(new_path.append(it_name->second).c_str());
+		//write the string
+		outfile << it_file->second.substr(2, it_file->second.size() - 3);
+		outfile.close();
+		_requestmapBody.clear();
+	}
+	std::cout << "Save file 2 = " << std::endl;
+}
+
+
 void Client::displayRequest()
 {
 	std::cout << "\n"
@@ -249,6 +458,8 @@ void Client::displayFullBody()
 {
 	std::cout << _requestBody << std::endl;
 }
+
+
 
 /*
 ** --------------------------------- ACCESSOR ---------------------------------

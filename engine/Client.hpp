@@ -7,6 +7,8 @@
 #include <string>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <fcntl.h>
+#include <sys/wait.h>
 #include "utils.hpp"
 #include "ParsingRequest.hpp"
 #include "CreateResponse.hpp"
@@ -45,6 +47,7 @@ class Client
 		std::vector<std::string> _request;
 		std::map<std::string, std::string> _requestmap;
 		std::string _requestBody;
+		std::map<std::string, std::string> _requestmapBody;
 
 		std::string _response;
 
@@ -59,9 +62,15 @@ class Client
 		bool _firstTimeBody;
 		size_t _bodyContentLenght;
 
-
+		std::string _cgiResponse;
 		size_t findContentLenght();
 		void transformRequestVectorToMap();
+		void transformBodyVectorToMap();
+		std::string	ft_find_boundary();
+		void saveFile();
+		void verifyCgi();
+		int workCgi(std::string format, std::string requestFile);
+		void transformBodyStringtoMap();
 		size_t findBodyContentLenght();
 		void setKeepAlive();
 		bool _isKeepAlive;

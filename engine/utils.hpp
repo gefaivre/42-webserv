@@ -90,6 +90,8 @@ typedef struct	s_requestData
 	std::string Connection;
 	std::string path;
 	std::string	fileToSend;
+	std::string _cgiResponse;
+	bool		isCgi;
 	bool		isIndex;
 
 }				t_requestData;
@@ -108,6 +110,8 @@ typedef struct	s_headerData
 
 
 int fileExist(std::string file_path);
+
+std::vector<std::string>	ft_split_vector_string(std::string str, char c);
 
 int isDirectory(std::string file_path);
 

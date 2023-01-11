@@ -148,10 +148,17 @@ void CreateResponse::createHeader()
 	_header += "Connection: " + _headerData.connection + "\r\n";
 }
 
+void CreateResponse::BodyIsCgi()
+{
+	_body = _requestData._cgiResponse;
+}
+
 void CreateResponse::createBody()
 {
 	if (_requestData.isIndex)
 		BodyIsIndex();
+	else if (_requestData.isCgi)
+		BodyIsCgi();
 	else
 		BodyIsNotIndex();
 }

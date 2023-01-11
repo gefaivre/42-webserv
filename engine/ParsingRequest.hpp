@@ -11,7 +11,7 @@ class ParsingRequest
 
 	public:
 
-		ParsingRequest(std::vector<std::string> request, Server *server);
+		ParsingRequest(std::vector<std::string> request, Server *server, std::string cgiResponse);
 		~ParsingRequest();
 
 		t_requestData getData();

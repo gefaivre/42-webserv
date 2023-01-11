@@ -10,6 +10,23 @@ int fileExist(string file_path)
 	return (!(status));
 }
 
+std::vector<std::string>	ft_split_vector_string(std::string str, char c)
+{
+	size_t			start;
+	size_t			end;
+	std::vector<std::string>	arr;
+	
+	start = 0;
+	while ((end = str.find(c, start)) && end < str.length())
+	{
+		arr.push_back(str.substr(start, end - start));
+		start = end + 1;
+	}
+	if (str[str.length() - 1] != c)
+		arr.push_back(str.substr(start, str.length() - start));
+	return (arr);
+}
+
 int isDirectory(string file_path)
 {
 
