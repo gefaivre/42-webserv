@@ -95,7 +95,7 @@ void Client::transformRequestVectorToMap()
 		if (colon != std::string::npos)
 		{
 			std::string key = _request[i].substr(0, colon);
-			std::string value = _request[i].substr(colon + 2, _request.size());
+			std::string value = _request[i].substr(colon + 2, _request[i].size());
 			_requestmap.insert(std::pair<std::string, std::string>(key, value));
 		}
 	}
@@ -239,7 +239,7 @@ int Client::sendResponse()
 
 std::string	Client::ft_find_boundary()
 {
-	std::cout << BRED <<  "--- BOUNDARY ---" << WHT << std::endl;
+	// std::cout << BRED <<  "--- BOUNDARY ---" << WHT << std::endl;
 	std::string boundary;
 	size_t pos_equal = 0;
 	std::map<std::string,std::string>::iterator it;
@@ -249,6 +249,7 @@ std::string	Client::ft_find_boundary()
 	// {
 	// 	std::cout << "REQUEST = " << it->first << " ** " << it->second << std::endl;
 	// }
+
 		it = _requestmap.find("Content-Type");
 		if (it != _requestmap.end())
 		{
@@ -327,11 +328,15 @@ int Client::workCgi(std::string format, std::string requestFile)
 	char buf[1024];
 	// _cgiResponse.clear();
 	std::string requestFileRoot = _server->getRoot().append(requestFile);
-	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
+	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};
+	std::string content_type = "CONTENT_TYPE=multipart/form-data; boundary=";
+	content_type.append(ft_find_boundary());
+	std::cout << "Content type = " << content_type << std::endl;
 	char *header[] = {
 	(char *) "SCRIPT_FILENAME=/mnt/nfs/homes/jbach/Documents/webserv1101/www/form.php",
 	(char *) "REQUEST_METHOD=POST",
-	(char *)"CONTENT_TYPE=application/x-www-form-urlencoded",
+	const_cast<char*>(content_type.c_str()),
+	// (char *) "CONTENT_TYPE=multipart/form-data; boundary=",
 	(char *)"CONTENT_LENGTH=500",
 	(char *) "REDIRECT_STATUS=200",
 	(char *) NULL
