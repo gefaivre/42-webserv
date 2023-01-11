@@ -8,6 +8,7 @@
 CreateResponse::CreateResponse(Server *server, t_requestData const requestData):
 	_server(server), _requestData(requestData)
 {
+	std::cout << "CHO = " << _requestData._cgiResponse << std::endl;
 	fillHeaderData();
 	// if (cgi)
 	// {}
@@ -119,10 +120,13 @@ void CreateResponse::createHeader()
 void CreateResponse::BodyIsCgi()
 {
 	std::cout << "***" << std::endl;
+	_body = _requestData._cgiResponse;
 }
 
 void CreateResponse::createBody()
 {
+	std::cout << "IS index = " << _requestData.isIndex << std::endl;
+	std::cout << "IS CGI = " << _requestData.isCgi << std::endl;
 	if (_requestData.isIndex)
 		BodyIsIndex();
 	else if (_requestData.isCgi)

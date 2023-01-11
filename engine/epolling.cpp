@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 12:42:44 by gefaivre          #+#    #+#             */
-/*   Updated: 2023/01/10 17:16:41 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/11 11:52:38 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,9 +94,7 @@ void epolling(Server server)
 
 				server.clients[events[i].data.fd]->displayFullRequest();
 				server.clients[events[i].data.fd]->verifyCgi();
-				
-				server.clients[events[i].data.fd]->saveFile();
-				
+				server.clients[events[i].data.fd]->saveFile();				
 				server.clients[events[i].data.fd]->createResponse();
 				
 				server.clients[events[i].data.fd]->sendResponse();

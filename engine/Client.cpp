@@ -9,7 +9,7 @@
 
 Client::Client()
 {
-
+	this->_cgiResponse.clear();
 }
 
 Client::Client(Server *server, int clientfd):
@@ -18,6 +18,8 @@ Client::Client(Server *server, int clientfd):
 	this->_headerIsRead = false;
 	this->_firstTimeBody = true;
 	this->_bodyContentLenght = 0;
+	this->_cgiResponse.clear();
+	std::cout << "CGI = " << this->_cgiResponse<< std::endl;
 }
 
 Client::Client( const Client & src ) : _clientfd(src._clientfd), _server(src._server)
@@ -25,6 +27,7 @@ Client::Client( const Client & src ) : _clientfd(src._clientfd), _server(src._se
 	this->_headerIsRead = false;
 	this->_firstTimeBody = true;
 	this->_bodyContentLenght = 0;
+	this->_cgiResponse.clear();
 }
 
 
@@ -168,7 +171,7 @@ int Client::readRequest()
 
 void Client::createResponse()
 {
-	ParsingRequest parsingRequest(_request, _server, _cgiResponse.empty());
+	ParsingRequest parsingRequest(_request, _server, _cgiResponse);
 	CreateResponse createResponse(_server, parsingRequest.getData());
 	createResponse.displayHeaderResponse();
 	// createResponse.displayFullResponse();
@@ -188,6 +191,7 @@ void Client::resetClient()
 	_firstTimeBody = false;
 	_bodyContentLenght = 0;
 	_isKeepAlive = false;
+	_cgiResponse.clear();
 }
 
 void Client::sendResponse()
@@ -318,7 +322,7 @@ int Client::workCgi(std::string format, std::string requestFile)
     int fd[2];
     int fd_out[2];
 	char buf[1024];
-	_cgiResponse.clear();
+	// _cgiResponse.clear();
 	std::string requestFileRoot = _server->getRoot().append(requestFile);
 	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *header[] = {
@@ -369,6 +373,7 @@ int Client::workCgi(std::string format, std::string requestFile)
 		{
             buf[n] = '\0';
 			_cgiResponse.append(buf);
+			std::cout << _cgiResponse << std::endl;
 		}
 	}
 	return (1);
