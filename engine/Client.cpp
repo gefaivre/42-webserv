@@ -318,6 +318,7 @@ int Client::workCgi(std::string format, std::string requestFile)
     int fd[2];
     int fd_out[2];
 	char buf[1024];
+	_cgiResponse.clear();
 	std::string requestFileRoot = _server->getRoot().append(requestFile);
 	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *header[] = {
@@ -335,14 +336,12 @@ int Client::workCgi(std::string format, std::string requestFile)
 	close(fd[1]);
 	if ((pid = fork()) < 0)
 	{
-		std::cout << "SALUT1" << std::endl;
 		perror("fork");
 		return EXIT_FAILURE;
 	}
 	else if (!pid) 
 	{ 
 		/* child */
-		std::cout << "SALUT2" << std::endl;
 		dup2(fd[0], STDIN_FILENO);
 		close(fd[0]);
 		dup2(fd_out[1], STDOUT_FILENO);
@@ -355,11 +354,15 @@ int Client::workCgi(std::string format, std::string requestFile)
 	{ 
 		/* parent */
 		close(fd[0]);
+		close(fd_out[1]);
 		while (waitpid(-1, NULL, WUNTRACED) != -1)
 			;
+		std::cout << "Before read" << std::endl;
 		int n = read(fd_out[0], buf, 1024);
 		if (n < 0)
 		{
+			
+			std::cout << "Error read" << std::endl;
 			perror("read");
            	exit(EXIT_FAILURE);
         } else
@@ -368,7 +371,6 @@ int Client::workCgi(std::string format, std::string requestFile)
 			_cgiResponse.append(buf);
 		}
 	}
-	std::cout << "_cgiResponse = " << _cgiResponse<< std::endl;
 	return (1);
 }
 
