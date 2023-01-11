@@ -1,7 +1,4 @@
 #include "Client.hpp"
-#include <stdlib.h>
-#include <fcntl.h>
-#include <sys/wait.h>
 
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
@@ -98,7 +95,7 @@ void Client::transformRequestVectorToMap()
 		if (colon != std::string::npos)
 		{
 			std::string key = _request[i].substr(0, colon);
-			std::string value = _request[i].substr(colon + 2, _request[i].size());
+			std::string value = _request[i].substr(colon + 2, _request.size());
 			_requestmap.insert(std::pair<std::string, std::string>(key, value));
 		}
 	}
@@ -120,7 +117,7 @@ void Client::EndOfRead()
 	
 }
 
-int Client::readRequest()
+int Client::readRequest1()
 {
 
 	std::cout << "READ REQUEST CLIENT FD = "  << _clientfd << std::endl;
@@ -171,7 +168,6 @@ int Client::readRequest()
 			std::cout << "EOR "  << _clientfd << std::endl;
 		}
 	}
-	// displayFullBody();
 	return (1);
 }
 
@@ -333,7 +329,7 @@ int Client::workCgi(std::string format, std::string requestFile)
 	std::string requestFileRoot = _server->getRoot().append(requestFile);
 	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *header[] = {
-	(char *) "SCRIPT_FILENAME=/mnt/nfs/homes/gefaivre/Desktop/gefaivre/www/form.php",
+	(char *) "SCRIPT_FILENAME=/mnt/nfs/homes/jbach/Documents/webserv1101/www/form.php",
 	(char *) "REQUEST_METHOD=POST",
 	(char *)"CONTENT_TYPE=application/x-www-form-urlencoded",
 	(char *)"CONTENT_LENGTH=500",

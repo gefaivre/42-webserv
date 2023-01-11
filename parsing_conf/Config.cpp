@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/10 17:54:49 by jbach            ###   ########.fr       */
+/*   Updated: 2022/12/16 18:02:47 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,10 @@ map<string, string> Config::getCgiMap(void)
 
 string	Config::getCgiValue(string key)
 {
-	// std::cout << "_cgi.find(key) = " << _cgi.find(key) << std::endl;
 	if (_cgi.find(key) != _cgi.end())
 		return (_cgi[key]);
 	else
-		throw (std::exception());
+		return (NULL);
 }
 
 void Config::setAutoIndex(bool autoIndex)

@@ -119,7 +119,5 @@ int	ft_define_error(string str);
 
 std::string itos(int nb);
 
-std::vector<std::string>	ft_split_vector_string(string str, char c);
-
 
 #endif

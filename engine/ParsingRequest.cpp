@@ -12,7 +12,6 @@ ParsingRequest::ParsingRequest( std::vector<std::string> request, Server *server
 		_requestData._cgiResponse = cgiResponse;
 	parsingRequest();
 	foundFileToSend();
-	// std::cout << RED "NEW = "<< _requestData._cgiResponse << WHT << std::endl;
 }
 
 

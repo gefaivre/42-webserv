@@ -32,10 +32,8 @@ class Client
 		void displayRequest();
 		void displayFullRequest();
 		void displayFullBody();
-		void saveFile();
-		void verifyCgi();
-		int workCgi(std::string format, std::string requestFile);
-		int readRequest();
+		void readRequest();
+		int readRequest1();
 		void parseHeader(std::string buf);
 		int	 sendResponse();
 		void createResponse();
