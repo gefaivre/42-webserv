@@ -549,6 +549,9 @@ void Client::verifyCgi()
 	size_t postIndex = _request[0].find("POST");
 	size_t getIndex = _request[0].find("GET");
 	requestFile = _request[0].substr(pos_slash + 1, pos_space - (pos_slash + 1));
+	requestFile =requestFile.substr(0, requestFile.find_first_of('?'));
+	std::cout << "Format = " << format << std::endl;
+	std::cout << "requestFile = " << requestFile << std::endl;
 	if (postIndex != std::string::npos)
 	{
 		// std::cout << ""

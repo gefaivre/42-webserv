@@ -65,7 +65,6 @@ void ParsingRequest::parsingRequest()
 		}
 	}
 	_autoindex = _server->getLocationByPath(_requestData.path).getAutoIndex();
-
 }
 
 void ParsingRequest::setFileToSend404()
@@ -89,8 +88,6 @@ void ParsingRequest::setFileToSend403()
 	else
 		_requestData.fileToSend = "error_pages/403.html";
 }
-
-
 
 int ParsingRequest::filepermission()
 {
@@ -121,25 +118,25 @@ int ParsingRequest::foundFileToSend()
 	
 	if (_autoindex == 1 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
 	{
-		std::cout << "--1--" << std::endl;
+		// std::cout << "--1--" << std::endl;
 		_requestData.fileToSend = fullPathFile;
 		_requestData.isIndex = 1;
 	}
 	else if (isDirectory(fullPathFile))
 	{
-		std::cout << "--2--" << std::endl;
+		// std::cout << "--2--" << std::endl;
 		_requestData.fileToSend = rootPath + "index.html";
 	}
 	else if (_autoindex == 0 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
 	{
-		std::cout << "--3--" << std::endl;
+		// std::cout << "--3--" << std::endl;
 		filepermission();
 	}
 	else if (_errorcode == 404)
 		filepermission();
 	else
 	{
-		std::cout << "--4--" << std::endl;
+		// std::cout << "--4--" << std::endl;
 		// std::cout << _requestData.fileToSend << std::endl;
 		_requestData.fileToSend = fullPathFile;
 	}
