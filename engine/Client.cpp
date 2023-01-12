@@ -19,6 +19,7 @@ Client::Client(Server *server, int clientfd) : _clientfd(clientfd), _server(serv
 	this->_moverSave = 0;
 	this->_errorcode = 0;
 	this->_cgiResponse.clear();
+	this->_getParams.clear();
 	this->authorizedExtension = setAuthorizedExtension(this->authorizedExtension);
 
 }
@@ -32,6 +33,7 @@ Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._serve
 	this->_isSend = false;
 	this->_moverSave = 0;
 	this->_cgiResponse.clear();
+		this->_getParams.clear();
 	this->authorizedExtension = setAuthorizedExtension(this->authorizedExtension);
 }
 
@@ -66,6 +68,7 @@ Client &Client::operator=(Client const &rhs)
 		this->_cgiResponse = rhs._cgiResponse;
 		this->_errorcode = rhs._errorcode;
 		this->authorizedExtension = rhs.authorizedExtension;
+		this->_getParams = rhs._getParams;
 	}
 	return *this;
 }
@@ -473,13 +476,11 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 
 int Client::workGetCgi(std::string format, std::string requestFile)
 {
-	std::cout << "workGetCgi\t=\t" << std::endl;
-	std::cout << "requestFile = " << requestFile << std::endl;
-	std::cout << "format = " << format << std::endl;
 	pid_t pid;
     int fd_out[2];
 	char buf[1024];
 	std::string request_method = "REQUEST_METHOD=GET";
+	std::string query_string = "QUERY_STRING=";
 	std::string requestFileRoot = _server->getRoot().append(requestFile);
 	std::string script_filename = "SCRIPT_FILENAME=";
 	script_filename.append(requestFileRoot);
@@ -487,7 +488,7 @@ int Client::workGetCgi(std::string format, std::string requestFile)
 	char *header[] = {
 	const_cast<char*> (script_filename.c_str()),
 	const_cast<char*> (request_method.c_str()),
-	(char *) "QUERY_STRING=name=gr&email=hello%40hello.com",
+	const_cast<char*> (query_string.append(_getParams).c_str()),
 	(char *) "REDIRECT_STATUS=200",
 	(char *) NULL
 	};
@@ -549,9 +550,8 @@ void Client::verifyCgi()
 	size_t postIndex = _request[0].find("POST");
 	size_t getIndex = _request[0].find("GET");
 	requestFile = _request[0].substr(pos_slash + 1, pos_space - (pos_slash + 1));
+	_getParams = requestFile.substr(requestFile.find_first_of('?') + 1);
 	requestFile =requestFile.substr(0, requestFile.find_first_of('?'));
-	std::cout << "Format = " << format << std::endl;
-	std::cout << "requestFile = " << requestFile << std::endl;
 	if (postIndex != std::string::npos)
 	{
 		// std::cout << ""

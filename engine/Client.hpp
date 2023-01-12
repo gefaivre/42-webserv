@@ -62,6 +62,8 @@ class Client
 
 		int _errorcode;
 
+		std::string _getParams;
+
 		bool _headerIsRead;
 		bool _firstTimeBody;
 		size_t _bodyContentLenght;
