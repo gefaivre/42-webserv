@@ -188,6 +188,9 @@ void Client::resetClient()
 	_request.clear();
 	_requestmap.clear();
 	_requestBody.clear();
+	_response.clear();
+	_cgiResponse.clear();
+	_requestmapBody.clear();
 	_headerIsRead = false;
 	_firstTimeBody = false;
 	_bodyContentLenght = 0;
@@ -297,33 +300,45 @@ void Client::transformBodyStringtoMap()
 	std::string value;
 	std::string key;
     std::vector<std::string> vector;
-	std::string boundary;
-	vector = ft_split_vector_string(_requestBody, '\n');
+	// std::string boundary;
 	try
 	{
-		boundary = ft_find_boundary();
+		vector = ft_split_vector_string(_requestBody, '\n');
+		std::string boundary = ft_find_boundary();
+		for (size_t i = 1; i < vector.size(); i++)
+		{
+			size_t colon_boundary = vector[i].find(boundary);
+			if (colon_boundary == std::string::npos)
+			{
+				if (vector[i].find("Content-Disposition") != std::string::npos)
+					key = findBodyKey(vector, i);
+				else
+					value += findBodyValue(vector, i, value, key);
+			}
+			else
+			{
+				std::cout << "key = " << key << "&& value = " << value << std::endl;
+				_requestmapBody.insert(std::pair<std::string, std::string>(key, value));
+				value.clear();
+				key.clear();
+			}
+		}
 	}
 	catch (std::exception &e)
 	{
+		vector = ft_split_vector_string(_requestBody, '&');
+		for (size_t i = 0; i < vector.size(); i++)
+		{
+			size_t colon_equal = vector[i].find('=');
+			_requestmapBody.insert(std::pair<std::string, std::string>(vector[i].substr(0, colon_equal), vector[i].substr(colon_equal + 1)));
+		}
+		std::map<std::string,std::string>::const_iterator it;
+		std::map<std::string,std::string>::const_iterator ite = _requestmapBody.end(); 
+		for (it = _requestmapBody.begin(); it != ite; ++it)
+		{
+			std::cout << "REQUEST = " << it->first << " ** " << it->second << std::endl;
+		}
 		return ;
-	}
-	for (size_t i = 1; i < vector.size(); i++)
-	{
-		size_t colon_boundary = vector[i].find(boundary);
-		if (colon_boundary == std::string::npos)
-		{
-			if (vector[i].find("Content-Disposition") != std::string::npos)
-				key = findBodyKey(vector, i);
-			else
-				value += findBodyValue(vector, i, value, key);
-		}
-		else
-		{
-			std::cout << "key = " << key << "&& value = " << value << std::endl;
-			_requestmapBody.insert(std::pair<std::string, std::string>(key, value));
-			value.clear();
-			key.clear();
-		}
 	}
 }
 
@@ -454,15 +469,15 @@ void Client::verifyCgi()
 	size_t pos_space = 0;
 	size_t pos_slash = 0;
 	size_t pos_point = 0;
+	pos_point = _request[0].find_first_of('.');
+	pos_space = _request[0].find_last_of(' ');
+	pos_slash = _request[0].find_first_of('/');
+	format = _request[0].substr(pos_point + 1, pos_space - (pos_point + 1));
+
 	size_t postIndex = _request[0].find("POST");
-
-
+	size_t getIndex = _request[0].find("GET");
 	if (postIndex != std::string::npos)
 	{
-		pos_point = _request[0].find_first_of('.');
-		pos_space = _request[0].find_last_of(' ');
-		pos_slash = _request[0].find_first_of('/');
-		format = _request[0].substr(pos_point + 1, pos_space - (pos_point + 1));
 		requestFile = _request[0].substr(pos_slash + 1, pos_space - (pos_slash + 1));
 		try {
 			workCgi(_server->getCgiValue(format), requestFile);
@@ -473,6 +488,8 @@ void Client::verifyCgi()
 			_errorcode = 404;
 		}
 	}
+	else if (getIndex != std::string::npos)
+		std::cout << "GET" << std::endl;
 }
 
 void Client::saveFile()
@@ -482,6 +499,12 @@ void Client::saveFile()
 
 	std::map<std::string,std::string>::iterator it_file;
 	std::map<std::string,std::string>::iterator it_name;
+	// std::map<std::string,std::string>::const_iterator it;
+	// std::map<std::string,std::string>::const_iterator ite = _requestmapBody.end(); 
+	// for (it = _requestmapBody.begin(); it != ite; ++it)
+	// {
+	// 	std::cout << "REQUEST = " << it->first << " ** " << it->second << std::endl;
+	// }
 	it_file = _requestmapBody.find("file");
 	it_name = _requestmapBody.find("name");
 	if (it_file != _requestmapBody.end())
@@ -495,7 +518,6 @@ void Client::saveFile()
 		//write the string
 		outfile << it_file->second.substr(2, it_file->second.size() - 3);
 		outfile.close();
-		_requestmapBody.clear();
 	}
 	std::cout << "Save file 2 = " << std::endl;
 }
