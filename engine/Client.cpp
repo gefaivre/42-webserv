@@ -1,5 +1,7 @@
 #include "Client.hpp"
 
+std::vector<std::string> setAuthorizedExtension(std::vector<std::string> ext);
+
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
@@ -17,6 +19,8 @@ Client::Client(Server *server, int clientfd) : _clientfd(clientfd), _server(serv
 	this->_moverSave = 0;
 	this->_errorcode = 0;
 	this->_cgiResponse.clear();
+	this->authorizedExtension = setAuthorizedExtension(this->authorizedExtension);
+
 }
 
 Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._server)
@@ -28,8 +32,7 @@ Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._serve
 	this->_isSend = false;
 	this->_moverSave = 0;
 	this->_cgiResponse.clear();
-
-
+	this->authorizedExtension = setAuthorizedExtension(this->authorizedExtension);
 }
 
 /*
@@ -62,7 +65,7 @@ Client &Client::operator=(Client const &rhs)
 		this->_moverSave = rhs._moverSave;
 		this->_cgiResponse = rhs._cgiResponse;
 		this->_errorcode = rhs._errorcode;
-
+		this->authorizedExtension = rhs.authorizedExtension;
 	}
 	return *this;
 }
@@ -76,6 +79,25 @@ Client &Client::operator=(Client const &rhs)
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
+
+std::vector<std::string> setAuthorizedExtension(std::vector<std::string> ext)
+{
+	ext.push_back("html");
+	ext.push_back("css");
+	ext.push_back("js");
+	ext.push_back("jpg");
+	ext.push_back("jpeg");
+	ext.push_back("png");
+	ext.push_back("gif");
+	ext.push_back("mp3");
+	ext.push_back("ogg");
+	ext.push_back("mp4");
+	ext.push_back("avi");
+	ext.push_back("pdf");
+	ext.push_back("txt");
+	ext.push_back("ico");
+	return (ext);
+}
 
 size_t Client::findBodyContentLenght()
 {
@@ -172,6 +194,7 @@ int Client::readRequest1()
 
 void Client::createResponse()
 {
+	std::cout << "** CREATE RESPONSE **" << std::endl;
 	ParsingRequest parsingRequest(_request, _server, _cgiResponse, _errorcode);
 	CreateResponse createResponse(_server, _requestmap, parsingRequest.getData());
 	createResponse.displayHeaderResponse();
@@ -364,7 +387,7 @@ std::string Client::findMethod()
 	return (NULL);
 }
 
-int Client::workCgi(std::string format, std::string requestFile)
+int Client::workPostCgi(std::string format, std::string requestFile)
 {
 	std::cout << "_requestBody\t=\t" << _requestBody << std::endl;
 	pid_t pid;
@@ -372,7 +395,7 @@ int Client::workCgi(std::string format, std::string requestFile)
     int fd_out[2];
 	char buf[1024];
 	std::string content_type;
-	std::string request_method = "REQUEST_METHOD=";
+	std::string request_method = "REQUEST_METHOD=POST";
 	std::string content_length = "CONTENT_LENGTH=";
 	std::string requestFileRoot = _server->getRoot().append(requestFile);
 	std::string script_filename = "SCRIPT_FILENAME=";
@@ -395,7 +418,7 @@ int Client::workCgi(std::string format, std::string requestFile)
 	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *header[] = {
 	const_cast<char*> (script_filename.c_str()),
-	const_cast<char*> (request_method.append(findMethod()).c_str()),
+	const_cast<char*> (request_method.c_str()),
 	const_cast<char*>(content_type.c_str()),
 	const_cast<char*>(content_length.append(findValueEnvCgi("Content-Length")).c_str()),
 	(char *) "REDIRECT_STATUS=200",
@@ -448,17 +471,66 @@ int Client::workCgi(std::string format, std::string requestFile)
 	return (1);
 }
 
-// void setFileToSend404()
-// {
-// 	std::string path;
-// 	path = _server->getLocationByPath("/" + _requestData.path).getRoot();
-// 	path += "404.html";
-// 	if (access(path.c_str(), R_OK) == 0)
-// 		_requestData.fileToSend = path;
-// 	else
-// 		_requestData.fileToSend = "error_pages/404.html";
-// }
+int Client::workGetCgi(std::string format, std::string requestFile)
+{
+	std::cout << "workGetCgi\t=\t" << std::endl;
+	std::cout << "requestFile = " << requestFile << std::endl;
+	std::cout << "format = " << format << std::endl;
+	pid_t pid;
+    int fd_out[2];
+	char buf[1024];
+	std::string request_method = "REQUEST_METHOD=GET";
+	std::string requestFileRoot = _server->getRoot().append(requestFile);
+	std::string script_filename = "SCRIPT_FILENAME=";
+	script_filename.append(requestFileRoot);
+	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
+	char *header[] = {
+	const_cast<char*> (script_filename.c_str()),
+	const_cast<char*> (request_method.c_str()),
+	(char *) "QUERY_STRING=name=gr&email=hello%40hello.com",
+	(char *) "REDIRECT_STATUS=200",
+	(char *) NULL
+	};
 
+	pipe(fd_out);
+
+	if ((pid = fork()) < 0)
+	{
+		perror("fork");
+		return EXIT_FAILURE;
+	}
+	else if (!pid) 
+	{ 
+		/* child */
+		dup2(fd_out[1], STDOUT_FILENO);
+		close(fd_out[0]);
+		execve(args[0], args, header);
+		perror("exec");
+		return EXIT_FAILURE;
+	} 
+	else 
+	{ 
+		/* parent */
+		close(fd_out[1]);
+		while (waitpid(-1, NULL, WUNTRACED) != -1)
+			;
+		std::cout << "Before read" << std::endl;
+		int n = read(fd_out[0], buf, 1024);
+		if (n < 0)
+		{
+			
+			std::cout << "Error read" << std::endl;
+			perror("read");
+           	exit(EXIT_FAILURE);
+        } else
+		{
+            buf[n] = '\0';
+			_cgiResponse.append(buf);
+			std::cout << "CGI response ="<<_cgiResponse << std::endl;
+		}
+	}
+	return (1);
+}
 
 void Client::verifyCgi()
 {
@@ -473,14 +545,15 @@ void Client::verifyCgi()
 	pos_space = _request[0].find_last_of(' ');
 	pos_slash = _request[0].find_first_of('/');
 	format = _request[0].substr(pos_point + 1, pos_space - (pos_point + 1));
-
+	format =format.substr(0, format.find_first_of('?'));
 	size_t postIndex = _request[0].find("POST");
 	size_t getIndex = _request[0].find("GET");
+	requestFile = _request[0].substr(pos_slash + 1, pos_space - (pos_slash + 1));
 	if (postIndex != std::string::npos)
 	{
-		requestFile = _request[0].substr(pos_slash + 1, pos_space - (pos_slash + 1));
+		// std::cout << ""
 		try {
-			workCgi(_server->getCgiValue(format), requestFile);
+			workPostCgi(_server->getCgiValue(format), requestFile);
 			saveFile();
 		}
 		catch(std::exception e)
@@ -489,7 +562,31 @@ void Client::verifyCgi()
 		}
 	}
 	else if (getIndex != std::string::npos)
-		std::cout << "GET" << std::endl;
+	{
+		//mettre catch qd il n'y a pas de CGI
+		std::cout << "** GET **" << std::endl;
+		try {
+			workGetCgi(_server->getCgiValue(format), requestFile);
+		}
+		catch(std::exception e)
+		{
+			bool found = false;
+			for (std::vector<std::string>::iterator it = \
+			authorizedExtension.begin(); it != authorizedExtension.end(); ++it) 
+			{
+				if (*it == format) 
+				{
+					std::cout << "found = " << found  << "format = "<<format << std::endl;
+					found = true;
+					break;
+				}
+			}
+			std::cout << "found = " << found  << "format = "<<format << std::endl;
+			// std::cout << "authorizedExtension = " << authorizedExtension[2]  << "format = "<<format << std::endl;
+			if (!found)
+				_errorcode = 404;
+		}
+	}
 }
 
 void Client::saveFile()

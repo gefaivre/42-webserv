@@ -7,6 +7,7 @@
 #include <string>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <algorithm>
 #include <fcntl.h>
 #include <sys/wait.h>
 #include "utils.hpp"
@@ -39,6 +40,7 @@ class Client
 		void createResponse();
 
 
+		std::vector<std::string> authorizedExtension;
 		std::vector<std::string> getRequest() const;
 
 	private:
@@ -71,7 +73,8 @@ class Client
 		std::string	ft_find_boundary();
 		void saveFile();
 		void verifyCgi();
-		int workCgi(std::string format, std::string requestFile);
+		int workPostCgi(std::string format, std::string requestFile);
+		int workGetCgi(std::string format, std::string requestFile);
 		void transformBodyStringtoMap();
 		size_t findBodyContentLenght();
 		std::string	findValueEnvCgi(std::string key);
