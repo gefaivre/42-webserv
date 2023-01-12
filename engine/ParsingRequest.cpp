@@ -4,8 +4,8 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-ParsingRequest::ParsingRequest( std::vector<std::string> request, Server *server, std::string cgiResponse):
- _request(request), _server(server)
+ParsingRequest::ParsingRequest( std::vector<std::string> request, Server *server, std::string cgiResponse, int error_code):
+ _errorcode(error_code), _request(request), _server(server)
 {
 	_requestData.isCgi = !cgiResponse.empty();
 	if (_requestData.isCgi)
@@ -94,7 +94,7 @@ int ParsingRequest::filepermission()
 	int fd;
 
 	fd = access(_requestData.fileToSend.c_str(), F_OK);
-	if (fd == -1)
+	if (fd == -1 || _errorcode == 404)
 		setFileToSend404();
 	fd = access(_requestData.fileToSend.c_str(), R_OK);
 	if (fd == -1 || _autoindex == 0)
@@ -115,8 +115,6 @@ int ParsingRequest::foundFileToSend()
 
 	_requestData.fileToSend = rootPath + _requestData.path ;
 	fullPathFile = _requestData.fileToSend;
-
-	// std::cout << fullPathFile << std::endl;
 	
 	if (_autoindex == 1 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
 	{
@@ -134,6 +132,8 @@ int ParsingRequest::foundFileToSend()
 		// std::cout << "--3--" << std::endl;
 		filepermission();
 	}
+	else if (_errorcode == 404)
+		filepermission();
 	else
 	{
 		// std::cout << "--4--" << std::endl;

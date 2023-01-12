@@ -58,6 +58,8 @@ class Client
 		size_t _moverSave;
 		char * _responsePointer;
 
+		int _errorcode;
+
 		bool _headerIsRead;
 		bool _firstTimeBody;
 		size_t _bodyContentLenght;

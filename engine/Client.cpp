@@ -15,6 +15,7 @@ Client::Client(Server *server, int clientfd) : _clientfd(clientfd), _server(serv
 	this->_bodyContentLenght = 0;
 	this->_isSend = false;
 	this->_moverSave = 0;
+	this->_errorcode = 0;
 	this->_cgiResponse.clear();
 }
 
@@ -23,6 +24,7 @@ Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._serve
 	this->_headerIsRead = false;
 	this->_firstTimeBody = true;
 	this->_bodyContentLenght = 0;
+	this->_errorcode = 0;
 	this->_isSend = false;
 	this->_moverSave = 0;
 	this->_cgiResponse.clear();
@@ -59,6 +61,7 @@ Client &Client::operator=(Client const &rhs)
 		this->_isKeepAlive = rhs._isKeepAlive;
 		this->_moverSave = rhs._moverSave;
 		this->_cgiResponse = rhs._cgiResponse;
+		this->_errorcode = rhs._errorcode;
 
 	}
 	return *this;
@@ -110,7 +113,6 @@ void Client::EndOfRead()
 	setKeepAlive();
 	displayRequest();
 	verifyCgi();
-	saveFile();
 	createResponse();
 }
 
@@ -170,7 +172,7 @@ int Client::readRequest1()
 
 void Client::createResponse()
 {
-	ParsingRequest parsingRequest(_request, _server, _cgiResponse);
+	ParsingRequest parsingRequest(_request, _server, _cgiResponse, _errorcode);
 	CreateResponse createResponse(_server, _requestmap, parsingRequest.getData());
 	createResponse.displayHeaderResponse();
 	// createResponse.displayFullResponse();
@@ -464,10 +466,11 @@ void Client::verifyCgi()
 		requestFile = _request[0].substr(pos_slash + 1, pos_space - (pos_slash + 1));
 		try {
 			workCgi(_server->getCgiValue(format), requestFile);
+			saveFile();
 		}
 		catch(std::exception e)
 		{
-			std::cout << "Pas de CGI" << std::endl;
+			_errorcode = 404;
 		}
 	}
 }
