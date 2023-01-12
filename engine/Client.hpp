@@ -72,6 +72,8 @@ class Client
 		int workCgi(std::string format, std::string requestFile);
 		void transformBodyStringtoMap();
 		size_t findBodyContentLenght();
+		std::string	findValueEnvCgi(std::string key);
+		std::string	findMethod();
 		void setKeepAlive();
 		bool _isKeepAlive;
 

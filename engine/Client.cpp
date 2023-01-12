@@ -319,6 +319,29 @@ void Client::transformBodyStringtoMap()
 	}
 
 }
+
+std::string Client::findValueEnvCgi(std::string key)
+{
+	std::map<std::string,std::string>::iterator it;
+	it = _requestmap.find(key);
+	if (it != _requestmap.end())
+		return (it->second);
+	return (NULL);
+}
+
+
+std::string Client::findMethod()
+{
+	size_t pos_space = 0;
+	size_t postIndex = _request[0].find("POST");
+	if (postIndex != std::string::npos)
+	{
+		pos_space = _request[0].find_first_of(' ');
+		return (_request[0].substr(0, pos_space));
+	}
+	return (NULL);
+}
+
 int Client::workCgi(std::string format, std::string requestFile)
 {
 	std::cout << "_requestBody\t=\t" << _requestBody << std::endl;
@@ -326,18 +349,25 @@ int Client::workCgi(std::string format, std::string requestFile)
     int fd[2];
     int fd_out[2];
 	char buf[1024];
-	// _cgiResponse.clear();
+	std::string content_type;
+	std::string request_method = "REQUEST_METHOD=";
+	std::string content_length = "CONTENT_LENGTH=";
 	std::string requestFileRoot = _server->getRoot().append(requestFile);
-	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};
-	std::string content_type = "CONTENT_TYPE=multipart/form-data; boundary=";
-	content_type.append(ft_find_boundary());
-	std::cout << "Content type = " << content_type << std::endl;
+	std::string script_filename = "SCRIPT_FILENAME=";
+	script_filename.append(requestFileRoot);
+	if (ft_find_boundary().empty())
+		content_type = "CONTENT_TYPE=application/x-www-form-urlencoded";
+	else
+	{
+		content_type = "CONTENT_TYPE=multipart/form-data; boundary=";
+		content_type.append(ft_find_boundary());
+	}
+	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *header[] = {
-	(char *) "SCRIPT_FILENAME=/mnt/nfs/homes/jbach/Documents/webserv1101/www/form.php",
-	(char *) "REQUEST_METHOD=POST",
+	const_cast<char*> (script_filename.c_str()),
+	const_cast<char*> (request_method.append(findMethod()).c_str()),
 	const_cast<char*>(content_type.c_str()),
-	// (char *) "CONTENT_TYPE=multipart/form-data; boundary=",
-	(char *)"CONTENT_LENGTH=500",
+	const_cast<char*>(content_length.append(findValueEnvCgi("Content-Length")).c_str()),
 	(char *) "REDIRECT_STATUS=200",
 	(char *) NULL
 	};
