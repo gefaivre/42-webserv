@@ -58,8 +58,8 @@ void ParsingRequest::parsingRequest()
 			_requestData.methode = _request[i].substr(0, _request[i].find(" ", 0));
 			unsigned int first = _requestData.methode.size() + 1;
 			unsigned int last = _request[i].find_first_of(" ", first);
-
 			_requestData.path = _request[i].substr(first, last - first);
+			_requestData.getParams = _requestData.path.substr(_requestData.path.find_first_of('?') + 1);
 			_requestData.path =_requestData.path.substr(0, _requestData.path.find_first_of('?'));
 			_requestData.protocol = _request[i].substr(last + 1, _request[i].size());
 		}

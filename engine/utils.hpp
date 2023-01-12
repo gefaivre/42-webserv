@@ -91,6 +91,7 @@ typedef struct	s_requestData
 	std::string path;
 	std::string	fileToSend;
 	std::string _cgiResponse;
+	std::string	getParams;
 	bool		isCgi;
 	bool		isIndex;
 
