@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   epolling.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 12:42:44 by gefaivre          #+#    #+#             */
-/*   Updated: 2023/01/10 18:48:03 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/12 15:19:07 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,9 +85,9 @@ void epolling(vector<Server *> servers)
 						servers[s]->deleteClient(events[i].data.fd);
 				}		
 			}
-			bzero(events, MAX_EVENTS);
 			if (s == servers.size())
 				s = 0;
+			bzero(events, MAX_EVENTS);
 		}
 	}
 	for (size_t s = 0; s < servers.size(); i++)

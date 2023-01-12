@@ -107,14 +107,11 @@ void Client::EndOfRead()
 	event.events = EPOLLOUT | EPOLLRDHUP;
 	event.data.fd = _clientfd;
 	epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
-
 	setKeepAlive();
 	displayRequest();
 	verifyCgi();
-	saveFile();	
+	saveFile();
 	createResponse();
-
-	
 }
 
 int Client::readRequest1()
@@ -146,7 +143,7 @@ int Client::readRequest1()
 			_requestBody += _requestLine;
 			transformRequestVectorToMap();
 			_bodyContentLenght = findBodyContentLenght();
-			if (_bodyContentLenght == 0)
+			if (_bodyContentLenght == 0 || _requestBody.size() == _bodyContentLenght)
 			{
 				EndOfRead();
 			}
@@ -239,7 +236,6 @@ int Client::sendResponse()
 
 std::string	Client::ft_find_boundary()
 {
-	// std::cout << BRED <<  "--- BOUNDARY ---" << WHT << std::endl;
 	std::string boundary;
 	size_t pos_equal = 0;
 	std::map<std::string,std::string>::iterator it;
@@ -249,11 +245,13 @@ std::string	Client::ft_find_boundary()
 	// {
 	// 	std::cout << "REQUEST = " << it->first << " ** " << it->second << std::endl;
 	// }
-
 		it = _requestmap.find("Content-Type");
 		if (it != _requestmap.end())
 		{
 			pos_equal = it->second.find_last_of('=');
+			if (pos_equal == std::string::npos)
+				throw std::exception();
+			std::cout << "pos_equal= " << pos_equal << std::endl;
 			boundary = it->second.substr(pos_equal + 1);
 		}
 	return (boundary);
@@ -297,8 +295,16 @@ void Client::transformBodyStringtoMap()
 	std::string value;
 	std::string key;
     std::vector<std::string> vector;
+	std::string boundary;
 	vector = ft_split_vector_string(_requestBody, '\n');
-	std::string boundary = ft_find_boundary();
+	try
+	{
+		boundary = ft_find_boundary();
+	}
+	catch (std::exception &e)
+	{
+		return ;
+	}
 	for (size_t i = 1; i < vector.size(); i++)
 	{
 		size_t colon_boundary = vector[i].find(boundary);
@@ -311,13 +317,12 @@ void Client::transformBodyStringtoMap()
 		}
 		else
 		{
-			// std::cout << "key = " << key << "&& value = " << value << std::endl;
+			std::cout << "key = " << key << "&& value = " << value << std::endl;
 			_requestmapBody.insert(std::pair<std::string, std::string>(key, value));
 			value.clear();
 			key.clear();
 		}
 	}
-
 }
 
 std::string Client::findValueEnvCgi(std::string key)
@@ -355,13 +360,21 @@ int Client::workCgi(std::string format, std::string requestFile)
 	std::string requestFileRoot = _server->getRoot().append(requestFile);
 	std::string script_filename = "SCRIPT_FILENAME=";
 	script_filename.append(requestFileRoot);
-	if (ft_find_boundary().empty())
+	try 
+	{
+		ft_find_boundary();
+	}
+	catch(std::exception e)
+	{
 		content_type = "CONTENT_TYPE=application/x-www-form-urlencoded";
-	else
+	}
+	if (content_type.empty())
 	{
 		content_type = "CONTENT_TYPE=multipart/form-data; boundary=";
 		content_type.append(ft_find_boundary());
 	}
+	// std::cout << "ft_find_boundary = " << ft_find_boundary() << std::endl;
+	// std::cout << "content_type = " << content_type << std::endl;
 	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *header[] = {
 	const_cast<char*> (script_filename.c_str()),
@@ -418,6 +431,18 @@ int Client::workCgi(std::string format, std::string requestFile)
 	return (1);
 }
 
+// void setFileToSend404()
+// {
+// 	std::string path;
+// 	path = _server->getLocationByPath("/" + _requestData.path).getRoot();
+// 	path += "404.html";
+// 	if (access(path.c_str(), R_OK) == 0)
+// 		_requestData.fileToSend = path;
+// 	else
+// 		_requestData.fileToSend = "error_pages/404.html";
+// }
+
+
 void Client::verifyCgi()
 {
 	std::cout << "** verifyCgi **" << std::endl;
@@ -437,15 +462,12 @@ void Client::verifyCgi()
 		pos_slash = _request[0].find_first_of('/');
 		format = _request[0].substr(pos_point + 1, pos_space - (pos_point + 1));
 		requestFile = _request[0].substr(pos_slash + 1, pos_space - (pos_slash + 1));
-		std::cout << "Request file = " <<  _server->getCgiValue(format) << std::endl;
-		std::cout << "format = " << format << std::endl;
 		try {
-			std::cout << "server = " << _server->getCgiValue(format) << std::endl;
 			workCgi(_server->getCgiValue(format), requestFile);
 		}
 		catch(std::exception e)
 		{
-			std::cout << "CGI NOT FOUND!" << std::endl;
+			std::cout << "Pas de CGI" << std::endl;
 		}
 	}
 }

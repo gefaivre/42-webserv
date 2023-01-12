@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/16 18:02:47 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/01/12 14:46:57 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ string	Config::getCgiValue(string key)
 	if (_cgi.find(key) != _cgi.end())
 		return (_cgi[key]);
 	else
-		return (NULL);
+		throw (std::exception());
 }
 
 void Config::setAutoIndex(bool autoIndex)
