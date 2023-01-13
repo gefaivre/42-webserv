@@ -535,11 +535,9 @@ int Client::workGetCgi(std::string format, std::string requestFile)
 
 void Client::verifyCgi()
 {
+	//TODO: faire une erreur qd le php ne peut pas lire
 	std::cout << "** verifyCgi **" << std::endl;
 
-	std::cout << "POST = " <<  _server->getAcceptedMethods()._post << std::endl; 
-	std::cout << "get = " <<  _server->getAcceptedMethods()._get << std::endl; 
-	std::cout << "delete = " <<  _server->getAcceptedMethods()._delete << std::endl; 
 	std::string format;
 	std::string requestFile;
 	size_t pos_space = 0;
@@ -560,10 +558,7 @@ void Client::verifyCgi()
 	{
 		std::cout << "** POST **" << std::endl;
 		if (!_server->getAcceptedMethods()._post)
-		{
 			_errorcode = 405;
-			std::cout << "ERRRO " <<std::endl;
-		}
 		else {
 			try {
 				workPostCgi(_server->getCgiValue(format), requestFile);
@@ -577,32 +572,71 @@ void Client::verifyCgi()
 	}
 	else if (getIndex != std::string::npos)
 	{
-		//mettre catch qd il n'y a pas de CGI
 		std::cout << "** GET **" << std::endl;
-		try {
-			workGetCgi(_server->getCgiValue(format), requestFile);
-		}
-		catch(std::exception e)
+		if (!_server->getAcceptedMethods()._get)
+			_errorcode = 405;
+		else
 		{
-			bool found = false;
-			for (std::vector<std::string>::iterator it = \
-			authorizedExtension.begin(); it != authorizedExtension.end(); ++it) 
-			{
-				if (*it == format) 
-				{
-					std::cout << "found = " << found  << "format = "<<format << std::endl;
-					found = true;
-					break;
-				}
+			try {
+				workGetCgi(_server->getCgiValue(format), requestFile);
 			}
-			std::cout << "found = " << found  << "format = "<<format << std::endl;
-			// std::cout << "authorizedExtension = " << authorizedExtension[2]  << "format = "<<format << std::endl;
-			if (!found)
-				_errorcode = 404;
+			catch(std::exception e)
+			{
+				bool found = false;
+				for (std::vector<std::string>::iterator it = \
+				authorizedExtension.begin(); it != authorizedExtension.end(); ++it) 
+				{
+					if (*it == format) 
+					{
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					_errorcode = 404;
+			}
 		}
 	}
 	else if (deleteIndex != std::string::npos)
+	{
 		std::cout << "** DELETE **" << std::endl;
+		if (!_server->getAcceptedMethods()._get)
+			_errorcode = 405;
+		else
+		{
+			// try
+			// {
+			// 	workDeleteCgi(_server->getCgiValue(format), requestFile);
+
+			// }
+			// catch(const std::exception& e)
+			// {
+				if (!access(_server->getRoot().append(requestFile).c_str(), F_OK))
+				{
+					//file exist
+					if (!access(_server->getRoot().append(requestFile).c_str(), W_OK))
+					{
+						//file writable
+						if (!remove(_server->getRoot().append(requestFile).c_str()))
+						{
+							std::cout << "File deleted" << std::endl;
+
+						}
+						else
+							std::cout <<"File not deleted" << std::endl;
+					}
+					else
+						std::cout <<"No rights to delete" << std::endl;
+				}
+				else
+					std::cout << "File not exist" << std::endl;
+				// std::cout << "requestFile = " << requestFile << std::endl;
+				// std::cerr << e.what() << '\n';
+			// }
+			
+		}
+	}
+	
 }
 
 void Client::saveFile()
