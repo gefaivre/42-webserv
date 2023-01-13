@@ -537,6 +537,9 @@ void Client::verifyCgi()
 {
 	std::cout << "** verifyCgi **" << std::endl;
 
+	std::cout << "POST = " <<  _server->getAcceptedMethods()._post << std::endl; 
+	std::cout << "get = " <<  _server->getAcceptedMethods()._get << std::endl; 
+	std::cout << "delete = " <<  _server->getAcceptedMethods()._delete << std::endl; 
 	std::string format;
 	std::string requestFile;
 	size_t pos_space = 0;
@@ -549,19 +552,27 @@ void Client::verifyCgi()
 	format =format.substr(0, format.find_first_of('?'));
 	size_t postIndex = _request[0].find("POST");
 	size_t getIndex = _request[0].find("GET");
+	size_t deleteIndex = _request[0].find("DELETE");
 	requestFile = _request[0].substr(pos_slash + 1, pos_space - (pos_slash + 1));
 	_getParams = requestFile.substr(requestFile.find_first_of('?') + 1);
 	requestFile =requestFile.substr(0, requestFile.find_first_of('?'));
 	if (postIndex != std::string::npos)
 	{
-		// std::cout << ""
-		try {
-			workPostCgi(_server->getCgiValue(format), requestFile);
-			saveFile();
-		}
-		catch(std::exception e)
+		std::cout << "** POST **" << std::endl;
+		if (!_server->getAcceptedMethods()._post)
 		{
-			_errorcode = 404;
+			_errorcode = 405;
+			std::cout << "ERRRO " <<std::endl;
+		}
+		else {
+			try {
+				workPostCgi(_server->getCgiValue(format), requestFile);
+				saveFile();
+			}
+			catch(std::exception e)
+			{
+				_errorcode = 404;
+			}
 		}
 	}
 	else if (getIndex != std::string::npos)
@@ -590,6 +601,8 @@ void Client::verifyCgi()
 				_errorcode = 404;
 		}
 	}
+	else if (deleteIndex != std::string::npos)
+		std::cout << "** DELETE **" << std::endl;
 }
 
 void Client::saveFile()

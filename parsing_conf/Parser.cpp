@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/11 14:04:20 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/13 14:31:28 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,7 @@ void	Parser::parseDirective(size_t nextSemiColon, vector<Config *> conf)
 						if (acMethods[i] == "GET")
 							methods._get = true;
 						else if (acMethods[i] == "POST")
-							methods._get = true;
+							methods._post = true;
 						else if (acMethods[i] == "DELETE")
 							methods._delete = true;
 						else

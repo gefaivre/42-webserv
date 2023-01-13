@@ -67,38 +67,40 @@ void ParsingRequest::parsingRequest()
 	_autoindex = _server->getLocationByPath(_requestData.path).getAutoIndex();
 }
 
-void ParsingRequest::setFileToSend404()
-{
-	std::string path;
-	path = _server->getLocationByPath("/" + _requestData.path).getRoot();
-	path += "404.html";
-	if (access(path.c_str(), R_OK) == 0)
-		_requestData.fileToSend = path;
-	else
-		_requestData.fileToSend = "error_pages/404.html";
-}
+// void ParsingRequest::setFileToSend404()
+// {
+// 	std::string path;
+// 	path = _server->getLocationByPath("/" + _requestData.path).getRoot();
+// 	path += "404.html";
+// 	if (access(path.c_str(), R_OK) == 0)
+// 		_requestData.fileToSend = path;
+// 	else
+// 		_requestData.fileToSend = "error_pages/404.html";
+// }
 
-void ParsingRequest::setFileToSend403()
+void ParsingRequest::setFileToSend(std::string errorcode)
 {
 	std::string path;
 	path = _server->getLocationByPath("/" +_requestData.path).getRoot();
-	path += "403.html";
+	path += errorcode;
 	if (access(path.c_str(), R_OK) == 0)
 		_requestData.fileToSend = path;
 	else
-		_requestData.fileToSend = "error_pages/403.html";
+		_requestData.fileToSend = "error_pages/" + errorcode;
 }
 
 int ParsingRequest::filepermission()
 {
 	int fd;
 
+	if (_errorcode == 405)
+		setFileToSend("405.html");
 	fd = access(_requestData.fileToSend.c_str(), F_OK);
 	if (fd == -1 || _errorcode == 404)
-		setFileToSend404();
+		setFileToSend("404.html");
 	fd = access(_requestData.fileToSend.c_str(), R_OK);
 	if (fd == -1 || _autoindex == 0)
-		setFileToSend403();
+		setFileToSend("403.html");
 	return (0);
 }
 
@@ -132,7 +134,7 @@ int ParsingRequest::foundFileToSend()
 		// std::cout << "--3--" << std::endl;
 		filepermission();
 	}
-	else if (_errorcode == 404)
+	else if (_errorcode)
 		filepermission();
 	else
 	{
