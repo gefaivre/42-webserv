@@ -12,12 +12,6 @@ CreateResponse::CreateResponse(Server *server,std::map<std::string, std::string>
 	createBody();
 	fillHeaderData();
 	createHeader();
-
-	if (_requestData.methode == "POST")
-	{
-		// std::cout << "new socket = " << newsocket << std::endl;
-		// collectData(newsocket);
-	}
 }
 
 
@@ -111,7 +105,6 @@ void CreateResponse::createHeader()
 	_header += "Content-length:  " + _headerData.contentLength + "\r\n";
 	_header += "Content-Type:  " + _headerData.contentType + "\r\n";
 	_header += "Connection: " + _headerData.connection + "\r\n";
-	std::cout << "TYPE = " << _headerData.contentType<< std::endl;
 }
 
 void CreateResponse::BodyIsCgi()

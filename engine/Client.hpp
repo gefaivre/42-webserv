@@ -75,8 +75,9 @@ class Client
 		std::string	ft_find_boundary();
 		void saveFile();
 		void verifyCgi();
-		int workPostCgi(std::string format, std::string requestFile);
 		int workGetCgi(std::string format, std::string requestFile);
+		int workPostCgi(std::string format, std::string requestFile);
+		int workDeleteCgi(std::string format, std::string requestFile);
 		void transformBodyStringtoMap();
 		size_t findBodyContentLenght();
 		std::string	findValueEnvCgi(std::string key);

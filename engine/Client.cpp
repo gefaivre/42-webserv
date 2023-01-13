@@ -392,6 +392,7 @@ std::string Client::findMethod()
 
 int Client::workPostCgi(std::string format, std::string requestFile)
 {
+	//TODO: rajouter query strings
 	std::cout << "_requestBody\t=\t" << _requestBody << std::endl;
 	pid_t pid;
     int fd[2];
@@ -533,6 +534,65 @@ int Client::workGetCgi(std::string format, std::string requestFile)
 	return (1);
 }
 
+int Client::workDeleteCgi(std::string format, std::string requestFile)
+{
+	pid_t pid;
+    int fd_out[2];
+	char buf[1024];
+	std::string request_method = "REQUEST_METHOD=DELETE";
+	std::string query_string = "QUERY_STRING=";
+	std::string requestFileRoot = _server->getRoot().append(requestFile);
+	std::string script_filename = "SCRIPT_FILENAME=";
+	script_filename.append(requestFileRoot);
+	char *args[]= {const_cast<char*>(format.c_str()), const_cast<char*>(requestFileRoot.c_str()), NULL};	
+	char *header[] = {
+		const_cast<char*> (script_filename.c_str()),
+		const_cast<char*> (request_method.c_str()),
+		const_cast<char*> (query_string.append(_getParams).c_str()),
+		(char *) "REDIRECT_STATUS=200",
+		(char *) NULL
+	};
+
+	pipe(fd_out);
+
+	if ((pid = fork()) < 0)
+	{
+		perror("fork");
+		return EXIT_FAILURE;
+	}
+	else if (!pid) 
+	{ 
+		/* child */
+		dup2(fd_out[1], STDOUT_FILENO);
+		dup2(fd_out[1], STDERR_FILENO);
+		close(fd_out[0]);
+		execve(args[0], args, header);
+		perror("exec");
+		return EXIT_FAILURE;
+	} 
+	else 
+	{ 
+		/* parent */
+		close(fd_out[1]);
+		while (waitpid(-1, NULL, WUNTRACED) != -1)
+			;
+		std::cout << "Before read" << std::endl;
+		int n = read(fd_out[0], buf, 1024);
+		if (n < 0)
+		{
+			std::cout << "Error read" << std::endl;
+			perror("read");
+           	exit(EXIT_FAILURE);
+        } else
+		{
+            buf[n] = '\0';
+			_cgiResponse.append(buf);
+			std::cout << "CGI DELETE response ="<<_cgiResponse << std::endl;
+		}
+	}
+	return (1);
+}
+
 void Client::verifyCgi()
 {
 	//TODO: faire une erreur qd le php ne peut pas lire
@@ -604,13 +664,13 @@ void Client::verifyCgi()
 			_errorcode = 405;
 		else
 		{
-			// try
-			// {
-			// 	workDeleteCgi(_server->getCgiValue(format), requestFile);
+			try
+			{
+				workDeleteCgi(_server->getCgiValue(format), requestFile);
 
-			// }
-			// catch(const std::exception& e)
-			// {
+			}
+			catch(const std::exception& e)
+			{
 				if (!access(_server->getRoot().append(requestFile).c_str(), F_OK))
 				{
 					//file exist
@@ -620,7 +680,6 @@ void Client::verifyCgi()
 						if (!remove(_server->getRoot().append(requestFile).c_str()))
 						{
 							std::cout << "File deleted" << std::endl;
-
 						}
 						else
 							std::cout <<"File not deleted" << std::endl;
@@ -631,8 +690,7 @@ void Client::verifyCgi()
 				else
 					std::cout << "File not exist" << std::endl;
 				// std::cout << "requestFile = " << requestFile << std::endl;
-				// std::cerr << e.what() << '\n';
-			// }
+			}
 			
 		}
 	}
