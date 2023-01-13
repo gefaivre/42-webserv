@@ -393,12 +393,14 @@ std::string Client::findMethod()
 int Client::workPostCgi(std::string format, std::string requestFile)
 {
 	//TODO: rajouter query strings
+	//TODO: Block a epollin qd on met des argu ds body directement ds postman
 	std::cout << "_requestBody\t=\t" << _requestBody << std::endl;
 	pid_t pid;
     int fd[2];
     int fd_out[2];
 	char buf[1024];
 	std::string content_type;
+	std::string query_string = "QUERY_STRING=";
 	std::string request_method = "REQUEST_METHOD=POST";
 	std::string content_length = "CONTENT_LENGTH=";
 	std::string requestFileRoot = _server->getRoot().append(requestFile);
@@ -423,6 +425,7 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 	const_cast<char*> (request_method.c_str()),
 	const_cast<char*>(content_type.c_str()),
 	const_cast<char*>(content_length.append(findValueEnvCgi("Content-Length")).c_str()),
+	const_cast<char*> (query_string.append(_getParams).c_str()),
 	(char *) "REDIRECT_STATUS=200",
 	(char *) NULL
 	};
