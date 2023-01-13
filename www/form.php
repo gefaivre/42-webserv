@@ -1,1 +1,1 @@
-<?php echo "this is cgi ". $_GET["name"] . "!!!";  ?>
+<?php echo "this is cgi ". $_POST["name"] . "!!!";  ?>

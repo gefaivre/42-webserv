@@ -503,6 +503,7 @@ int Client::workGetCgi(std::string format, std::string requestFile)
 	{ 
 		/* child */
 		dup2(fd_out[1], STDOUT_FILENO);
+		dup2(fd_out[1], STDERR_FILENO);
 		close(fd_out[0]);
 		execve(args[0], args, header);
 		perror("exec");
