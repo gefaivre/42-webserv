@@ -416,8 +416,6 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 		content_type = "CONTENT_TYPE=multipart/form-data; boundary=";
 		content_type.append(ft_find_boundary());
 	}
-	// std::cout << "ft_find_boundary = " << ft_find_boundary() << std::endl;
-	// std::cout << "content_type = " << content_type << std::endl;
 	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *header[] = {
 	const_cast<char*> (script_filename.c_str()),
@@ -444,6 +442,7 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 		dup2(fd[0], STDIN_FILENO);
 		close(fd[0]);
 		dup2(fd_out[1], STDOUT_FILENO);
+		dup2(fd_out[1], STDERR_FILENO);
 		close(fd_out[0]);
 		execve(args[0], args, header);
 		perror("exec");
