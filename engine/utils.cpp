@@ -61,3 +61,16 @@ std::string itos(int nb)
 	std::string temp_str = strs.str();
 	return (temp_str);
 }
+
+std::string ft_pwd()
+{
+	char buffer[PATH_MAX+ 1];
+
+	if (getcwd(buffer, PATH_MAX))
+	{
+		std::string buf = buffer;
+		return (buf);
+	}
+	else
+		return ("PWD: Failed to retrieve current directory");
+}

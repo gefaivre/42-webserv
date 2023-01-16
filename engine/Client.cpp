@@ -33,7 +33,7 @@ Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._serve
 	this->_isSend = false;
 	this->_moverSave = 0;
 	this->_cgiResponse.clear();
-		this->_getParams.clear();
+	this->_getParams.clear();
 	this->authorizedExtension = setAuthorizedExtension(this->authorizedExtension);
 }
 
@@ -203,7 +203,6 @@ void Client::createResponse()
 	createResponse.displayHeaderResponse();
 	// createResponse.displayFullResponse();
 	_response = createResponse.getResponse();
-
 }
 
 void Client::resetClient()
@@ -223,8 +222,7 @@ void Client::resetClient()
 	_isKeepAlive = false;
 	_isSend = false;
 	_moverSave = 0;
-
-
+	_errorcode = 0;
 }
 
 int Client::sendResponse()
@@ -392,8 +390,6 @@ std::string Client::findMethod()
 
 int Client::workPostCgi(std::string format, std::string requestFile)
 {
-	//TODO: rajouter query strings
-	//TODO: Block a epollin qd on met des argu ds body directement ds postman
 	std::cout << "_requestBody\t=\t" << _requestBody << std::endl;
 	pid_t pid;
     int fd[2];
@@ -408,6 +404,7 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 	script_filename.append(requestFileRoot);
 	try 
 	{
+		std::cout << "Found boundary" << std::endl;
 		ft_find_boundary();
 	}
 	catch(std::exception e)
@@ -419,6 +416,7 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 		content_type = "CONTENT_TYPE=multipart/form-data; boundary=";
 		content_type.append(ft_find_boundary());
 	}
+	// char *args[]= {const_cast<char*>(format.c_str()), const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *header[] = {
 	const_cast<char*> (script_filename.c_str()),
@@ -434,6 +432,7 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 	pipe(fd_out);
 	write(fd[1], _requestBody.c_str(), _requestBody.length());
 	close(fd[1]);
+	std::cout << "//POST//"<<std::endl;
 
 	if ((pid = fork()) < 0)
 	{
@@ -471,7 +470,7 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 		{
             buf[n] = '\0';
 			_cgiResponse.append(buf);
-			std::cout << _cgiResponse << std::endl;
+			std::cout << "_cgiResponse" << _cgiResponse << std::endl;
 		}
 	}
 	return (1);
@@ -488,6 +487,7 @@ int Client::workGetCgi(std::string format, std::string requestFile)
 	std::string script_filename = "SCRIPT_FILENAME=";
 	script_filename.append(requestFileRoot);
 	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
+	// char *args[]= {const_cast<char*>(format.c_str()), const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *header[] = {
 	const_cast<char*> (script_filename.c_str()),
 	const_cast<char*> (request_method.c_str()),
@@ -599,6 +599,7 @@ int Client::workDeleteCgi(std::string format, std::string requestFile)
 void Client::verifyCgi()
 {
 	//TODO: faire une erreur qd le php ne peut pas lire
+	//TODO: que faire ds le cas d'un file sans ext ?
 	std::cout << "** verifyCgi **" << std::endl;
 
 	std::string format;
@@ -609,7 +610,9 @@ void Client::verifyCgi()
 	pos_point = _request[0].find_first_of('.');
 	pos_space = _request[0].find_last_of(' ');
 	pos_slash = _request[0].find_first_of('/');
+	std::cout << "_request[0] = " << _request[0]<< std::endl;
 	format = _request[0].substr(pos_point + 1, pos_space - (pos_point + 1));
+	std::cout << "format = " << format<< std::endl;
 	format =format.substr(0, format.find_first_of('?'));
 	size_t postIndex = _request[0].find("POST");
 	size_t getIndex = _request[0].find("GET");
@@ -624,12 +627,13 @@ void Client::verifyCgi()
 			_errorcode = 405;
 		else {
 			try {
+				std::cout << "_server->getCgiValue(format)" << format << std::endl;
 				workPostCgi(_server->getCgiValue(format), requestFile);
 				saveFile();
 			}
 			catch(std::exception e)
 			{
-				_errorcode = 404;
+				_errorcode = 405;
 			}
 		}
 	}
@@ -649,14 +653,14 @@ void Client::verifyCgi()
 				for (std::vector<std::string>::iterator it = \
 				authorizedExtension.begin(); it != authorizedExtension.end(); ++it) 
 				{
-					if (*it == format) 
+					if (*it == format || format.empty()) 
 					{
 						found = true;
 						break;
 					}
 				}
 				if (!found)
-					_errorcode = 404;
+					_errorcode = 500;
 			}
 		}
 	}
@@ -670,7 +674,6 @@ void Client::verifyCgi()
 			try
 			{
 				workDeleteCgi(_server->getCgiValue(format), requestFile);
-
 			}
 			catch(const std::exception& e)
 			{
@@ -692,7 +695,6 @@ void Client::verifyCgi()
 				}
 				else
 					std::cout << "File not exist" << std::endl;
-				// std::cout << "requestFile = " << requestFile << std::endl;
 			}
 			
 		}
@@ -720,7 +722,7 @@ void Client::saveFile()
 		std::cout <<YEL <<  "FILE = " << it_name->second<< WHT<< std::endl;
 		//open a file in write mode
 		ofstream outfile;
-		std::string new_path = "new_files/";
+		std::string new_path = "www/new_files/";
 		mkdir(new_path.c_str(), 0777);
 		outfile.open(new_path.append(it_name->second).c_str());
 		//write the string

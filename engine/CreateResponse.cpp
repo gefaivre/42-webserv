@@ -66,21 +66,66 @@ void CreateResponse::fillFilesExtension()
 	_switchFilesExtension.insert(std::pair<std::string, std::string>("default","text/html") );
 }
 
-void CreateResponse::fillHeaderData()
+int CreateResponse::checkErrorPage(std::string errorCode, std::string path)
 {
+	std::cout << "1 = "<< (_requestData.fileToSend == path + errorCode) << std::endl;
+	std::cout << "2 = " << (_requestData.fileToSend == ft_pwd() + "/error_pages/" + errorCode) << std::endl;
+	std::cout << "_requestData.fileToSend = " << _requestData.fileToSend << std::endl;
+	std::cout << "ft_pwd() + /error_pages/ + errorCode = " << ft_pwd() + "/error_pages/" + errorCode << std::endl;
+	if ((_requestData.fileToSend == path + errorCode) || (_requestData.fileToSend == ft_pwd() + "/error_pages/" + errorCode))
+		return (1);
+	return (0);
+}
+
+void CreateResponse::errorStatus()
+{
+	std::cout << "IN ERRORSTATUS" << std::endl;
+
 	std::string path = _server->getLocationByPath("/" + _requestData.path).getRoot();
-	
-	_headerData.protocol = _requestData.protocol;
-	if ((_requestData.fileToSend == path + "404.html") && (path + _requestData.path != _requestData.fileToSend))
-	{
-		_headerData.statusCode = "404";
-		_headerData.statusMessage = "Not Found";
-	}
+	std::cout << "path = " << path << std::endl;
+	std::cout << "path + _requestData.path = " << path + _requestData.path << std::endl;
+	std::cout << "_requestData.fileToSend = " << _requestData.fileToSend << std::endl;
+	// if (path + _requestData.path != _requestData.fileToSend)
+	// {
+		if (checkErrorPage("400.html", path))
+		{
+			_headerData.statusCode = "400";
+			_headerData.statusMessage = "Bad Request";
+		}
+		else if ((_requestData.fileToSend == path + "403.html"))
+		{
+			_headerData.statusCode = "403";
+			_headerData.statusMessage = "Forbidden";
+		}
+		else if ((_requestData.fileToSend == path + "404.html"))
+		{
+			_headerData.statusCode = "404";
+			_headerData.statusMessage = "Not Found";
+		}
+		else if ((_requestData.fileToSend == path + "405.html"))
+		{
+			_headerData.statusCode = "405";
+			_headerData.statusMessage = "Not Allowed";
+		}
+		else if (checkErrorPage("500.html", path))
+		{
+			std::cout << "LGKYFKJFKJHFKJFKJHFKHF" << std::endl;
+			_headerData.statusCode = "500";
+			_headerData.statusMessage = "Internal Server Error";
+		}
+	// }
 	else
 	{
 		_headerData.statusCode = "200";
 		_headerData.statusMessage = "OK";
 	}
+}
+
+void CreateResponse::fillHeaderData()
+{
+	
+	_headerData.protocol = _requestData.protocol;
+	errorStatus();
 	std::string type = _requestData.fileToSend.substr(_requestData.fileToSend.find('.') + 1, _requestData.fileToSend.size());
 	_headerData.contentType = _switchFilesExtension[type];
 	if (_headerData.contentType.size() == 0)

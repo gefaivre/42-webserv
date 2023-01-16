@@ -120,5 +120,7 @@ int	ft_define_error(string str);
 
 std::string itos(int nb);
 
+std::string ft_pwd();
+
 
 #endif

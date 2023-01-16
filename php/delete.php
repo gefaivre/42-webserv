@@ -10,4 +10,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 	}  
 }
 else
-	echo "This is not a Delete request !\n";    
+	echo "SAlut !\n";    

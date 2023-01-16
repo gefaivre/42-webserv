@@ -50,6 +50,10 @@ class CreateResponse
 
 		void fillFilesExtension();
 		void fillHeaderData();
+	
+		void errorStatus();
+		int checkErrorPage(std::string errorCode, std::string path);
+
 
 		void createHeader();
 		std::string _header;

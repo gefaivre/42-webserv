@@ -82,11 +82,12 @@ void ParsingRequest::setFileToSend(std::string errorcode)
 {
 	std::string path;
 	path = _server->getLocationByPath("/" +_requestData.path).getRoot();
+	std::cout << _server->getLocationByPath("/").getRoot() << std::endl;
 	path += errorcode;
 	if (access(path.c_str(), R_OK) == 0)
 		_requestData.fileToSend = path;
 	else
-		_requestData.fileToSend = "error_pages/" + errorcode;
+		_requestData.fileToSend = ft_pwd() + "/error_pages/" + errorcode;
 }
 
 int ParsingRequest::filepermission()
@@ -95,6 +96,8 @@ int ParsingRequest::filepermission()
 
 	if (_errorcode == 405)
 		setFileToSend("405.html");
+	else if (_errorcode == 500)
+		setFileToSend("500.html");
 	fd = access(_requestData.fileToSend.c_str(), F_OK);
 	if (fd == -1 || _errorcode == 404)
 		setFileToSend("404.html");
@@ -135,7 +138,9 @@ int ParsingRequest::foundFileToSend()
 		filepermission();
 	}
 	else if (_errorcode)
+	{
 		filepermission();
+	}
 	else
 	{
 		// std::cout << "--4--" << std::endl;
