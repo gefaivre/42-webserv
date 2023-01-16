@@ -123,32 +123,33 @@ int ParsingRequest::foundFileToSend()
 	
 	if (_autoindex == 1 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
 	{
-		// std::cout << "--1--" << std::endl;
+		std::cout << "--1--" << std::endl;
 		_requestData.fileToSend = fullPathFile;
 		_requestData.isIndex = 1;
 	}
 	else if (isDirectory(fullPathFile))
 	{
-		// std::cout << "--2--" << std::endl;
+		std::cout << "--2--" << std::endl;
 		_requestData.fileToSend = rootPath + "index.html";
 	}
 	else if (_autoindex == 0 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
 	{
-		// std::cout << "--3--" << std::endl;
+		std::cout << "--3--" << std::endl;
 		filepermission();
 	}
 	else if (_errorcode)
 	{
+		std::cout << "--4--" << std::endl;
 		filepermission();
 	}
 	else
 	{
-		// std::cout << "--4--" << std::endl;
-		// std::cout << _requestData.fileToSend << std::endl;
+		std::cout << "--5--" << std::endl;
 		_requestData.fileToSend = fullPathFile;
 	}
 
 
+	std::cout <<"full path = "<<fullPathFile << std::endl;
 	FILE *f = fopen(fullPathFile.c_str(), "r+");
 	if ( f == NULL)
 	{

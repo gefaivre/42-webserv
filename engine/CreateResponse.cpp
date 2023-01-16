@@ -8,6 +8,8 @@
 CreateResponse::CreateResponse(Server *server,std::map<std::string, std::string> &requestMap, t_requestData const requestData):
 	_server(server), _requestData(requestData), _requestMap(requestMap)
 {
+	std::cout << "_requestData.fileToSend = " << _requestData.fileToSend<<std::endl;
+
 	fillFilesExtension();
 	createBody();
 	fillHeaderData();
@@ -68,10 +70,6 @@ void CreateResponse::fillFilesExtension()
 
 int CreateResponse::checkErrorPage(std::string errorCode, std::string path)
 {
-	std::cout << "1 = "<< (_requestData.fileToSend == path + errorCode) << std::endl;
-	std::cout << "2 = " << (_requestData.fileToSend == ft_pwd() + "/error_pages/" + errorCode) << std::endl;
-	std::cout << "_requestData.fileToSend = " << _requestData.fileToSend << std::endl;
-	std::cout << "ft_pwd() + /error_pages/ + errorCode = " << ft_pwd() + "/error_pages/" + errorCode << std::endl;
 	if ((_requestData.fileToSend == path + errorCode) || (_requestData.fileToSend == ft_pwd() + "/error_pages/" + errorCode))
 		return (1);
 	return (0);
@@ -82,27 +80,24 @@ void CreateResponse::errorStatus()
 	std::cout << "IN ERRORSTATUS" << std::endl;
 
 	std::string path = _server->getLocationByPath("/" + _requestData.path).getRoot();
-	std::cout << "path = " << path << std::endl;
-	std::cout << "path + _requestData.path = " << path + _requestData.path << std::endl;
-	std::cout << "_requestData.fileToSend = " << _requestData.fileToSend << std::endl;
-	// if (path + _requestData.path != _requestData.fileToSend)
-	// {
+	if (path + _requestData.path != _requestData.fileToSend)
+	{
 		if (checkErrorPage("400.html", path))
 		{
 			_headerData.statusCode = "400";
 			_headerData.statusMessage = "Bad Request";
 		}
-		else if ((_requestData.fileToSend == path + "403.html"))
+		else if (checkErrorPage("403.html", path))
 		{
 			_headerData.statusCode = "403";
 			_headerData.statusMessage = "Forbidden";
 		}
-		else if ((_requestData.fileToSend == path + "404.html"))
+		else if (checkErrorPage("404.html", path))
 		{
 			_headerData.statusCode = "404";
 			_headerData.statusMessage = "Not Found";
 		}
-		else if ((_requestData.fileToSend == path + "405.html"))
+		else if (checkErrorPage("405.html", path))
 		{
 			_headerData.statusCode = "405";
 			_headerData.statusMessage = "Not Allowed";
@@ -113,7 +108,7 @@ void CreateResponse::errorStatus()
 			_headerData.statusCode = "500";
 			_headerData.statusMessage = "Internal Server Error";
 		}
-	// }
+	}
 	else
 	{
 		_headerData.statusCode = "200";
@@ -125,6 +120,7 @@ void CreateResponse::fillHeaderData()
 {
 	
 	_headerData.protocol = _requestData.protocol;
+	std::cout << "protocol = " << _headerData.protocol<<std::endl;
 	errorStatus();
 	std::string type = _requestData.fileToSend.substr(_requestData.fileToSend.find('.') + 1, _requestData.fileToSend.size());
 	_headerData.contentType = _switchFilesExtension[type];
@@ -150,6 +146,7 @@ void CreateResponse::createHeader()
 	_header += "Content-length:  " + _headerData.contentLength + "\r\n";
 	_header += "Content-Type:  " + _headerData.contentType + "\r\n";
 	_header += "Connection: " + _headerData.connection + "\r\n";
+	std::cout << "header = " << _header << std::endl;
 }
 
 void CreateResponse::BodyIsCgi()
@@ -171,6 +168,7 @@ void CreateResponse::createBody()
 
 void CreateResponse::BodyIsNotIndex()
 {
+	std::cout << "** BodyIsNotIndex **"<<std::endl;
 
 	time_t current_time;
   	current_time = time(NULL);

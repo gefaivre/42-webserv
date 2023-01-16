@@ -319,6 +319,20 @@ std::string findBodyValue(std::vector<std::string> vector, size_t i, std::string
 	return (value);
 }
 
+
+std::string	ft_remove_not_print(std::string str)
+{
+	std::string::iterator it;
+	std::string str2;
+	for (it = str.begin(); it != str.end(); it++)
+	{
+		if (isprint(*it))
+			str2 += *it;
+	}
+	std::cout << "str2 = ." << str2 << "."<< std::endl;
+	return (str2);
+}
+
 void Client::transformBodyStringtoMap()
 {
 	std::string value;
@@ -337,11 +351,14 @@ void Client::transformBodyStringtoMap()
 				if (vector[i].find("Content-Disposition") != std::string::npos)
 					key = findBodyKey(vector, i);
 				else
+				{
 					value += findBodyValue(vector, i, value, key);
+					if (key != "file")
+						value = ft_remove_not_print(value);
+				}
 			}
 			else
 			{
-				std::cout << "key = " << key << "&& value = " << value << std::endl;
 				_requestmapBody.insert(std::pair<std::string, std::string>(key, value));
 				value.clear();
 				key.clear();
@@ -481,6 +498,8 @@ int Client::workGetCgi(std::string format, std::string requestFile)
 	pid_t pid;
     int fd_out[2];
 	char buf[1024];
+	if (format.empty())
+		return (1);
 	std::string request_method = "REQUEST_METHOD=GET";
 	std::string query_string = "QUERY_STRING=";
 	std::string requestFileRoot = _server->getRoot().append(requestFile);
@@ -600,6 +619,7 @@ void Client::verifyCgi()
 {
 	//TODO: faire une erreur qd le php ne peut pas lire
 	//TODO: que faire ds le cas d'un file sans ext ?
+	//TODO: pb avec http://localhost:8042/form ==> error 500 au lieu de 404
 	std::cout << "** verifyCgi **" << std::endl;
 
 	std::string format;
@@ -607,19 +627,24 @@ void Client::verifyCgi()
 	size_t pos_space = 0;
 	size_t pos_slash = 0;
 	size_t pos_point = 0;
-	pos_point = _request[0].find_first_of('.');
 	pos_space = _request[0].find_last_of(' ');
+	pos_point = _request[0].find_first_of('.');
 	pos_slash = _request[0].find_first_of('/');
-	std::cout << "_request[0] = " << _request[0]<< std::endl;
-	format = _request[0].substr(pos_point + 1, pos_space - (pos_point + 1));
+	if (pos_space < pos_point)
+		format = "";
+	else
+	{
+		format = _request[0].substr(pos_point + 1, pos_space - (pos_point + 1));
+		format =format.substr(0, format.find_first_of('?'));
+	}
 	std::cout << "format = " << format<< std::endl;
-	format =format.substr(0, format.find_first_of('?'));
 	size_t postIndex = _request[0].find("POST");
 	size_t getIndex = _request[0].find("GET");
 	size_t deleteIndex = _request[0].find("DELETE");
 	requestFile = _request[0].substr(pos_slash + 1, pos_space - (pos_slash + 1));
 	_getParams = requestFile.substr(requestFile.find_first_of('?') + 1);
 	requestFile =requestFile.substr(0, requestFile.find_first_of('?'));
+	std::cout << "requestFile= " << requestFile << std::endl;
 	if (postIndex != std::string::npos)
 	{
 		std::cout << "** POST **" << std::endl;
@@ -704,6 +729,7 @@ void Client::verifyCgi()
 
 void Client::saveFile()
 {
+	//TODO: remettre les spaces ds le file 
 	std::cout << "Save file = " << std::endl;
 	transformBodyStringtoMap();
 
@@ -726,7 +752,8 @@ void Client::saveFile()
 		mkdir(new_path.c_str(), 0777);
 		outfile.open(new_path.append(it_name->second).c_str());
 		//write the string
-		outfile << it_file->second.substr(2, it_file->second.size() - 3);
+		std::cout << "second = " << it_file->second.substr(2, it_file->second.size() - 3) << std::endl;
+		outfile << std::noskipws << it_file->second.substr(2, it_file->second.size() - 3);
 		outfile.close();
 	}
 	std::cout << "Save file 2 = " << std::endl;
