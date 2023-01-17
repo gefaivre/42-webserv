@@ -487,6 +487,11 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 		{
             buf[n] = '\0';
 			_cgiResponse.append(buf);
+			std::string mystring = buf;
+			std::string substring = "Content-type";
+			if (mystring.find(substring) != std::string::npos && mystring.find_first_of("\n\n") != std::string::npos)
+				mystring.erase(mystring.find(substring), mystring.find_first_of("\n\n"));
+			_cgiResponse.append(mystring);
 			std::cout << "_cgiResponse" << _cgiResponse << std::endl;
 		}
 	}
@@ -548,7 +553,6 @@ int Client::workGetCgi(std::string format, std::string requestFile)
         } else
 		{
             buf[n] = '\0';
-			// char *result = strstr(buf, "Content-type");
 			std::string mystring = buf;
 			std::string substring = "Content-type";
 			if (mystring.find(substring) != std::string::npos && mystring.find_first_of("\n\n") != std::string::npos)
@@ -613,6 +617,11 @@ int Client::workDeleteCgi(std::string format, std::string requestFile)
 		{
             buf[n] = '\0';
 			_cgiResponse.append(buf);
+			std::string mystring = buf;
+			std::string substring = "Content-type";
+			if (mystring.find(substring) != std::string::npos && mystring.find_first_of("\n\n") != std::string::npos)
+				mystring.erase(mystring.find(substring), mystring.find_first_of("\n\n"));
+			_cgiResponse.append(mystring);
 			std::cout << "CGI DELETE response ="<<_cgiResponse << std::endl;
 		}
 	}
@@ -756,7 +765,7 @@ void Client::saveFile()
 		mkdir(new_path.c_str(), 0777);
 		outfile.open(new_path.append(it_name->second).c_str());
 		//write the string
-		outfile << std::noskipws << it_file->second.substr(2, it_file->second.size() - 3);
+		outfile << it_file->second.substr(2, it_file->second.size() - 3);
 		outfile.close();
 	}
 }
