@@ -96,6 +96,8 @@ int ParsingRequest::filepermission()
 
 	if (_errorcode == 405)
 		setFileToSend("405.html");
+	else if (_errorcode == 4041)
+		setFileToSend("404_noSpecified.html");
 	else if (_errorcode == 500)
 		setFileToSend("500.html");
 	fd = access(_requestData.fileToSend.c_str(), F_OK);

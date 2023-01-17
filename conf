@@ -4,9 +4,9 @@ server{
 
 	accepted_methods	GET POST DELETE;
 	autoindex on;
-	cgi .php /usr/bin/php-cgi;
-	cgi .html /usr/bin/php-cgi;
-	cgi .py /usr/bin/python3.10;
+	# cgi .php /usr/bin/php-cgi;
+	# cgi .html /usr/bin/php-cgi;
+	# cgi .py /usr/bin/python3.10;
 	root /mnt/nfs/homes/jbach/Documents/new1101/www;
 }
 server{

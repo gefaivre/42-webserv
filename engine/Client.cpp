@@ -726,13 +726,22 @@ void Client::verifyCgi()
 							std::cout << "File deleted" << std::endl;
 						}
 						else
-							std::cout <<"File not deleted" << std::endl;
+						{
+							_errorcode = 500;
+							// std::cout <<"File not deleted" << std::endl;
+						}
 					}
 					else
-						std::cout <<"No rights to delete" << std::endl;
+					{
+						_errorcode = 4041;
+						// std::cout <<"No rights to delete" << std::endl;
+					}
 				}
 				else
-					std::cout << "File not exist" << std::endl;
+				{
+					_errorcode = 404;
+					// std::cout << "File not exist" << std::endl;
+				}
 			}
 			
 		}

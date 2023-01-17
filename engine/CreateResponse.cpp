@@ -103,9 +103,13 @@ void CreateResponse::errorStatus()
 		}
 		else if (checkErrorPage("500.html", path))
 		{
-			std::cout << "LGKYFKJFKJHFKJFKJHFKHF" << std::endl;
 			_headerData.statusCode = "500";
 			_headerData.statusMessage = "Internal Server Error";
+		}
+		else if (checkErrorPage("404_noSpecified.html", path))
+		{
+			_headerData.statusCode = "404";
+			_headerData.statusMessage = "Not Found";
 		}
 	}
 	else
