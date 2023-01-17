@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/12 14:46:57 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/17 20:27:01 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,15 +56,18 @@ bool	Config::getAutoIndex(void)
 }
 
 void	Config::setRoot(string root)
-{
+{ 
 	_wasSet->push_back("root");
 	if (root.size() != 0 && root[root.size() - 1] != '/')
 		root += '/';
+
 	_root = root;
+	std::cout << "SET ROOT:" << root << std::endl;
 }
 
 string Config::getRoot(void)
 {
+	std::cout << "GET ROOT:" << _root << std::endl;
 	return (_root);
 }
 

@@ -89,6 +89,7 @@ typedef struct	s_requestData
 	std::string protocol;
 	std::string Connection;
 	std::string path;
+	std::string pathKey;
 	std::string	fileToSend;
 	std::string _cgiResponse;
 	std::string	getParams;

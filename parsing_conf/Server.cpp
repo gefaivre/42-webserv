@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/09 15:44:02 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/17 20:33:34 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,10 @@
 
 Server::Server()
 {
+	// TODO
 	Location *location;
 	location = new Location("/");
 	this->addLocation(location);
-	
-	
 }
 
 Server::~Server()
@@ -117,6 +116,9 @@ void		Server::addLocation(Location *location)
 	if (!locationExist(location->getKey()))
 	{
 		_locations[location->getKey()] = *location;
+		std::cout << "key = " << location->getKey() << std::endl;
+		std::cout << "rooy = " << location->getRoot() << std::endl;
+		std::cout << "Save loc = " << _locations[location->getKey()].getRoot() << std::endl;
 	}
 	else
 		cerr << "Location already exists!" << endl;
@@ -125,15 +127,23 @@ void		Server::addLocation(Location *location)
 
 Location	Server::getLocationByPath(std::string path)
 {
-	int			max = 0;
+	int			max = -1;
+	int 		newMax = -1;
 	Location	loc;
-
 	std::map<std::string, Location>::iterator	it;
+	// std::cout << "path = " << path<< std::endl;
 	for (it = _locations.begin(); it != _locations.end(); it++)
 	{
-		if	(ft_strcmp_fowardslash(path, it->first) > max)
+		// std::cout << "it -> " << it->second.getRoot() << std::endl;
+		newMax = ft_strcmp_fowardslash(path, it->first);
+		if	( newMax > max)
+		{
+			max = newMax;
 			loc = it->second;
+			// std::cout << "LOC = " << loc.getKey() << std::endl;
+		}
 	}
+	std::cout << "loc root = " << loc.getRoot() << std::endl;
 	return loc;
 }
 
@@ -143,6 +153,7 @@ void	Server::setupLocations()
 	for (iter = _locations.begin(); iter != _locations.end(); iter++)
 	{
 		iter->second.beSetup(this);
+		std::cout << "INSPECTLOCATIONS:"<< iter->second.getKey() << "..root:"<< iter->second.getRoot() << std::endl;
 	}
 }
 

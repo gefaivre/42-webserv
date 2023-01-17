@@ -51,6 +51,7 @@ ParsingRequest::~ParsingRequest()
 
 void ParsingRequest::parsingRequest()
 {
+	std::string key;
 	for(unsigned long int i = 0; i < _request.size()  ; i++)
 	{
 		if (i == 0)
@@ -64,7 +65,13 @@ void ParsingRequest::parsingRequest()
 			_requestData.protocol = _request[i].substr(last + 1, _request[i].size());
 		}
 	}
+	_requestData.pathKey = _requestData.path;
+	key = _server->getLocationByPath(_requestData.path).getKey();
+	if (key.length() != 1)
+		_requestData.path = _requestData.path.substr(key.length() - 1);
 	_autoindex = _server->getLocationByPath(_requestData.path).getAutoIndex();
+	std::cout << "KEY 00 " << _requestData.pathKey << std::endl;
+	std::cout << "_requestData.path  " << _requestData.path << std::endl;
 }
 
 // void ParsingRequest::setFileToSend404()
@@ -81,6 +88,7 @@ void ParsingRequest::parsingRequest()
 void ParsingRequest::setFileToSend(std::string errorcode)
 {
 	std::string path;
+	std::cout << "888  -- " << _requestData.path<< std::endl;
 	path = _server->getLocationByPath("/" +_requestData.path).getRoot();
 	std::cout << _server->getLocationByPath("/").getRoot() << std::endl;
 	path += errorcode;
@@ -94,6 +102,7 @@ int ParsingRequest::filepermission()
 {
 	int fd;
 
+	std::cout << "_requestData.fileToSend = " << _requestData.fileToSend << std::endl;
 	if (_errorcode == 405)
 		setFileToSend("405.html");
 	else if (_errorcode == 4041)
@@ -114,15 +123,15 @@ int ParsingRequest::foundFileToSend()
 	std::string rootPath;
 	std::string fullPathFile;
 	_requestData.isIndex = 0;
-
-	rootPath = _server->getLocationByPath(_requestData.path).getRoot();
-
+	std::cout << "PATH =  = " << _requestData.path << std::endl;
+	rootPath = _server->getLocationByPath(_requestData.pathKey).getRoot();
+	std::cout << _requestData.pathKey << std::endl;
+	std::cout << "rootPath =  = " << rootPath << std::endl;
 	if (_requestData.path[0] == '/')
 		_requestData.path.erase(0, 1);
 
 	_requestData.fileToSend = rootPath + _requestData.path ;
 	fullPathFile = _requestData.fileToSend;
-	
 	if (_autoindex == 1 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
 	{
 		std::cout << "--1--" << std::endl;

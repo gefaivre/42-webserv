@@ -486,7 +486,6 @@ int Client::workPostCgi(std::string format, std::string requestFile)
         } else
 		{
             buf[n] = '\0';
-			_cgiResponse.append(buf);
 			std::string mystring = buf;
 			std::string substring = "Content-type";
 			if (mystring.find(substring) != std::string::npos && mystring.find_first_of("\n\n") != std::string::npos)
@@ -616,7 +615,6 @@ int Client::workDeleteCgi(std::string format, std::string requestFile)
         } else
 		{
             buf[n] = '\0';
-			_cgiResponse.append(buf);
 			std::string mystring = buf;
 			std::string substring = "Content-type";
 			if (mystring.find(substring) != std::string::npos && mystring.find_first_of("\n\n") != std::string::npos)
@@ -632,11 +630,10 @@ void Client::verifyCgi()
 {
 	//TODO: faire une erreur qd le php ne peut pas lire
 	//TODO: que faire ds le cas d'un file sans ext ?
-	//TODO: pb avec http://localhost:8042/form ==> error 500 au lieu de 404
 	std::cout << "** verifyCgi **" << std::endl;
-
 	std::string format;
 	std::string requestFile;
+	std::string key;
 	size_t pos_space = 0;
 	size_t pos_slash = 0;
 	size_t pos_point = 0;
@@ -657,7 +654,10 @@ void Client::verifyCgi()
 	requestFile = _request[0].substr(pos_slash + 1, pos_space - (pos_slash + 1));
 	_getParams = requestFile.substr(requestFile.find_first_of('?') + 1);
 	requestFile =requestFile.substr(0, requestFile.find_first_of('?'));
-	std::cout << "requestFile= " << requestFile << std::endl;
+	key = _server->getLocationByPath('/' + requestFile).getKey();
+	if (key.length() != 1)
+		requestFile =requestFile.substr(key.length() - 2);
+	std::cout << "999 -- " << requestFile << std::endl;
 	if (postIndex != std::string::npos)
 	{
 		std::cout << "** POST **" << std::endl;
@@ -665,6 +665,7 @@ void Client::verifyCgi()
 			_errorcode = 405;
 		else {
 			try {
+				// _server->getLocationByPath(_requestData.path)
 				// std::cout << "_server->getCgiValue(format)" << format << std::endl;
 				workPostCgi(_server->getCgiValue(format), requestFile);
 				saveFile();
@@ -722,28 +723,19 @@ void Client::verifyCgi()
 					{
 						//file writable
 						if (!remove(_server->getRoot().append(requestFile).c_str()))
-						{
 							std::cout << "File deleted" << std::endl;
-						}
 						else
-						{
 							_errorcode = 500;
 							// std::cout <<"File not deleted" << std::endl;
-						}
 					}
 					else
-					{
 						_errorcode = 4041;
 						// std::cout <<"No rights to delete" << std::endl;
-					}
 				}
 				else
-				{
 					_errorcode = 404;
 					// std::cout << "File not exist" << std::endl;
-				}
 			}
-			
 		}
 	}
 	
