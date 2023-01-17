@@ -542,14 +542,18 @@ int Client::workGetCgi(std::string format, std::string requestFile)
 		int n = read(fd_out[0], buf, 1024);
 		if (n < 0)
 		{
-			
 			std::cout << "Error read" << std::endl;
 			perror("read");
            	exit(EXIT_FAILURE);
         } else
 		{
             buf[n] = '\0';
-			_cgiResponse.append(buf);
+			// char *result = strstr(buf, "Content-type");
+			std::string mystring = buf;
+			std::string substring = "Content-type";
+			if (mystring.find(substring) != std::string::npos && mystring.find_first_of("\n\n") != std::string::npos)
+				mystring.erase(mystring.find(substring), mystring.find_first_of("\n\n"));
+			_cgiResponse.append(mystring);
 			std::cout << "CGI response ="<<_cgiResponse << std::endl;
 		}
 	}
@@ -652,7 +656,7 @@ void Client::verifyCgi()
 			_errorcode = 405;
 		else {
 			try {
-				std::cout << "_server->getCgiValue(format)" << format << std::endl;
+				// std::cout << "_server->getCgiValue(format)" << format << std::endl;
 				workPostCgi(_server->getCgiValue(format), requestFile);
 				saveFile();
 			}
@@ -730,7 +734,7 @@ void Client::verifyCgi()
 void Client::saveFile()
 {
 	//TODO: remettre les spaces ds le file 
-	std::cout << "Save file = " << std::endl;
+	std::cout << "** Save file **" << std::endl;
 	transformBodyStringtoMap();
 
 	std::map<std::string,std::string>::iterator it_file;
@@ -752,11 +756,9 @@ void Client::saveFile()
 		mkdir(new_path.c_str(), 0777);
 		outfile.open(new_path.append(it_name->second).c_str());
 		//write the string
-		std::cout << "second = " << it_file->second.substr(2, it_file->second.size() - 3) << std::endl;
 		outfile << std::noskipws << it_file->second.substr(2, it_file->second.size() - 3);
 		outfile.close();
 	}
-	std::cout << "Save file 2 = " << std::endl;
 }
 
 

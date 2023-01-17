@@ -8,7 +8,6 @@
 CreateResponse::CreateResponse(Server *server,std::map<std::string, std::string> &requestMap, t_requestData const requestData):
 	_server(server), _requestData(requestData), _requestMap(requestMap)
 {
-	std::cout << "_requestData.fileToSend = " << _requestData.fileToSend<<std::endl;
 
 	fillFilesExtension();
 	createBody();
