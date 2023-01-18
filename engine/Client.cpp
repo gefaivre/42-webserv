@@ -452,9 +452,10 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 	const_cast<char*> (script_filename.c_str()),
 	const_cast<char*> (request_method.c_str()),
 	const_cast<char*>(content_type.c_str()),
-	const_cast<char*>(content_length.append(envCGI).c_str()),
+	// const_cast<char*>(content_length.append(envCGI).c_str()),
 	const_cast<char*> (query_string.append(_getParams).c_str()),
 	(char *) "REDIRECT_STATUS=200",
+	(char *) "HTTP_TRANSFER_ENCODING=chunked",
 	(char *) NULL
 	};
    	pipe(fd);
