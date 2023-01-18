@@ -19,11 +19,6 @@ Louise
 Content-Disposition: form-data; name="email"
 
 loulou@gmail.com
-------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="file"; filename="file.jpg"
-Content-Type: image/jpeg
-
-[dedededefefefe]
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 

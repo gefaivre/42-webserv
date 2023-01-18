@@ -6,7 +6,7 @@
 using namespace std;
 
 #define SENDING_BUFFER 1000
-#define READING_BUFFER 1000
+#define READING_BUFFER 1500
 
 //Regular text
 #define BLK "\e[0;30m"

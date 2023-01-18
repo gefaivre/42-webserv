@@ -140,6 +140,7 @@ void Client::EndOfRead()
 	displayRequest();
 	verifyCgi();
 	createResponse();
+	// _requestmap.clear();
 }
 
 int Client::readRequest1()
@@ -147,7 +148,6 @@ int Client::readRequest1()
 	std::cout << "READ REQUEST CLIENT FD = "  << _clientfd << std::endl;
 	char buf[READING_BUFFER];
 	int sizeRead;
-
 	bzero(buf, READING_BUFFER);
 
 	if (_headerIsRead == false)
@@ -164,9 +164,12 @@ int Client::readRequest1()
 			std::string line = _requestLine.substr(0, _requestLine.find("\r\n"));
 			_requestLine.erase(0, _requestLine.find("\r\n") + 2);
 			_request.push_back(line);
+			if (line == "")
+				break;
 		}
 		if (_request.size() != 0 && (_request[_request.size() - 1].size() == 0))
 		{
+			// std::cout << "_request Line = ." << _requestLine << "." <<std::endl;
 			_requestBody += _requestLine;
 			transformRequestVectorToMap();
 			_bodyContentLenght = findBodyContentLenght();
@@ -192,6 +195,7 @@ int Client::readRequest1()
 			std::cout << "EOR "  << _clientfd << std::endl;
 		}
 	}
+	// std::cout << "Body = " << _request <<std::endl;
 	return (1);
 }
 
@@ -277,8 +281,9 @@ std::string	Client::ft_find_boundary()
 	// {
 	// 	std::cout << "REQUEST = " << it->first << " ** " << it->second << std::endl;
 	// }
-	std::cout << "BOUN 1" << std::endl;
 	it = _requestmap.find("Content-Type");
+	if (it == _requestmap.end())
+		it = _requestmap.find("content-type");
 	if (it != _requestmap.end())
 	{
 		pos_equal = it->second.find_last_of('=');
@@ -378,12 +383,12 @@ void Client::transformBodyStringtoMap()
 			size_t colon_equal = vector[i].find('=');
 			_requestmapBody.insert(std::pair<std::string, std::string>(vector[i].substr(0, colon_equal), vector[i].substr(colon_equal + 1)));
 		}
-		std::map<std::string,std::string>::const_iterator it;
-		std::map<std::string,std::string>::const_iterator ite = _requestmapBody.end(); 
-		for (it = _requestmapBody.begin(); it != ite; ++it)
-		{
-			std::cout << "REQUEST = " << it->first << " ** " << it->second << std::endl;
-		}
+		// std::map<std::string,std::string>::const_iterator it;
+		// std::map<std::string,std::string>::const_iterator ite = _requestmapBody.end(); 
+		// for (it = _requestmapBody.begin(); it != ite; ++it)
+		// {
+		// 	std::cout << "REQUEST = " << it->first << " ** " << it->second << std::endl;
+		// }
 		return ;
 	}
 }
@@ -423,6 +428,9 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 	std::string content_length = "CONTENT_LENGTH=";
 	std::string requestFileRoot = _loc.getRoot().append(requestFile);
 	std::string script_filename = "SCRIPT_FILENAME=";
+	std::string envCGI = findValueEnvCgi("Content-Length");	
+	if (envCGI.empty())
+		envCGI = findValueEnvCgi("content-length");
 	script_filename.append(requestFileRoot);
 	try 
 	{
@@ -444,17 +452,15 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 	const_cast<char*> (script_filename.c_str()),
 	const_cast<char*> (request_method.c_str()),
 	const_cast<char*>(content_type.c_str()),
-	const_cast<char*>(content_length.append(findValueEnvCgi("Content-Length")).c_str()),
+	const_cast<char*>(content_length.append(envCGI).c_str()),
 	const_cast<char*> (query_string.append(_getParams).c_str()),
 	(char *) "REDIRECT_STATUS=200",
 	(char *) NULL
 	};
-
    	pipe(fd);
 	pipe(fd_out);
 	write(fd[1], _requestBody.c_str(), _requestBody.length());
 	close(fd[1]);
-	std::cout << "//POST//"<<std::endl;
 
 	if ((pid = fork()) < 0)
 	{
@@ -484,7 +490,6 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 		int n = read(fd_out[0], buf, 1024);
 		if (n < 0)
 		{
-			
 			std::cout << "Error read" << std::endl;
 			perror("read");
            	exit(EXIT_FAILURE);
