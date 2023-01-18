@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 14:08:38 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/17 20:22:16 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/18 13:39:00 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,11 +73,7 @@ void Location::beSetup(Server *server)
 	if (find(_wasSet->begin(), _wasSet->end(), "autoIndex") == _wasSet->end())
 		_autoIndex = server->getAutoIndex();
 	if (find(_wasSet->begin(), _wasSet->end(), "root") == _wasSet->end())
-	{
-		std::cout << "ROOT "<< _key <<"= " << _root << std::endl;
 		_root = server->getRoot();
-		std::cout << "ROOT = " << _root << std::endl;
-	}
 	if (find(_wasSet->begin(), _wasSet->end(), "acceptedMethods") == _wasSet->end())
 		_acceptedMethods = server->getAcceptedMethods();
 

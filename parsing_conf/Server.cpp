@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/17 20:33:34 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/18 13:39:29 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,10 +115,7 @@ void		Server::addLocation(Location *location)
 {
 	if (!locationExist(location->getKey()))
 	{
-		_locations[location->getKey()] = *location;
-		std::cout << "key = " << location->getKey() << std::endl;
-		std::cout << "rooy = " << location->getRoot() << std::endl;
-		std::cout << "Save loc = " << _locations[location->getKey()].getRoot() << std::endl;
+		_locations[location->getKey()] = location;
 	}
 	else
 		cerr << "Location already exists!" << endl;
@@ -129,8 +126,8 @@ Location	Server::getLocationByPath(std::string path)
 {
 	int			max = -1;
 	int 		newMax = -1;
-	Location	loc;
-	std::map<std::string, Location>::iterator	it;
+	Location	*loc;
+	std::map<std::string, Location *>::iterator	it;
 	// std::cout << "path = " << path<< std::endl;
 	for (it = _locations.begin(); it != _locations.end(); it++)
 	{
@@ -143,17 +140,15 @@ Location	Server::getLocationByPath(std::string path)
 			// std::cout << "LOC = " << loc.getKey() << std::endl;
 		}
 	}
-	std::cout << "loc root = " << loc.getRoot() << std::endl;
-	return loc;
+	return *loc;
 }
 
 void	Server::setupLocations()
 {
-	std::map<std::string, Location>::iterator iter;
+	std::map<std::string, Location *>::iterator iter;
 	for (iter = _locations.begin(); iter != _locations.end(); iter++)
 	{
-		iter->second.beSetup(this);
-		std::cout << "INSPECTLOCATIONS:"<< iter->second.getKey() << "..root:"<< iter->second.getRoot() << std::endl;
+		iter->second->beSetup(this);
 	}
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:29:46 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/09 15:20:44 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/01/18 13:30:58 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ class Server: public Config
 {
 private:
 
-	map<string, Location>	_locations;
+	map<string, Location *>	_locations;
 	int _sockfd;
 	struct sockaddr_in _addr;
 	int _epollfd;

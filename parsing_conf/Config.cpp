@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/17 20:27:01 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/18 13:36:35 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,12 +62,10 @@ void	Config::setRoot(string root)
 		root += '/';
 
 	_root = root;
-	std::cout << "SET ROOT:" << root << std::endl;
 }
 
 string Config::getRoot(void)
 {
-	std::cout << "GET ROOT:" << _root << std::endl;
 	return (_root);
 }
 

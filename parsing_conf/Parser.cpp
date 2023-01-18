@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/17 20:51:06 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/18 13:38:33 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ Location *Parser::parseNewContext(size_t nextOpenBracket, Server *server)
 	{
 		directive_value_start = _currIdx + target_length;
 		location = new Location(_content.substr(directive_value_start, nextOpenBracket - directive_value_start - 1));
-		// server->addLocation(location);
+		server->addLocation(location);
 		cout << "	Location:" << location->getKey() << endl;
 	}
 	else
@@ -98,11 +98,7 @@ void	Parser::parseDirective(size_t nextSemiColon, vector<Config *> conf)
 				else if (ft_starts_with(directive, "autoindex "))
 					parseAutoIndex(directive, conf);
 				else if (ft_starts_with(directive, "root "))
-				{
-					std::cout << "CONF:"<<conf.size() << std::endl;
 					conf.back()->setRoot(directive.substr(5));
-					std::cout << "CONF2:"<<conf.back()->getRoot() << std::endl;
-				}
 				else if (ft_starts_with(directive, "client_max_body_size "))
 					conf.back()->setClientMaxBodySize(atoi(directive.substr(21).c_str()));
 				else if (ft_starts_with(directive, "cgi "))
@@ -145,7 +141,6 @@ Server	*Parser::getServerConf(void)
 	vector<Config *> conf;
 	string sTarget = "server {";
 	Server *server = new Server();
-	Location *loc;
 	conf.push_back(server);
 	cout << "server:" << endl;
 	_currIdx += sTarget.length() + 1;
@@ -156,12 +151,10 @@ Server	*Parser::getServerConf(void)
 		{
 		case '{':
 			conf.push_back(parseNewContext(next,(Server *) conf[0]));
-			std::cout << "CONF3:" << conf.back()->getRoot() << std::endl;
 			break;
 		case '}':
 			parseEndOfContext(i);
-			loc = dynamic_cast<Location *>(conf.pop_back());
-			server->addLocation(loc);
+			conf.pop_back();
 			break;
 		case ';':
 			parseDirective(next, conf);
