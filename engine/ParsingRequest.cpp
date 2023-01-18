@@ -123,10 +123,7 @@ int ParsingRequest::foundFileToSend()
 	std::string rootPath;
 	std::string fullPathFile;
 	_requestData.isIndex = 0;
-	std::cout << "PATH =  = " << _requestData.path << std::endl;
 	rootPath = _server->getLocationByPath(_requestData.pathKey).getRoot();
-	std::cout << _requestData.pathKey << std::endl;
-	std::cout << "rootPath =  = " << rootPath << std::endl;
 	if (_requestData.path[0] == '/')
 		_requestData.path.erase(0, 1);
 

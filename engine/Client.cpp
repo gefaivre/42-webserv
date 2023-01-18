@@ -21,7 +21,6 @@ Client::Client(Server *server, int clientfd) : _clientfd(clientfd), _server(serv
 	this->_cgiResponse.clear();
 	this->_getParams.clear();
 	this->authorizedExtension = setAuthorizedExtension(this->authorizedExtension);
-
 }
 
 Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._server)
@@ -69,6 +68,7 @@ Client &Client::operator=(Client const &rhs)
 		this->_errorcode = rhs._errorcode;
 		this->authorizedExtension = rhs.authorizedExtension;
 		this->_getParams = rhs._getParams;
+		this->_loc = rhs._loc;
 	}
 	return *this;
 }
@@ -223,6 +223,7 @@ void Client::resetClient()
 	_isSend = false;
 	_moverSave = 0;
 	_errorcode = 0;
+	// _loc.clear();
 }
 
 int Client::sendResponse()
@@ -416,7 +417,7 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 	std::string query_string = "QUERY_STRING=";
 	std::string request_method = "REQUEST_METHOD=POST";
 	std::string content_length = "CONTENT_LENGTH=";
-	std::string requestFileRoot = _server->getRoot().append(requestFile);
+	std::string requestFileRoot = _loc.getRoot().append(requestFile);
 	std::string script_filename = "SCRIPT_FILENAME=";
 	script_filename.append(requestFileRoot);
 	try 
@@ -506,7 +507,7 @@ int Client::workGetCgi(std::string format, std::string requestFile)
 		return (1);
 	std::string request_method = "REQUEST_METHOD=GET";
 	std::string query_string = "QUERY_STRING=";
-	std::string requestFileRoot = _server->getRoot().append(requestFile);
+	std::string requestFileRoot = _loc.getRoot().append(requestFile);
 	std::string script_filename = "SCRIPT_FILENAME=";
 	script_filename.append(requestFileRoot);
 	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
@@ -570,7 +571,7 @@ int Client::workDeleteCgi(std::string format, std::string requestFile)
 	char buf[1024];
 	std::string request_method = "REQUEST_METHOD=DELETE";
 	std::string query_string = "QUERY_STRING=";
-	std::string requestFileRoot = _server->getRoot().append(requestFile);
+	std::string requestFileRoot = _loc.getRoot().append(requestFile);
 	std::string script_filename = "SCRIPT_FILENAME=";
 	script_filename.append(requestFileRoot);
 	char *args[]= {const_cast<char*>(format.c_str()), const_cast<char*>(requestFileRoot.c_str()), NULL};	
@@ -654,20 +655,22 @@ void Client::verifyCgi()
 	requestFile = _request[0].substr(pos_slash + 1, pos_space - (pos_slash + 1));
 	_getParams = requestFile.substr(requestFile.find_first_of('?') + 1);
 	requestFile =requestFile.substr(0, requestFile.find_first_of('?'));
-	key = _server->getLocationByPath('/' + requestFile).getKey();
+	std::cout << "112 -- " << requestFile << std::endl;
+	_loc = _server->getLocationByPath('/' + requestFile);
+	key = _loc.getKey();
 	if (key.length() != 1)
-		requestFile =requestFile.substr(key.length() - 2);
+		requestFile = requestFile.substr(key.length() - 2);
 	std::cout << "999 -- " << requestFile << std::endl;
 	if (postIndex != std::string::npos)
 	{
 		std::cout << "** POST **" << std::endl;
-		if (!_server->getAcceptedMethods()._post)
+		if (!_loc.getAcceptedMethods()._post)
 			_errorcode = 405;
 		else {
 			try {
 				// _server->getLocationByPath(_requestData.path)
 				// std::cout << "_server->getCgiValue(format)" << format << std::endl;
-				workPostCgi(_server->getCgiValue(format), requestFile);
+				workPostCgi(_loc.getCgiValue(format), requestFile);
 				saveFile();
 			}
 			catch(std::exception e)
@@ -679,12 +682,12 @@ void Client::verifyCgi()
 	else if (getIndex != std::string::npos)
 	{
 		std::cout << "** GET **" << std::endl;
-		if (!_server->getAcceptedMethods()._get)
+		if (!_loc.getAcceptedMethods()._get)
 			_errorcode = 405;
 		else
 		{
 			try {
-				workGetCgi(_server->getCgiValue(format), requestFile);
+				workGetCgi(_loc.getCgiValue(format), requestFile);
 			}
 			catch(std::exception e)
 			{
@@ -706,23 +709,23 @@ void Client::verifyCgi()
 	else if (deleteIndex != std::string::npos)
 	{
 		std::cout << "** DELETE **" << std::endl;
-		if (!_server->getAcceptedMethods()._get)
+		if (!_loc.getAcceptedMethods()._get)
 			_errorcode = 405;
 		else
 		{
 			try
 			{
-				workDeleteCgi(_server->getCgiValue(format), requestFile);
+				workDeleteCgi(_loc.getCgiValue(format), requestFile);
 			}
 			catch(const std::exception& e)
 			{
-				if (!access(_server->getRoot().append(requestFile).c_str(), F_OK))
+				if (!access(_loc.getRoot().append(requestFile).c_str(), F_OK))
 				{
 					//file exist
-					if (!access(_server->getRoot().append(requestFile).c_str(), W_OK))
+					if (!access(_loc.getRoot().append(requestFile).c_str(), W_OK))
 					{
 						//file writable
-						if (!remove(_server->getRoot().append(requestFile).c_str()))
+						if (!remove(_loc.getRoot().append(requestFile).c_str()))
 							std::cout << "File deleted" << std::endl;
 						else
 							_errorcode = 500;

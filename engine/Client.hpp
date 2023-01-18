@@ -62,6 +62,8 @@ class Client
 
 		int _errorcode;
 
+		Location _loc;
+
 		std::string _getParams;
 
 		bool _headerIsRead;
