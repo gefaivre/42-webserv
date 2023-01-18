@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/18 13:39:29 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/18 15:19:16 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@
 Server::Server()
 {
 	// TODO
-	Location *location;
-	location = new Location("/");
-	this->addLocation(location);
+	// Location *location;
+	// location = new Location("/");
+	// this->addLocation(location);
 }
 
 Server::~Server()
@@ -66,7 +66,7 @@ void Server::newclient(int epoll_fd)
 	event.data.fd = clientfd;
 	std::cout << "NEWCLIENT FD = " << clientfd << std::endl;
 	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, clientfd, &event);
-	
+	std::cout << "After epoll" << std::endl;
 	Client *client = new Client(this, clientfd);
 	clients.insert(std::pair<int, Client *>(clientfd, client));
 }
@@ -145,6 +145,12 @@ Location	Server::getLocationByPath(std::string path)
 
 void	Server::setupLocations()
 {
+	if (!_locations.count("/"))
+	{
+		Location *location;
+		location = new Location("/");
+		this->addLocation(location);
+	}
 	std::map<std::string, Location *>::iterator iter;
 	for (iter = _locations.begin(); iter != _locations.end(); iter++)
 	{

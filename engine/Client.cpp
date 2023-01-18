@@ -123,6 +123,7 @@ void Client::transformRequestVectorToMap()
 		if (colon != std::string::npos)
 		{
 			std::string key = _request[i].substr(0, colon);
+			std::cout << "Key = " << key << std::endl;
 			std::string value = _request[i].substr(colon + 2, _request[i].size());
 			_requestmap.insert(std::pair<std::string, std::string>(key, value));
 		}
@@ -143,7 +144,6 @@ void Client::EndOfRead()
 
 int Client::readRequest1()
 {
-
 	std::cout << "READ REQUEST CLIENT FD = "  << _clientfd << std::endl;
 	char buf[READING_BUFFER];
 	int sizeRead;
@@ -253,7 +253,9 @@ int Client::sendResponse()
 			resetClient();
 			event.events =  EPOLLIN | EPOLLRDHUP;
 			event.data.fd = _clientfd;
+			// std::cout << "1" << std::endl;
 			epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
+			// std::cout << "2" << std::endl;
 		}
 		else
 		{
@@ -275,15 +277,17 @@ std::string	Client::ft_find_boundary()
 	// {
 	// 	std::cout << "REQUEST = " << it->first << " ** " << it->second << std::endl;
 	// }
-		it = _requestmap.find("Content-Type");
-		if (it != _requestmap.end())
-		{
-			pos_equal = it->second.find_last_of('=');
-			if (pos_equal == std::string::npos)
-				throw std::exception();
-			std::cout << "pos_equal= " << pos_equal << std::endl;
-			boundary = it->second.substr(pos_equal + 1);
-		}
+	std::cout << "BOUN 1" << std::endl;
+	it = _requestmap.find("Content-Type");
+	if (it != _requestmap.end())
+	{
+		pos_equal = it->second.find_last_of('=');
+		if (pos_equal == std::string::npos)
+			throw std::exception();
+		std::cout << "pos_equal= " << pos_equal << std::endl;
+		boundary = it->second.substr(pos_equal + 1);
+	}
+	std::cout << "Bound = " << boundary << std::endl;
 	return (boundary);
 }
 
@@ -778,14 +782,14 @@ void Client::saveFile()
 void Client::displayRequest()
 {
 	std::cout << "\n"
-			  << "\033[33m" << _request[0] << "\033[0m" << std::endl;
+			  << YEL << _request[0] << "\033[0m" << std::endl;
 }
 
 void Client::displayFullRequest()
 {
 	std::cout << std::endl;
 	for (size_t i = 0; i < _request.size(); i++)
-		std::cout << "\033[33m" << _request[i] << "\033[0m" << std::endl;
+		std::cout << YEL << _request[i] << "\033[0m" << std::endl;
 }
 
 void Client::displayFullBody()

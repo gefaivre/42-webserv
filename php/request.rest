@@ -1,0 +1,30 @@
+# POST http://localhost:8080/form.html
+# Transfer-Encoding: chunked
+# Content-Type: application/json
+
+# 5
+# hello
+# 7
+# world!
+# 0
+
+POST http://localhost:8080/form.php  HTTP/1.1
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="name"
+
+Louise
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="email"
+
+loulou@gmail.com
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="file.jpg"
+Content-Type: image/jpeg
+
+[dedededefefefe]
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+
+# GET http://localhost:8080/form.html

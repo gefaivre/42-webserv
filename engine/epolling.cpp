@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 12:42:44 by gefaivre          #+#    #+#             */
-/*   Updated: 2023/01/12 15:19:07 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/18 15:31:52 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,7 @@ void epolling(vector<Server *> servers)
 		{
 			event_count = epoll_wait(servers[s]->getEpollFd(), events, MAX_EVENTS, 0);
 			for (i = 0; i < event_count; i++)
-			{	
-			
+			{
 				if (events[i].data.fd == servers[s]->getServerFd())
 				{
 					std::cout << "----------SERVER EVENT" << std::endl;
