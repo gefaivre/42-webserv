@@ -193,7 +193,6 @@ std::string Client::chunkedBody()
 		if (_request[i].find("transfer-encoding: chunked") != std::string::npos)
 			_request.erase(_request.begin() + i);
 	}
-	std::cout << "BODYYYYYY == " << _requestBody << std::endl;
 	std::string str;
 	std::vector<std::string> vector;
 	vector = ft_split_chunked_request(_requestBody);
@@ -211,6 +210,7 @@ std::string Client::chunkedBody()
 		vector.erase(vector.begin() + i);
 		i--;
 	}
+	std::cout << "BODYYYYYY == " << _requestBody << std::endl;
 	for (size_t i = 0; i< vector.size(); i++)
 	{
 		str += vector[i];
@@ -267,7 +267,7 @@ int Client::readRequest1()
 		}
 		if (_requestBody.size() == _bodyContentLenght || _requestBody.find(ft_find_boundary() + "\r\n" + '0') !=  std::string::npos)
 		{
-			_requestBody = chunkedBody();
+			// _requestBody = chunkedBody();
 			for (size_t i = 0; i < _request.size();i++)
 				std::cout << YEL <<_request[i] << reset <<std::endl;
 			std::cout << YEL <<_requestBody << reset <<std::endl;
