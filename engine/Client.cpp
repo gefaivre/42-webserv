@@ -154,6 +154,20 @@ void Client::parseChunked()
 {
 	for (size_t i = 0; i < _request.size(); i++)
 		std::cout << "**_request = ." << _request[i] << "." <<std::endl;
+	// std::string bodyChunked;
+	// int sizeRead;
+	// std::string line;
+	// // transformRequestVectorToMap();
+	// // std::cout << "boundary = " << ft_find_boundary() << std::endl;
+	// do{
+
+	// 	char buf[READING_BUFFER];
+	// 	bzero(buf, READING_BUFFER);
+	// 	sizeRead = recv(_clientfd, buf, READING_BUFFER - 1, 0);
+	// 	line += std::string(buf);
+	// }while(bodyChunked.find(ft_find_boundary() + '\n' + '0') != std::string::npos && sizeRead > 0);
+	// std::cout << "line = " << line << std::endl;
+	// std::cout << "exit" << std::endl;
 }
 
 int Client::readRequest1()
@@ -177,6 +191,11 @@ int Client::readRequest1()
 			std::string line = _requestLine.substr(0, _requestLine.find("\r\n"));
 			_requestLine.erase(0, _requestLine.find("\r\n") + 2);
 			_request.push_back(line);
+			// for (size_t i = 0; i < _request.size(); i++)
+			// {
+			// 	// if (_request[i].find("transfer-encoding") !=  std::string::npos)
+			// 		std::cout << "**REQUESY =" <<_request[i]<< std::endl;
+			// }
 			if (line == "")
 				break;
 		}
@@ -306,7 +325,7 @@ std::string	Client::ft_find_boundary()
 		std::cout << "pos_equal= " << pos_equal << std::endl;
 		boundary = it->second.substr(pos_equal + 1);
 	}
-	std::cout << "Bound = " << boundary << std::endl;
+	// std::cout << "Bound = ." << boundary + '\n' + '0'<<"." << std::endl;
 	return (boundary);
 }
 
