@@ -87,6 +87,7 @@ class Client
 		void setKeepAlive();
 		bool _isKeepAlive;
 		bool parseChunked();
+		std::string chunkedBody();
 
 		void EndOfRead();
 		void resetClient();

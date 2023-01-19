@@ -1,7 +1,8 @@
 #include "Client.hpp"
-
 std::vector<std::string> setAuthorizedExtension(std::vector<std::string> ext);
-
+#include <algorithm>
+#include <vector>
+#include <iostream>
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
@@ -104,7 +105,10 @@ std::vector<std::string> setAuthorizedExtension(std::vector<std::string> ext)
 
 size_t Client::findBodyContentLenght()
 {
-	return (atoi(_requestmap[std::string("Content-Length")].c_str()));
+	if (atoi(_requestmap[std::string("Content-Length")].c_str()))
+		return (atoi(_requestmap[std::string("Content-Length")].c_str()));
+	return (atoi(_requestmap[std::string("content-length")].c_str()));
+	
 }
 
 void Client::setKeepAlive()
@@ -182,6 +186,39 @@ bool Client::parseChunked()
 	// _chunked = false;
 }
 
+std::string Client::chunkedBody()
+{
+	for (size_t i = 0; i< _request.size(); i++)
+	{
+		if (_request[i].find("transfer-encoding: chunked") != std::string::npos)
+			_request.erase(_request.begin() + i);
+	}
+	std::cout << "BODYYYYYY == " << _requestBody << std::endl;
+	std::string str;
+	std::vector<std::string> vector;
+	vector = ft_split_chunked_request(_requestBody);
+	// std::vector<std::string>::iterator it;
+	for (size_t i = 0; i< vector.size();i++)
+	{
+		if (vector[i].find("Content-Disposition") != std::string::npos && !vector[i + 1].empty())
+			vector.erase(vector.begin() + i + 1);
+		//TODO: verifier si vector[i + 1] est un num sinon error
+		vector[i].find_last_of("Content-Disposition");
+	}
+	size_t i = vector.size() - 1;
+	while (vector[i].find(ft_find_boundary()) == std::string::npos)
+	{
+		vector.erase(vector.begin() + i);
+		i--;
+	}
+	for (size_t i = 0; i< vector.size(); i++)
+	{
+		str += vector[i];
+		str += "\r\n";
+	}
+	return (str);
+}
+
 int Client::readRequest1()
 {
 	std::cout << "READ REQUEST CLIENT FD = "  << _clientfd << std::endl;
@@ -202,11 +239,6 @@ int Client::readRequest1()
 			std::string line = _requestLine.substr(0, _requestLine.find("\r\n"));
 			_requestLine.erase(0, _requestLine.find("\r\n") + 2);
 			_request.push_back(line);
-			// for (size_t i = 0; i < _request.size(); i++)
-			// {
-			// 	// if (_request[i].find("transfer-encoding") !=  std::string::npos)
-			// 		std::cout << "**REQUESY =" <<_request[i]<< std::endl;
-			// }
 			if (line == "")
 				break;
 		}
@@ -217,11 +249,11 @@ int Client::readRequest1()
 			_bodyContentLenght = findBodyContentLenght();
 			if ((_bodyContentLenght == 0 || _requestBody.size() == _bodyContentLenght) && parseChunked() == false)
 			{
+				std::cout << "_bodyContentLenght" << _bodyContentLenght <<std::endl;
 				EndOfRead();
 			}
 			_headerIsRead = true;
 		}
-		std::cout <<YEL <<"_headerIsRead =" << _headerIsRead << reset <<std::endl;
 	}
 	else if (parseChunked() == true || _bodyContentLenght)
 	{
@@ -235,7 +267,10 @@ int Client::readRequest1()
 		}
 		if (_requestBody.size() == _bodyContentLenght || _requestBody.find(ft_find_boundary() + "\r\n" + '0') !=  std::string::npos)
 		{
-			
+			_requestBody = chunkedBody();
+			for (size_t i = 0; i < _request.size();i++)
+				std::cout << YEL <<_request[i] << reset <<std::endl;
+			std::cout << YEL <<_requestBody << reset <<std::endl;
 			EndOfRead();
 			std::cout << "EOR "  << _clientfd << std::endl;
 		}

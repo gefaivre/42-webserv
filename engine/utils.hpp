@@ -123,5 +123,7 @@ std::string itos(int nb);
 
 std::string ft_pwd();
 
+std::vector<std::string>	ft_split_chunked_request(std::string str);
+
 
 #endif
