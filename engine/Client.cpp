@@ -135,12 +135,25 @@ void Client::EndOfRead()
 	struct epoll_event event;
 	event.events = EPOLLOUT | EPOLLRDHUP;
 	event.data.fd = _clientfd;
+
+	std::cout << "BEFORE CHUNKED" << std::endl;
+
+	// std::map<std::string,std::string>::const_iterator it_chunked = _requestmapBody.find("transfer-encoding");
+	// std::cout << "Chunked = " << it_chunked->second << std::endl;
+	// if (_requestmapBody.find("transfer-encoding:") != std::string::npos)
+	// 	std::cout << "CHUNKED" << std::endl;
 	epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
 	setKeepAlive();
 	displayRequest();
 	verifyCgi();
 	createResponse();
 	// _requestmap.clear();
+}
+
+void Client::parseChunked()
+{
+	for (size_t i = 0; i < _request.size(); i++)
+		std::cout << "**_request = ." << _request[i] << "." <<std::endl;
 }
 
 int Client::readRequest1()
@@ -152,13 +165,13 @@ int Client::readRequest1()
 
 	if (_headerIsRead == false)
 	{
-		sizeRead = recv(_clientfd, buf, READING_BUFFER, 0);
+		sizeRead = recv(_clientfd, buf, READING_BUFFER - 1, 0);
 		if (sizeRead == -1)
 			std::cout << "Error recv" << std::endl;
 		if (sizeRead == 0)
 			return (0);
 		_requestLine += std::string(buf);
-
+		std::cout << "// Buf = " << buf <<std::endl;
 		while (_requestLine.find("\r\n") != std::string::npos)
 		{
 			std::string line = _requestLine.substr(0, _requestLine.find("\r\n"));
@@ -167,9 +180,9 @@ int Client::readRequest1()
 			if (line == "")
 				break;
 		}
+		parseChunked();
 		if (_request.size() != 0 && (_request[_request.size() - 1].size() == 0))
 		{
-			// std::cout << "_request Line = ." << _requestLine << "." <<std::endl;
 			_requestBody += _requestLine;
 			transformRequestVectorToMap();
 			_bodyContentLenght = findBodyContentLenght();
@@ -187,7 +200,6 @@ int Client::readRequest1()
 			if (sizeRead == -1)
 				std::cout << "Error recv" << std::endl;
 			_requestBody.insert(_requestBody.size(), buf, sizeRead);
-			std::cout << buf << std::endl;
 		}
 		if (_requestBody.size() == _bodyContentLenght)
 		{
@@ -195,7 +207,9 @@ int Client::readRequest1()
 			std::cout << "EOR "  << _clientfd << std::endl;
 		}
 	}
-	// std::cout << "Body = " << _request <<std::endl;
+	// for (size_t i = 0; i < _request.size(); i++)
+	// 	std::cout << "**_request = ." << _request[i] << "." <<std::endl;
+	// std::cout << "** Body request - " << _requestBody << std::endl;
 	return (1);
 }
 
@@ -455,7 +469,6 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 	// const_cast<char*>(content_length.append(envCGI).c_str()),
 	const_cast<char*> (query_string.append(_getParams).c_str()),
 	(char *) "REDIRECT_STATUS=200",
-	(char *) "HTTP_TRANSFER_ENCODING=chunked",
 	(char *) NULL
 	};
    	pipe(fd);

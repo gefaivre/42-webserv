@@ -86,6 +86,7 @@ class Client
 		std::string	findMethod();
 		void setKeepAlive();
 		bool _isKeepAlive;
+		void parseChunked();
 
 		void EndOfRead();
 		void resetClient();
