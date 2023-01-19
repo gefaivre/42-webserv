@@ -61,7 +61,7 @@ class Client
 		char * _responsePointer;
 
 		int _errorcode;
-
+	
 		Location _loc;
 
 		std::string _getParams;
@@ -86,7 +86,7 @@ class Client
 		std::string	findMethod();
 		void setKeepAlive();
 		bool _isKeepAlive;
-		void parseChunked();
+		bool parseChunked();
 
 		void EndOfRead();
 		void resetClient();

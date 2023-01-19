@@ -150,24 +150,36 @@ void Client::EndOfRead()
 	// _requestmap.clear();
 }
 
-void Client::parseChunked()
+bool Client::parseChunked()
 {
-	for (size_t i = 0; i < _request.size(); i++)
-		std::cout << "**_request = ." << _request[i] << "." <<std::endl;
 	// std::string bodyChunked;
 	// int sizeRead;
 	// std::string line;
-	// // transformRequestVectorToMap();
-	// // std::cout << "boundary = " << ft_find_boundary() << std::endl;
-	// do{
+		std::cout << RED <<"** parseChunked **"<<reset<<std::endl;
+	// if (_headerIsRead == true)
+	// {
+		for (size_t i = 0; i < _request.size(); i++)
+		{
+			std::cout << "request == " << _request[i] << std::endl;
+			if (_request[i].find("transfer-encoding: chunked") != std::string::npos)
+			{
+				std::cout << "chunked" << std::endl;
+				return (true);
+			}
+				// _chunked = true;
+		// }
+		// do{
 
-	// 	char buf[READING_BUFFER];
-	// 	bzero(buf, READING_BUFFER);
-	// 	sizeRead = recv(_clientfd, buf, READING_BUFFER - 1, 0);
-	// 	line += std::string(buf);
-	// }while(bodyChunked.find(ft_find_boundary() + '\n' + '0') != std::string::npos && sizeRead > 0);
-	// std::cout << "line = " << line << std::endl;
-	// std::cout << "exit" << std::endl;
+		// 	char buf[READING_BUFFER];
+		// 	bzero(buf, READING_BUFFER);
+		// 	sizeRead = recv(_clientfd, buf, READING_BUFFER - 1, 0);
+		// 	line += std::string(buf);
+		// }while(bodyChunked.find(ft_find_boundary() + '\n' + '0') != std::string::npos && sizeRead > 0);
+		// std::cout << "line = " << line << std::endl;
+		// std::cout << "exit" << std::endl;
+	}
+	return (false);
+	// _chunked = false;
 }
 
 int Client::readRequest1()
@@ -185,7 +197,6 @@ int Client::readRequest1()
 		if (sizeRead == 0)
 			return (0);
 		_requestLine += std::string(buf);
-		std::cout << "// Buf = " << buf <<std::endl;
 		while (_requestLine.find("\r\n") != std::string::npos)
 		{
 			std::string line = _requestLine.substr(0, _requestLine.find("\r\n"));
@@ -199,29 +210,32 @@ int Client::readRequest1()
 			if (line == "")
 				break;
 		}
-		parseChunked();
 		if (_request.size() != 0 && (_request[_request.size() - 1].size() == 0))
 		{
 			_requestBody += _requestLine;
 			transformRequestVectorToMap();
 			_bodyContentLenght = findBodyContentLenght();
-			if (_bodyContentLenght == 0 || _requestBody.size() == _bodyContentLenght)
+			if ((_bodyContentLenght == 0 || _requestBody.size() == _bodyContentLenght) && parseChunked() == false)
 			{
 				EndOfRead();
 			}
 			_headerIsRead = true;
 		}
+		std::cout <<YEL <<"_headerIsRead =" << _headerIsRead << reset <<std::endl;
 	}
-	else if (_bodyContentLenght)
+	else if (parseChunked() == true || _bodyContentLenght)
 	{
-		if ((sizeRead = recv(_clientfd, buf, READING_BUFFER, 0)) != 0)
+		std::cout << "------- Body" << std::endl;
+		if ((sizeRead = recv(_clientfd, buf, READING_BUFFER - 1, 0)) != 0)
 		{
 			if (sizeRead == -1)
 				std::cout << "Error recv" << std::endl;
 			_requestBody.insert(_requestBody.size(), buf, sizeRead);
+			// std::cout << "BDYYYYY= " << _requestBody <<std::endl;
 		}
-		if (_requestBody.size() == _bodyContentLenght)
+		if (_requestBody.size() == _bodyContentLenght || _requestBody.find(ft_find_boundary() + "\r\n" + '0') !=  std::string::npos)
 		{
+			
 			EndOfRead();
 			std::cout << "EOR "  << _clientfd << std::endl;
 		}
@@ -322,7 +336,6 @@ std::string	Client::ft_find_boundary()
 		pos_equal = it->second.find_last_of('=');
 		if (pos_equal == std::string::npos)
 			throw std::exception();
-		std::cout << "pos_equal= " << pos_equal << std::endl;
 		boundary = it->second.substr(pos_equal + 1);
 	}
 	// std::cout << "Bound = ." << boundary + '\n' + '0'<<"." << std::endl;
