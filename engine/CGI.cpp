@@ -75,12 +75,6 @@ std::vector<std::string> CGI::setAuthorizedExtension(std::vector<std::string> ex
 }
 
 
-//TODO: delete
-void saveFile()
-{
-	return ;
-}
-
 void CGI::verifyCgi()
 {
 	//TODO: faire une erreur qd le php ne peut pas lire
@@ -126,7 +120,7 @@ void CGI::verifyCgi()
 				// _server->getLocationByPath(_requestData.path)
 				// std::cout << "_server->getCgiValue(format)" << format << std::endl;
 				workPostCgi(_loc.getCgiValue(format), requestFile);
-				saveFile();
+				saveFile(*_requestmap, *_requestBody);
 			}
 			catch(std::exception e)
 			{

@@ -73,7 +73,6 @@ class Client
 		void transformBodyStringtoMap();
 		size_t findBodyContentLenght();
 		std::string	findValueEnvCgi(std::string key);
-		std::string	findMethod();
 		void setKeepAlive();
 		bool _isKeepAlive;
 		bool parseChunked();
