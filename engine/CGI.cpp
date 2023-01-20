@@ -101,10 +101,9 @@ void CGI::verifyCgi()
 	size_t postIndex = firstReq.find("POST");
 	size_t getIndex = firstReq.find("GET");
 	size_t deleteIndex = firstReq.find("DELETE");
-	requestFile = firstReq.substr(pos_slash + 1, pos_space - (pos_slash + 1));
-	_getParams = requestFile.substr(requestFile.find_first_of('?') + 1);
-	requestFile =requestFile.substr(0, requestFile.find_first_of('?'));
-	std::cout << "112 -- " << requestFile << std::endl;
+	_getParams = "";
+	requestFile = getRequestFile(firstReq, &_getParams);
+	std::cout << "requestFile= " << requestFile << std::endl;
 	_loc = _server->getLocationByPath('/' + requestFile);
 	key = _loc.getKey();
 	if (key.length() != 1)
@@ -196,7 +195,7 @@ void CGI::verifyCgi()
 
 int CGI::workPostCgi(std::string format, std::string requestFile)
 {
-	std::cout << "_requestBody =" << _requestBody << std::endl;
+	std::cout << "_requestBody =" << _requestBody[0] << std::endl;
 	pid_t pid;
     int fd[2];
     int fd_out[2];
@@ -243,7 +242,7 @@ int CGI::workPostCgi(std::string format, std::string requestFile)
 	std::cout << YEL << "METHOD = " << request_method<<reset<< std::endl;
 	std::cout << YEL << "TYPE = " << content_type<<reset<< std::endl;
 	std::cout << YEL << "LENGTH = " << content_length<<reset<< std::endl;
-	std::cout << YEL << "Body = " << _requestBody<<reset<< std::endl;
+	std::cout << YEL << "Body = " << _requestBody <<reset<< std::endl;
    	pipe(fd);
 	pipe(fd_out);
 	write(fd[1], _requestBody->c_str(), _requestBody->length());

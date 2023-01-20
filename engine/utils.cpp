@@ -122,3 +122,16 @@ std::string	ft_find_boundary(std::map<std::string, std::string> requestmap)
 	// std::cout << "Bound = ." << boundary + '\n' + '0'<<"." << std::endl;
 	return (boundary);
 }
+
+std::string getRequestFile(std::string firstReq, std::string *getParams)
+{
+	size_t pos_space = firstReq.find_last_of(' ');
+	size_t pos_slash = firstReq.find_first_of('/');
+	std::string requestFile;
+
+	requestFile = firstReq.substr(pos_slash + 1, pos_space - (pos_slash + 1));
+	if (getParams != NULL)
+		*getParams = requestFile.substr(requestFile.find_first_of('?') + 1);
+	requestFile =requestFile.substr(0, requestFile.find_first_of('?'));
+	return (requestFile);
+}

@@ -105,6 +105,8 @@ int ParsingRequest::filepermission()
 	std::cout << "_requestData.fileToSend = " << _requestData.fileToSend << std::endl;
 	if (_errorcode == 405)
 		setFileToSend("405.html");
+	else if (_errorcode == 413)
+		setFileToSend("413.html");
 	else if (_errorcode == 4041)
 		setFileToSend("404_noSpecified.html");
 	else if (_errorcode == 500)

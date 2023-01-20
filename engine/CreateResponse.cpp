@@ -111,6 +111,11 @@ void CreateResponse::errorStatus()
 			_headerData.statusCode = "404";
 			_headerData.statusMessage = "Not Found";
 		}
+		else if (checkErrorPage("413.html", path))
+		{
+			_headerData.statusCode = "413";
+			_headerData.statusMessage = "Request Entity Too Large";
+		}
 	}
 	else
 	{

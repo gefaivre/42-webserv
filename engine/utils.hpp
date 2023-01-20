@@ -125,6 +125,7 @@ std::string ft_pwd();
 
 std::vector<std::string>	ft_split_chunked_request(std::string str);
 std::string	ft_find_boundary(std::map<std::string, std::string> requestmap);
+std::string getRequestFile(std::string firstReq, std::string *getParams);
 
 
 

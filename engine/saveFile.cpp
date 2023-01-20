@@ -69,6 +69,10 @@ std::map<std::string, std::string>  transformBodyStringtoMap(std::map<std::strin
 					value += findBodyValue(vector, i, value, key);
 					if (key != "file")
 						value = ft_remove_not_print(value);
+					// if (key == "file")
+					// {
+					// 	std::cout << RED<<vector[i] << "FILE = " << vector[i].find("filename")<<reset<< std::endl;
+					// }
 				}
 			}
 			else
@@ -119,7 +123,6 @@ void saveFile(std::map<std::string, std::string> requestmap, std::string request
 		}
 		if (!isempty)
 		{
-			std::cout << "Contenu = " << it_file->second<< std::endl;
 			std::cout <<YEL <<  "FILE = " << it_name->second<< WHT<< std::endl;
 			//open a file in write mode
 			ofstream outfile;

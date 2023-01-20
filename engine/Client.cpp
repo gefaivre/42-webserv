@@ -123,7 +123,8 @@ void Client::EndOfRead()
 	epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
 	setKeepAlive();
 	displayRequest();
-	cgi.verifyCgi();
+	if (!_errorcode)
+		cgi.verifyCgi();
 	createResponse();
 	// _requestmap.clear();
 }
@@ -186,6 +187,7 @@ int Client::readRequest1()
 	char buf[READING_BUFFER];
 	int sizeRead;
 	bzero(buf, READING_BUFFER);
+	Location loc;
 
 	if (_headerIsRead == false)
 	{
@@ -210,7 +212,9 @@ int Client::readRequest1()
 			_bodyContentLenght = findBodyContentLenght();
 			if ((_bodyContentLenght == 0 || _requestBody.size() == _bodyContentLenght) && parseChunked() == false)
 			{
-				std::cout << "_bodyContentLenght" << _bodyContentLenght <<std::endl;
+				loc = _server->getLocationByPath('/' + getRequestFile(_request[0], NULL));
+				if ((_bodyContentLenght > (size_t)loc.getClientMaxBodySize()) && (loc.getClientMaxBodySize() != 0))
+					_errorcode = 413;
 				EndOfRead();
 			}
 			_headerIsRead = true;
@@ -233,6 +237,11 @@ int Client::readRequest1()
 			// for (size_t i = 0; i < _request.size();i++)
 			// 	std::cout << YEL <<_request[i] << reset <<std::endl;
 			// std::cout << YEL <<_requestBody << reset <<std::endl;
+			loc = _server->getLocationByPath('/' + getRequestFile(_request[0], NULL));
+			if ((_bodyContentLenght > (size_t)loc.getClientMaxBodySize()) && (loc.getClientMaxBodySize() != 0))
+					_errorcode = 413;
+			std::cout << "LOC2" <<std::endl;
+			std::cout << "LOC2" << loc.getClientMaxBodySize()<<std::endl;
 			EndOfRead();
 			std::cout << "EOR "  << _clientfd << std::endl;
 		}
