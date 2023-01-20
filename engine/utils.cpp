@@ -103,3 +103,22 @@ std::vector<std::string>	ft_split_chunked_request(std::string str)
 	}
 	return (arr);
 }
+
+std::string	ft_find_boundary(std::map<std::string, std::string> requestmap)
+{
+	std::string boundary;
+	size_t pos_equal = 0;
+	std::map<std::string,std::string>::iterator it;
+	it = requestmap.find("Content-Type");
+	if (it == requestmap.end())
+		it = requestmap.find("content-type");
+	if (it != requestmap.end())
+	{
+		pos_equal = it->second.find_last_of('=');
+		if (pos_equal == std::string::npos)
+			throw std::exception();
+		boundary = it->second.substr(pos_equal + 1);
+	}
+	// std::cout << "Bound = ." << boundary + '\n' + '0'<<"." << std::endl;
+	return (boundary);
+}

@@ -3,6 +3,7 @@ NAME= webserv
 SRCS=	main.cpp \
 		engine/utils.cpp \
 		engine/Client.cpp \
+		engine/CGI.cpp \
 		engine/CreateResponse.cpp \
 		engine/ParsingRequest.cpp\
 		engine/epolling.cpp\

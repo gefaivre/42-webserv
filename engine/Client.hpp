@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <string>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <algorithm>
@@ -12,6 +11,7 @@
 #include <sys/wait.h>
 #include "utils.hpp"
 #include "ParsingRequest.hpp"
+#include "CGI.hpp"
 #include "CreateResponse.hpp"
 
 
@@ -40,7 +40,6 @@ class Client
 		void createResponse();
 
 
-		std::vector<std::string> authorizedExtension;
 		std::vector<std::string> getRequest() const;
 
 	private:
@@ -54,17 +53,13 @@ class Client
 		std::string _response;
 
 		int _clientfd;
-		Server * _server;
+		Server *_server;
 
 		bool _isSend;
 		size_t _moverSave;
 		char * _responsePointer;
 
 		int _errorcode;
-	
-		Location _loc;
-
-		std::string _getParams;
 
 		bool _headerIsRead;
 		bool _firstTimeBody;
@@ -74,12 +69,7 @@ class Client
 		size_t findContentLenght();
 		void transformRequestVectorToMap();
 		void transformBodyVectorToMap();
-		std::string	ft_find_boundary();
 		void saveFile();
-		void verifyCgi();
-		int workGetCgi(std::string format, std::string requestFile);
-		int workPostCgi(std::string format, std::string requestFile);
-		int workDeleteCgi(std::string format, std::string requestFile);
 		void transformBodyStringtoMap();
 		size_t findBodyContentLenght();
 		std::string	findValueEnvCgi(std::string key);

@@ -124,6 +124,8 @@ std::string itos(int nb);
 std::string ft_pwd();
 
 std::vector<std::string>	ft_split_chunked_request(std::string str);
+std::string	ft_find_boundary(std::map<std::string, std::string> requestmap);
+
 
 
 #endif
