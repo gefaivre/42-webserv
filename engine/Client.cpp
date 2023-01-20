@@ -140,7 +140,7 @@ void Client::EndOfRead()
 	event.events = EPOLLOUT | EPOLLRDHUP;
 	event.data.fd = _clientfd;
 
-	std::cout << "BEFORE CHUNKED" << std::endl;
+	std::cout << "** EndOfRead **" << std::endl;
 
 	// std::map<std::string,std::string>::const_iterator it_chunked = _requestmapBody.find("transfer-encoding");
 	// std::cout << "Chunked = " << it_chunked->second << std::endl;
@@ -164,10 +164,10 @@ bool Client::parseChunked()
 	// {
 		for (size_t i = 0; i < _request.size(); i++)
 		{
-			std::cout << "request == " << _request[i] << std::endl;
+			// std::cout << "request == " << _request[i] << std::endl;
 			if (_request[i].find("transfer-encoding: chunked") != std::string::npos)
 			{
-				std::cout << "chunked" << std::endl;
+				// std::cout << "chunked" << std::endl;
 				return (true);
 			}
 				// _chunked = true;
@@ -188,6 +188,7 @@ bool Client::parseChunked()
 
 std::string Client::chunkedBody()
 {
+	std::cout << "** Chunked Body **" << std::endl;
 	for (size_t i = 0; i< _request.size(); i++)
 	{
 		if (_request[i].find("transfer-encoding: chunked") != std::string::npos)
@@ -199,8 +200,11 @@ std::string Client::chunkedBody()
 	// std::vector<std::string>::iterator it;
 	for (size_t i = 0; i< vector.size();i++)
 	{
-		if (vector[i].find("Content-Disposition") != std::string::npos && !vector[i + 1].empty())
-			vector.erase(vector.begin() + i + 1);
+		if (vector[i].find("Content-Disposition") != std::string::npos)
+		{
+			if (vector[i + 1].empty() && (i + 2) < vector.size())
+				vector.erase(vector.begin() + i + 2);
+		}
 		//TODO: verifier si vector[i + 1] est un num sinon error
 		vector[i].find_last_of("Content-Disposition");
 	}
@@ -210,6 +214,7 @@ std::string Client::chunkedBody()
 		vector.erase(vector.begin() + i);
 		i--;
 	}
+	vector.erase(vector.begin());
 	std::cout << "BODYYYYYY == " << _requestBody << std::endl;
 	for (size_t i = 0; i< vector.size(); i++)
 	{
@@ -267,10 +272,10 @@ int Client::readRequest1()
 		}
 		if (_requestBody.size() == _bodyContentLenght || _requestBody.find(ft_find_boundary() + "\r\n" + '0') !=  std::string::npos)
 		{
-			// _requestBody = chunkedBody();
-			for (size_t i = 0; i < _request.size();i++)
-				std::cout << YEL <<_request[i] << reset <<std::endl;
-			std::cout << YEL <<_requestBody << reset <<std::endl;
+			_requestBody = chunkedBody();
+			// for (size_t i = 0; i < _request.size();i++)
+			// 	std::cout << YEL <<_request[i] << reset <<std::endl;
+			// std::cout << YEL <<_requestBody << reset <<std::endl;
 			EndOfRead();
 			std::cout << "EOR "  << _clientfd << std::endl;
 		}
@@ -498,7 +503,7 @@ std::string Client::findMethod()
 
 int Client::workPostCgi(std::string format, std::string requestFile)
 {
-	std::cout << "_requestBody\t=\t" << _requestBody << std::endl;
+	std::cout << "_requestBody =" << _requestBody << std::endl;
 	pid_t pid;
     int fd[2];
     int fd_out[2];
@@ -512,6 +517,8 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 	std::string envCGI = findValueEnvCgi("Content-Length");	
 	if (envCGI.empty())
 		envCGI = findValueEnvCgi("content-length");
+	if(envCGI.empty())
+		envCGI = itos(_requestBody.length());
 	script_filename.append(requestFileRoot);
 	try 
 	{
@@ -530,14 +537,20 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 	// char *args[]= {const_cast<char*>(format.c_str()), const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *header[] = {
-	const_cast<char*> (script_filename.c_str()),
-	const_cast<char*> (request_method.c_str()),
-	const_cast<char*>(content_type.c_str()),
-	// const_cast<char*>(content_length.append(envCGI).c_str()),
-	const_cast<char*> (query_string.append(_getParams).c_str()),
-	(char *) "REDIRECT_STATUS=200",
-	(char *) NULL
+		const_cast<char*> (script_filename.c_str()),
+		const_cast<char*> (request_method.c_str()),
+		const_cast<char*>(content_type.c_str()),
+		const_cast<char*>(content_length.append(envCGI).c_str()),
+		// const_cast<char*>("CONTENT_LENGTH=80"),
+		const_cast<char*> (query_string.append(_getParams).c_str()),
+		(char *) "REDIRECT_STATUS=200",
+		(char *) NULL
 	};
+	std::cout << YEL << "SCRIPT = " << script_filename<<reset<< std::endl;
+	std::cout << YEL << "METHOD = " << request_method<<reset<< std::endl;
+	std::cout << YEL << "TYPE = " << content_type<<reset<< std::endl;
+	std::cout << YEL << "LENGTH = " << content_length<<reset<< std::endl;
+	std::cout << YEL << "Body = " << _requestBody<<reset<< std::endl;
    	pipe(fd);
 	pipe(fd_out);
 	write(fd[1], _requestBody.c_str(), _requestBody.length());
@@ -582,7 +595,7 @@ int Client::workPostCgi(std::string format, std::string requestFile)
 			if (mystring.find(substring) != std::string::npos && mystring.find_first_of("\n\n") != std::string::npos)
 				mystring.erase(mystring.find(substring), mystring.find_first_of("\n\n"));
 			_cgiResponse.append(mystring);
-			std::cout << "_cgiResponse" << _cgiResponse << std::endl;
+			// std::cout << "_cgiResponse" << _cgiResponse << std::endl;
 		}
 	}
 	return (1);
@@ -840,6 +853,7 @@ void Client::saveFile()
 	std::cout << "** Save file **" << std::endl;
 	transformBodyStringtoMap();
 
+	int isempty = 1;
 	std::map<std::string,std::string>::iterator it_file;
 	std::map<std::string,std::string>::iterator it_name;
 	// std::map<std::string,std::string>::const_iterator it;
@@ -852,15 +866,27 @@ void Client::saveFile()
 	it_name = _requestmapBody.find("name");
 	if (it_file != _requestmapBody.end())
 	{
-		std::cout <<YEL <<  "FILE = " << it_name->second<< WHT<< std::endl;
-		//open a file in write mode
-		ofstream outfile;
-		std::string new_path = "www/new_files/";
-		mkdir(new_path.c_str(), 0777);
-		outfile.open(new_path.append(it_name->second).c_str());
-		//write the string
-		outfile << it_file->second.substr(2, it_file->second.size() - 3);
-		outfile.close();
+		for (size_t i = 0; it_file->second[i];i++)
+		{
+			if (isprint(it_file->second[i]))
+			{
+				isempty = 0;
+				break;
+			}
+		}
+		if (!isempty)
+		{
+			std::cout << "Contenu = " << it_file->second<< std::endl;
+			std::cout <<YEL <<  "FILE = " << it_name->second<< WHT<< std::endl;
+			//open a file in write mode
+			ofstream outfile;
+			std::string new_path = "www/new_files/";
+			mkdir(new_path.c_str(), 0777);
+			outfile.open(new_path.append(it_name->second).c_str());
+			//write the string
+			outfile << it_file->second.substr(2, it_file->second.size() - 3);
+			outfile.close();
+		}
 	}
 }
 

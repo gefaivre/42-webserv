@@ -37,11 +37,11 @@ server {
       root /mnt/nfs/homes/jbach/Documents/new1101/php;
     }
   }
-#   server {
-#     listen  9090;
-#     autoindex on;
-#     server_name domain1.com;
-#     location /b/ {
-#       root /var/www/index.html;
-#     }
-#   }
+  server {
+    listen  9090;
+    autoindex on;
+    server_name domain1.com;
+    location /b/ {
+      root /var/www/index.html;
+    }
+  }
