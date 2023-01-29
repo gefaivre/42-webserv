@@ -8,7 +8,7 @@
 #include <map>
 #include "utils.hpp"
 
-void saveFile(std::map<std::string, std::string> requestmap, std::string requestBody);
+bool saveFile(std::map<std::string, std::string> requestmap, std::string requestBody);
 std::map<std::string, std::string>  transformBodyStringtoMap(std::map<std::string, std::string> requestmapBody, std::map<std::string, std::string> requestmap, std::string requestBody);
 
 #endif

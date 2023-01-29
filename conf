@@ -23,10 +23,10 @@ server {
     
     listen  8080;
     server_name domain1.com;
-    cgi .php /usr/bin/php-cgi;
-    root /mnt/nfs/homes/jbach/Documents/WebservBeforeCGI/www;
+    # cgi .php /usr/bin/php-cgi;
+    root /mnt/nfs/homes/jbach/Documents/2901/www;
     location /a/ {
-      root /mnt/nfs/homes/jbach/Documents/WebservBeforeCGI/www;
+      root /mnt/nfs/homes/jbach/Documents/2901/www;
       # server_name domain1.com;
     }
     autoindex on;
@@ -34,7 +34,7 @@ server {
     server_name domain2.com ;
     accepted_methods       GET POST DELETE;
     location /abc/ {
-      root /mnt/nfs/homes/jbach/Documents/WebservBeforeCGI/php;
+      root /mnt/nfs/homes/jbach/Documents/2901/php;
     }
   }
   server {

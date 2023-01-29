@@ -118,12 +118,14 @@ void CGI::verifyCgi()
 			try {
 				// _server->getLocationByPath(_requestData.path)
 				// std::cout << "_server->getCgiValue(format)" << format << std::endl;
+				// std::cout << "SERVERU = "
 				workPostCgi(_loc.getCgiValue(format), requestFile);
-				saveFile(*_requestmap, *_requestBody);
 			}
 			catch(std::exception e)
 			{
-				*_errorcode = 405;
+				// std::cout << "request = " << *_requestBody << std::endl;
+				if (!saveFile(*_requestmap, *_requestBody))
+					*_errorcode = 405;
 			}
 		}
 	}
@@ -215,7 +217,7 @@ int CGI::workPostCgi(std::string format, std::string requestFile)
 	try 
 	{
 		std::cout << "Found boundary" << std::endl;
-		ft_find_boundary(*_requestmap);
+		ft_find_boundary_utils(*_requestmap);
 	}
 	catch(std::exception e)
 	{
@@ -224,7 +226,7 @@ int CGI::workPostCgi(std::string format, std::string requestFile)
 	if (content_type.empty())
 	{
 		content_type = "CONTENT_TYPE=multipart/form-data; boundary=";
-		content_type.append(ft_find_boundary(*_requestmap));
+		content_type.append(ft_find_boundary_utils(*_requestmap));
 	}
 	// char *args[]= {const_cast<char*>(format.c_str()), const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
@@ -287,7 +289,7 @@ int CGI::workPostCgi(std::string format, std::string requestFile)
 			if (mystring.find(substring) != std::string::npos && mystring.find_first_of("\n\n") != std::string::npos)
 				mystring.erase(mystring.find(substring), mystring.find_first_of("\n\n"));
 			_cgiResponse->append(mystring);
-			// std::cout << "_cgiResponse" << _cgiResponse << std::endl;
+			// std::cout << "_cgiResponse" << *_cgiResponse << std::endl;
 		}
 	}
 	return (1);

@@ -27,6 +27,41 @@ std::vector<std::string>	ft_split_vector_string(std::string str, char c)
 	return (arr);
 }
 
+
+std::vector<std::string>	ft_split_vector_string_file(std::string str, char c, std::string boundary)
+{
+	size_t			start;
+	size_t			end;
+	std::vector<std::string>	arr;
+	
+	start = 0;
+	while ((end = str.find(c, start)) && end < str.length())
+	{
+		std::string smallstr = str.substr(start, end - start);
+		// std::cout << "." << smallstr << "." << std::endl;
+		arr.push_back(smallstr);
+		start = end + 1;
+
+		size_t colon_equal = smallstr.find("Content-Type:");
+		// --> premier \n apres colon_equal
+		//substr entre \n + 1 jusque a find (boundary)
+		//Enlever le premier letre si \n et dernier letre si \n
+		//start boundary
+		if (colon_equal != std::string::npos)
+		{
+		std::cout << "Boundary" << boundary <<std::endl;
+			colon_equal = str.find("Content-Type:");
+			size_t file_start = str.find('\n', colon_equal);
+			size_t file_end = str.find(boundary, file_start);
+			std::cout << "ICI: -->"<< str.substr(file_start, file_end - file_start)<<"End"<< std::endl;
+		}
+
+	}
+	if (str[str.length() - 1] != c)
+		arr.push_back(str.substr(start, str.length() - start));
+	return (arr);
+}
+
 int isDirectory(string file_path)
 {
 
@@ -104,7 +139,7 @@ std::vector<std::string>	ft_split_chunked_request(std::string str)
 	return (arr);
 }
 
-std::string	ft_find_boundary(std::map<std::string, std::string> requestmap)
+std::string	ft_find_boundary_utils(std::map<std::string, std::string> requestmap)
 {
 	std::string boundary;
 	size_t pos_equal = 0;

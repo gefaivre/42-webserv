@@ -114,6 +114,8 @@ typedef struct	s_headerData
 int fileExist(std::string file_path);
 
 std::vector<std::string>	ft_split_vector_string(std::string str, char c);
+std::vector<std::string>	ft_split_vector_string_file(std::string str, char c);
+
 
 int isDirectory(std::string file_path);
 
@@ -124,9 +126,10 @@ std::string itos(int nb);
 std::string ft_pwd();
 
 std::vector<std::string>	ft_split_chunked_request(std::string str);
-std::string	ft_find_boundary(std::map<std::string, std::string> requestmap);
+std::vector<std::string>	ft_split_vector_string_file(std::string str, char c, std::string boundary);
 std::string getRequestFile(std::string firstReq, std::string *getParams);
 
+std::string	ft_find_boundary_utils(std::map<std::string, std::string> requestmap);
 
 
 

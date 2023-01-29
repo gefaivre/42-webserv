@@ -166,7 +166,7 @@ std::string Client::chunkedBody()
 		vector[i].find_last_of("Content-Disposition");
 	}
 	size_t i = vector.size() - 1;
-	while (vector[i].find(ft_find_boundary(_requestmap)) == std::string::npos)
+	while (vector[i].find(ft_find_boundary_utils(_requestmap)) == std::string::npos)
 	{
 		vector.erase(vector.begin() + i);
 		i--;
@@ -230,7 +230,7 @@ int Client::readRequest1()
 			_requestBody.insert(_requestBody.size(), buf, sizeRead);
 			// std::cout << "BDYYYYY= " << _requestBody <<std::endl;
 		}
-		if (_requestBody.size() == _bodyContentLenght || _requestBody.find(ft_find_boundary(_requestmap) + "\r\n" + '0') !=  std::string::npos)
+		if (_requestBody.size() == _bodyContentLenght || _requestBody.find(ft_find_boundary_utils(_requestmap) + "\r\n" + '0') !=  std::string::npos)
 		{
 			if (parseChunked() == true)
 				_requestBody = chunkedBody();
