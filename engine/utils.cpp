@@ -43,12 +43,9 @@ std::vector<std::string>	ft_split_vector_string_file(std::string str, char c, st
 	{
 		if (file_end != 0)
 		{
-			// end = (file_end - file_start) + 2;
 			end = file_end -1;
 			start = file_start + 1;
 			std::string smallstr = str.substr(start, end - start);
-			// std::cout << "smallstr = " <<smallstr <<std::endl;
-			// exit(1);
 			file_end = 0;
 		}
 		else
@@ -56,26 +53,18 @@ std::vector<std::string>	ft_split_vector_string_file(std::string str, char c, st
 			std::cout <<"start = " << start << std::endl;
 			end = str.find(c, start);
 		}
-		// if (start == 0)
-		// 	std::string smallstr = str.substr(start, end - start);
 		std::string smallstr = str.substr(start, end - start);
 		std::cout << YEL << smallstr << reset << std::endl;
 		arr.push_back(smallstr);
-		// std::cout << "smallstr = " <<smallstr <<std::endl;
 		start = end + 1;
 
-		std::cout << "colon_no_null = " << colon_no_null <<std::endl;
-		// std::cout << "smallstr = " << smallstr <<std::endl;
-		// colon_equal = str.find("Content-Type:", colon_no_null + 1);
 		colon_equal = smallstr.find("Content-Type:");
 		if (colon_equal != std::string::npos)
 		{
-			std::cout << "colon_equal = " <<colon_equal << std::endl;
 			colon_equal = str.find("Content-Type:", colon_no_null + 1);
 			colon_no_null = colon_equal;
 			file_start = str.find('\n', colon_equal);
 			file_end = str.find(boundary, file_start) - 3;
-			std::cout << "fileend ="<< file_end <<std::endl;
 		}
 		// exit(1);
 
