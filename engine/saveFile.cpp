@@ -80,8 +80,10 @@ std::map<std::string, std::string>  transformBodyStringtoMap(std::map<std::strin
 	
 		std::string boundary = ft_find_boundary_utils(requestmap);
 		vector = ft_split_vector_string_file(requestBody, '\r', boundary);
-		for (size_t i = 1; i < vector.size(); i++)
+
+		for (size_t i = 0; i < vector.size(); i++)
 		{
+			// std::cout<< RED << "VECOT = " <<  vector[i]<< "."<<reset << std::endl;
 			size_t colon_boundary = vector[i].find(boundary);
 			if (colon_boundary == std::string::npos)
 			{
