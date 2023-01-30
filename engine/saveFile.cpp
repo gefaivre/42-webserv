@@ -81,7 +81,7 @@ std::map<std::string, std::string>  transformBodyStringtoMap(std::map<std::strin
 		std::string boundary = ft_find_boundary_utils(requestmap);
 		std::cout <<boundary <<std::endl;
 		vector = ft_split_vector_string_file(requestBody, '\r', boundary);
-
+		std::cout <<"REQUEST BODY = "<<requestBody <<std::endl;
 		for (size_t i = 0; i < vector.size(); i++)
 		{
 			// std::cout<< RED << "VECOT = " <<  vector[i]<< "."<<reset << std::endl;
@@ -103,9 +103,6 @@ std::map<std::string, std::string>  transformBodyStringtoMap(std::map<std::strin
 			{
 				if (!key.empty())
 				{
-					// std::cout << "KEY = " << key << std::endl;
-					// std::cout << "VLAUE = " << value << std::endl;
-
 					requestmapBody.insert(std::pair<std::string, std::string>(key, value));
 					value.clear();
 					key.clear();
@@ -133,7 +130,7 @@ bool saveFile(std::map<std::string, std::string> requestmap, std::string request
 {
 	//TODO: remettre les spaces ds le file 
 	std::cout << "** Save file **" << std::endl;
-
+	// exit(1);
 	std::map<std::string, std::string> requestmapBody;
 	requestmapBody = transformBodyStringtoMap(requestmapBody, requestmap, requestBody);
 	std::map<std::string,std::string>::iterator it;

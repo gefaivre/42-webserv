@@ -124,6 +124,7 @@ void CGI::verifyCgi()
 			catch(std::exception e)
 			{
 				// std::cout << "request = " << *_requestBody << std::endl;
+				// exit(1);
 				if (!saveFile(*_requestmap, *_requestBody))
 					*_errorcode = 405;
 			}
