@@ -41,41 +41,27 @@ std::vector<std::string>	ft_split_vector_string_file(std::string str, char c, st
 	{
 		if (file_end != 0)
 		{
-			end = (file_end - file_start) + 2;
+			// end = (file_end - file_start) + 2;
+			end = file_end -1;
+			start = file_start + 1;
 			file_end = 0;
+			// exit(1);
 		}
 		else
 			end = str.find(c, start);
-		std::cout<< YEL<< "START =" << start <<reset<<std::endl;
-		std::cout<< YEL<< "END =" << end <<reset<<std::endl;
 		// if (start > 172532)
 		// 	exit(1);
 
 		std::string smallstr = str.substr(start, end - start);
-		if (start > 100 && start < 300)
-			std::cout << "." << smallstr << "." << std::endl;
 		arr.push_back(smallstr);
-
 		start = end + 1;
 
 		size_t colon_equal = smallstr.find("Content-Type:");
-		// --> premier \n apres colon_equal
-		//substr entre \n + 1 jusque a find (boundary)
-		//Enlever le premier letre si \n et dernier letre si \n
-		//start boundary
 		if (colon_equal != std::string::npos)
 		{
-			// std::cout << "Boundary" << boundary <<std::endl;
 			colon_equal = str.find("Content-Type:");
 			file_start = str.find('\n', colon_equal);
-			file_end = str.find(boundary, file_start);
-			// std::cout<< "str = "<< str <<std::endl;
-			// std::cout << "ICI: -->" << str.substr(file_start + 1, (file_end - file_start) + 1)<<"End"<< std::endl;
-			end = (file_end - file_start) + 2;
-			start = file_start +1;
-			std::cout<< YEL<< "start =" << start <<reset<<std::endl;
-			std::cout<< YEL<< "COLO eND =" << end <<reset<<std::endl;
-			// arr.push_back(str.substr(file_start + 1, (file_end - file_start) + 1));
+			file_end = str.find(boundary, file_start) - 3;
 		}
 
 	}

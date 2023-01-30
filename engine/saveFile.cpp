@@ -75,10 +75,11 @@ std::map<std::string, std::string>  transformBodyStringtoMap(std::map<std::strin
     std::vector<std::string> vector;
 	try
 	{
-		for (size_t i = 0; i < vector.size(); i++)
-			std::cout << YEL << vector[i] << reset <<std::endl;
+		// for (size_t i = 0; i < vector.size(); i++)
+		// 	std::cout << YEL << vector[i] << reset <<std::endl;
 	
 		std::string boundary = ft_find_boundary_utils(requestmap);
+		std::cout <<boundary <<std::endl;
 		vector = ft_split_vector_string_file(requestBody, '\r', boundary);
 
 		for (size_t i = 0; i < vector.size(); i++)
