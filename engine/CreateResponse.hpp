@@ -4,6 +4,7 @@
 #include "utils.hpp"
 #include "Server.hpp"
 #include <string>
+#include "define.hpp"
 
 class Server;
 
@@ -24,6 +25,7 @@ class CreateResponse
 		std::string getBodyResponse() const;
 		void displayHeaderResponse() const;
 		void displayFullResponse() const;
+		int create();
 
 	private:
 		CreateResponse();
@@ -58,12 +60,21 @@ class CreateResponse
 		void createHeader();
 		std::string _header;
 
-		void createBody();
-		void BodyIsCgi();
-		void BodyIsNotIndex();
-		void BodyIsIndex();
+		int createBody();
+		int BodyIsCgi();
+		int BodyIsNotIndex();
+		int BodyIsIndex();
 		std::string _body;
 		FILE *_FILEtoRead;
+
+		// EPOLLING
+		bool _createBody;
+		bool _fillHeaderData;
+		bool _createHeader;
+		bool _firstTimeBody;
+		bool _bodyIsRead;
+		std::ifstream _myfile;
+
 
 
 };

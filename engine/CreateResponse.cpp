@@ -10,9 +10,11 @@ CreateResponse::CreateResponse(Server *server,std::map<std::string, std::string>
 {
 
 	fillFilesExtension();
-	createBody();
-	fillHeaderData();
-	createHeader();
+	_createBody = false;
+	_fillHeaderData = false;
+	_createHeader = false;
+	_firstTimeBody = true;
+	_bodyIsRead = false;
 }
 
 
@@ -49,6 +51,7 @@ CreateResponse::~CreateResponse()
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
+
 
 
 void CreateResponse::collectData(int newsocket)
@@ -154,38 +157,82 @@ void CreateResponse::createHeader()
 	_header += "Connection: " + _headerData.connection + "\r\n";
 }
 
-void CreateResponse::BodyIsCgi()
+
+int CreateResponse::create()
+{
+	int ret;
+
+	if (_createBody == false)
+	{
+		ret = createBody();
+		if (ret == READ)
+			_createBody = true;
+		return NOT_READ_YET;
+	}
+	else if (_fillHeaderData == false)
+	{
+		fillHeaderData();
+		_fillHeaderData = true;
+		return NOT_READ_YET;
+	}
+	else if (_createHeader == false)
+	{
+		createHeader();
+		_createHeader = true;
+		return READ;
+	}
+	else
+		return ERROR;
+
+}
+
+
+int CreateResponse::createBody()
+{
+	int ret;
+
+	if (_requestData.isIndex)
+		ret = BodyIsIndex();
+	else if (_requestData.isCgi)
+		ret = BodyIsCgi();
+	else
+		ret = BodyIsNotIndex();
+	return ret;
+}
+
+int CreateResponse::BodyIsCgi()
 {
 	_body = _requestData._cgiResponse;
+	return READ;
 }
 
-void CreateResponse::createBody()
+int CreateResponse::BodyIsNotIndex()
 {
-	if (_requestData.isIndex)
-		BodyIsIndex();
-	else if (_requestData.isCgi)
-		BodyIsCgi();
-	else
-		BodyIsNotIndex();
-}
-
-void CreateResponse::BodyIsNotIndex()
-{
-	std::string line;
-	std::ifstream myfile;
-
-	myfile.open(_requestData.fileToSend.c_str(), std::ifstream::in);
-	while ( std::getline(myfile,line) )
+	if (_firstTimeBody == true)
 	{
-		if (_body.size() != 0)
-			_body += '\n';
-		_body += line;
+		_myfile.open(_requestData.fileToSend.c_str(), std::ifstream::in);
+		_firstTimeBody = false;
+		return NOT_READ_YET;
 	}
-	myfile.close();
+	else if (_myfile && _bodyIsRead == false)
+	{
+		char buf[READING_BUFFER];
+		bzero(buf, READING_BUFFER);
+		
+		_myfile.read(buf, READING_BUFFER - 1);
+		_body +=  std::string(buf, _myfile.gcount());
+		if (!_myfile)
+		{
+			_myfile.close();
+			_bodyIsRead = true;
+			return READ;
+		}
+		return NOT_READ_YET;
+	}
+	return ERROR;
 }
 
-
-void CreateResponse::BodyIsIndex()
+int CreateResponse::BodyIsIndex()
 {
 	_body += "<!DOCTYPE html>\n<html>\n<head>\n<title> Index of ";
 	_body += _requestData.path;
@@ -219,6 +266,7 @@ void CreateResponse::BodyIsIndex()
 	_body += "</h1>\n";
 	_body += "<hr>\n<p>Webserv/1.0</p>\n</body>";
 	_body += "\n\r";
+	return READ;
 }
 
 

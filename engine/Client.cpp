@@ -19,6 +19,8 @@ Client::Client(Server *server, int clientfd) : _clientfd(clientfd), _server(serv
 	this->_moverSave = 0;
 	this->_errorcode = 0;
 	this->_cgiResponse.clear();
+	this->_firstTimeCreate = 0;
+	this->_createIsFinish = 0;
 }
 
 Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._server)
@@ -30,6 +32,8 @@ Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._serve
 	this->_isSend = false;
 	this->_moverSave = 0;
 	this->_cgiResponse.clear();
+	this->_firstTimeCreate = 0;
+	this->_createIsFinish = 0;
 }
 
 /*
@@ -62,6 +66,8 @@ Client &Client::operator=(Client const &rhs)
 		this->_moverSave = rhs._moverSave;
 		this->_cgiResponse = rhs._cgiResponse;
 		this->_errorcode = rhs._errorcode;
+		this->_firstTimeCreate = rhs._firstTimeCreate;
+		this->_createIsFinish = rhs._createIsFinish;
 	}
 	return *this;
 }
@@ -82,6 +88,18 @@ size_t Client::findBodyContentLenght()
 		return (atoi(_requestmap[std::string("Content-Length")].c_str()));
 	return (atoi(_requestmap[std::string("content-length")].c_str()));
 	
+}
+
+size_t Client::setBodyContentLenght()
+{
+	for(size_t i = 0; i < _request.size(); i++)
+	{
+		 if (_request[i].find("Content-Length:") != std::string::npos)
+		 	return (std::atoi(_request[i].c_str()));
+		if (i == (_request.size() - 1))
+			return 0;
+	}
+	return 0;
 }
 
 void Client::setKeepAlive()
@@ -106,21 +124,32 @@ void Client::transformRequestVectorToMap()
 	}
 }
 
+void Client::resetClient()
+{
+	_requestLine.clear();
+	_request.clear();
+	_requestmap.clear();
+	_requestBody.clear();
+	_response.clear();
+	_cgiResponse.clear();
+	_requestmapBody.clear();
+	_headerIsRead = false;
+	_firstTimeBody = false;
+	_bodyContentLenght = 0;
+	_isKeepAlive = false;
+	_isSend = false;
+	_moverSave = 0;
+	_errorcode = 0;
+}
+
 void Client::EndOfRead()
 {
-	CGI cgi = CGI(&_request, _server, &_errorcode, &_requestBody, &_requestmap, &_cgiResponse);
 	struct epoll_event event;
 	event.events = EPOLLOUT | EPOLLRDHUP;
 	event.data.fd = _clientfd;
-
-	// std::map<std::string,std::string>::const_iterator it_chunked = _requestmapBody.find("transfer-encoding");
-	// if (_requestmapBody.find("transfer-encoding:") != std::string::npos)
 	epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
-	setKeepAlive();
-	displayRequest();
-	if (!_errorcode)
-		cgi.verifyCgi();
-	createResponse();
+
+	
 	// _requestmap.clear();
 }
 
@@ -171,94 +200,138 @@ std::string Client::chunkedBody()
 	return (str);
 }
 
-int Client::readRequest1()
+int Client::readRequestHeader()
 {
 	char buf[READING_BUFFER];
 	int sizeRead;
-	bzero(buf, READING_BUFFER);
-	Location loc;
 
-	if (_headerIsRead == false)
+	bzero(buf, READING_BUFFER);
+
+	sizeRead = recv(_clientfd, buf, READING_BUFFER - 1, 0);
+	if (sizeRead == -1)
+		return ERROR;
+	if (sizeRead == 0)
+		return READ;
+	_requestLine += std::string(buf);
+	while (_requestLine.find("\r\n") != std::string::npos)
 	{
-		sizeRead = recv(_clientfd, buf, READING_BUFFER - 1, 0);
-		if (sizeRead == -1)
-			std::cout << "Error recv" << std::endl;
-		if (sizeRead == 0)
-			return (0);
-		_requestLine += std::string(buf);
-		while (_requestLine.find("\r\n") != std::string::npos)
-		{
-			std::string line = _requestLine.substr(0, _requestLine.find("\r\n"));
-			_requestLine.erase(0, _requestLine.find("\r\n") + 2);
-			_request.push_back(line);
-			if (line == "")
-				break;
-		}
-		if (_request.size() != 0 && (_request[_request.size() - 1].size() == 0))
-		{
-			_requestBody += _requestLine;
-			transformRequestVectorToMap();
-			_bodyContentLenght = findBodyContentLenght();
-			if ((_bodyContentLenght == 0 || _requestBody.size() == _bodyContentLenght) && parseChunked() == false)
+		std::string line = _requestLine.substr(0, _requestLine.find("\r\n"));
+		_requestLine.erase(0, _requestLine.find("\r\n") + 2);
+		_request.push_back(line);
+		if (line.size() == 0)
+			break;
+	}
+	if (_request.size() != 0 && (_request[_request.size() - 1].size() == 0))
+	{
+		_requestBody += _requestLine;
+		_bodyContentLenght = setBodyContentLenght();
+		if ((_bodyContentLenght == 0 || _requestBody.size() == _bodyContentLenght) && parseChunked() == false)
 			{
+				Location loc;
 				loc = _server->getLocationByPath('/' + getRequestFile(_request[0], NULL));
 				if ((_bodyContentLenght > (size_t)loc.getClientMaxBodySize()) && (loc.getClientMaxBodySize() != 0))
 					_errorcode = 413;
 				EndOfRead();
 			}
-			_headerIsRead = true;
-		}
+			return READ;
 	}
-	else if (parseChunked() == true || _bodyContentLenght)
+	return NOT_READ_YET;
+}
+
+void Client::readRequestBody()
+{
+	char buf[READING_BUFFER];
+	int sizeRead;
+
+	bzero(buf, READING_BUFFER);
+
+	if ((sizeRead = recv(_clientfd, buf, READING_BUFFER - 1, 0)) != 0)
 	{
-		if ((sizeRead = recv(_clientfd, buf, READING_BUFFER - 1, 0)) != 0)
-		{
-			if (sizeRead == -1)
-				std::cout << "Error recv" << std::endl;
-			_requestBody.insert(_requestBody.size(), buf, sizeRead);
-		}
-		if (_requestBody.size() == _bodyContentLenght || _requestBody.find(ft_find_boundary_utils(_requestmap) + "\r\n" + '0') !=  std::string::npos)
-		{
-			if (parseChunked() == true)
-				_requestBody = chunkedBody();
+		if (sizeRead == -1)
+			std::cout << "Error recv" << std::endl;
+		_requestBody.insert(_requestBody.size(), buf, sizeRead);
+	}
+	if (_requestBody.size() == _bodyContentLenght || _requestBody.find(ft_find_boundary_utils(_requestmap) + "\r\n" + '0') !=  std::string::npos)
+	{
+		Location loc;
+		if (parseChunked() == true)
+			_requestBody = chunkedBody();
 
-			loc = _server->getLocationByPath('/' + getRequestFile(_request[0], NULL));
-			if ((_bodyContentLenght > (size_t)loc.getClientMaxBodySize()) && (loc.getClientMaxBodySize() != 0))
-					_errorcode = 413;
-			EndOfRead();
+		loc = _server->getLocationByPath('/' + getRequestFile(_request[0], NULL));
+		if ((_bodyContentLenght > (size_t)loc.getClientMaxBodySize()) && (loc.getClientMaxBodySize() != 0))
+				_errorcode = 413;
+		EndOfRead();
+	}
+}
+
+void Client::readRequest1()
+{
+	if (_headerIsRead == false)
+	{
+		if (readRequestHeader() == READ)
+		{
+			_headerIsRead = true;
+			transformRequestVectorToMap();
 		}
 	}
-	return (1);
+	else if (_bodyContentLenght || parseChunked() == true )
+		readRequestBody();
 }
 
-void Client::createResponse()
+int Client::CreateAndSendResponse()
 {
-	ParsingRequest parsingRequest(_request, _server, _cgiResponse, _errorcode);
-	CreateResponse createResponse(_server, _requestmap, parsingRequest.getData());
-	createResponse.displayHeaderResponse();
-	_response = createResponse.getResponse();
+	int ret;
+	if(_firstTimeCreate == false)
+	{
+		setKeepAlive();
+		CGI cgi = CGI(&_request, _server, &_errorcode, &_requestBody, &_requestmap, &_cgiResponse);
+		ParsingRequest parsingRequest(_request, _server, _cgiResponse, _errorcode);
+		CreateResponse *CR = new CreateResponse(_server, _requestmap, parsingRequest.getData());
+		_createR = CR;
+		if (!_errorcode)
+			cgi.verifyCgi();
+
+		_firstTimeCreate = true;
+		return NOT_READ_YET;
+	}
+	else if(_createIsFinish == false)
+	{
+		ret = _createR->create();
+		if (ret == READ)
+		{
+			_response = _createR->getResponse();
+			_createIsFinish = true;
+		}
+		return NOT_READ_YET;
+	}
+	else
+	{
+		ret = sendResponse();
+		if (ret != NOT_READ_YET)
+		{
+			displayRequest();
+			_createR->displayHeaderResponse();
+			// _createR->displayFullResponse();
+			_response = _createR->getResponse();
+			if (ret == DELETE_CLIENT)
+				return DELETE_CLIENT;
+			else if (ret == READ)
+			{
+				resetClient();
+				return READ;
+			}
+		}
+		else
+			return NOT_READ_YET;
+	}
+	return ERROR;
 }
 
-void Client::resetClient()
-{
-	_requestLine.clear();
-	_request.clear();
-	_requestmap.clear();
-	_requestBody.clear();
-	_response.clear();
-	_cgiResponse.clear();
-	_requestmapBody.clear();
-	_headerIsRead = false;
-	_firstTimeBody = false;
-	_bodyContentLenght = 0;
-	_isKeepAlive = false;
-	_isSend = false;
-	_moverSave = 0;
-	_errorcode = 0;
-}
 
 int Client::sendResponse()
 {
+	// std::cout << "SEND RESPONSE" << std::endl;
+
 	struct epoll_event event;
 	int ret;
 	size_t mover = _moverSave * SENDING_BUFFER;
@@ -279,19 +352,18 @@ int Client::sendResponse()
 	}
 	else
 	{
-		if (this->_isKeepAlive)
+		if (_isKeepAlive)
 		{
-			resetClient();
 			event.events =  EPOLLIN | EPOLLRDHUP;
 			event.data.fd = _clientfd;
 			epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
+			return READ;
 		}
 		else
-		{
-			return 0;
-		}
+			return DELETE_CLIENT;
 	}
-	return 1;
+
+	return NOT_READ_YET;
 }
 
 

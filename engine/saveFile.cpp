@@ -142,7 +142,7 @@ bool saveFile(std::map<std::string, std::string> requestmap, std::string request
 	// }
 	for (it = requestmapBody.begin(); it != requestmapBody.end(); it++)
 	{
-		ofstream outfile;
+		std::ofstream outfile;
 		std::string new_path = "www/new_files/";
 		mkdir(new_path.c_str(), 0777);
 		outfile.open(new_path.append(it->first).c_str());

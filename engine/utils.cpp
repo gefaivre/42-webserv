@@ -2,7 +2,7 @@
 
 // using namespace std;
 
-int fileExist(string file_path)
+int fileExist(std::string file_path)
 {
 	struct stat sb;
 	int status = stat(file_path.c_str(), &sb);
@@ -75,7 +75,7 @@ std::vector<std::string>	ft_split_vector_string_file(std::string str, char c, st
 	return (arr);
 }
 
-int isDirectory(string file_path)
+int isDirectory(std::string file_path)
 {
 
 	if (file_path.size() > 0 && file_path[file_path.size() - 1] == '/')
@@ -94,11 +94,11 @@ int isDirectory(string file_path)
 	return (0);
 }
 
-int	ft_define_error(string str)
+int	ft_define_error(std::string str)
 {
-	string std_str(str);
-	cout << std_str << endl;
-	cout << strerror(errno) << endl;
+	std::string std_str(str);
+	std::cout << std_str << std::endl;
+	std::cout << strerror(errno) << std::endl;
 	return(errno);
 }
 

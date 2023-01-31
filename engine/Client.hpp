@@ -13,11 +13,11 @@
 #include "ParsingRequest.hpp"
 #include "CGI.hpp"
 #include "CreateResponse.hpp"
+#include "define.hpp"
 
 
-char **ft_split(const char *str);
-std::vector<std::string>	ft_split_header(std::string str);
 class Server;
+class CreateResponse;
 
 
 class Client
@@ -33,11 +33,13 @@ class Client
 		void displayRequest();
 		void displayFullRequest();
 		void displayFullBody();
-		void readRequest();
-		int readRequest1();
-		void parseHeader(std::string buf);
-		int	 sendResponse();
-		void createResponse();
+
+		int readRequestHeader();
+		void readRequestBody();
+		void readRequest1();
+
+		int CreateAndSendResponse();
+		int sendResponse();
 
 
 		std::vector<std::string> getRequest() const;
@@ -55,24 +57,16 @@ class Client
 		int _clientfd;
 		Server *_server;
 
-		bool _isSend;
-		size_t _moverSave;
 		char * _responsePointer;
 
 		int _errorcode;
 
-		bool _headerIsRead;
-		bool _firstTimeBody;
 		size_t _bodyContentLenght;
 
 		std::string _cgiResponse;
-		size_t findContentLenght();
+		size_t setBodyContentLenght();
 		void transformRequestVectorToMap();
-		void transformBodyVectorToMap();
-		void saveFile();
-		void transformBodyStringtoMap();
 		size_t findBodyContentLenght();
-		std::string	findValueEnvCgi(std::string key);
 		void setKeepAlive();
 		bool _isKeepAlive;
 		bool parseChunked();
@@ -80,6 +74,18 @@ class Client
 
 		void EndOfRead();
 		void resetClient();
+
+
+		// POLLING CREATE RESPONSE
+		bool _headerIsRead;
+		bool _firstTimeBody;
+		bool _firstTimeCreate;
+		bool _createIsFinish;
+		bool _isSend;
+		size_t _moverSave;
+
+		CreateResponse *_createR;
+
 
 
 };

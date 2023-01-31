@@ -79,8 +79,8 @@ void epolling(vector<Server *> servers)
 				else if (events[i].events & EPOLLOUT)
 				{
 					// std::cout << "----------EPOLLOUT EVENT" << std::endl;
-					if (servers[s]->clients[events[i].data.fd]->sendResponse() == 0)
-						servers[s]->deleteClient(events[i].data.fd);
+						if (servers[s]->clients[events[i].data.fd]->CreateAndSendResponse() == DELETE_CLIENT)
+							servers[s]->deleteClient(events[i].data.fd);
 				}		
 			}
 			if (s == servers.size())
