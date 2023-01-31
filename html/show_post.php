@@ -38,18 +38,17 @@ $fileexits = 1;
             {
                 echo "<h2>Hey " . $_POST['name'] . " you just send a POST request to our CGI</h2>";
                 if ($path_filename_ext)
-                    echo "<img src=\"".$path_filename_ext."\">";
+                    echo "<img alt=\"".$file."\" src=\"".$path_filename_ext."\">";
             }
             else
             {
                 echo "<h2>Every request will be send to php-cgi</h2>";
             }
         ?>
-        
     </header>
     <nav>
-            <a href="startcgi.html" class="previous">Previous</a>
-            <a href="post_cgi.html" class="next">Next</a>
+            <a href="post_cgi.html" class="previous">Previous</a>
+            <a href="endcgi.html" class="next">Next</a>
 	</nav>
     <?php
         if ($fileexits){

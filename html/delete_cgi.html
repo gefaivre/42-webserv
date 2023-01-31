@@ -17,21 +17,22 @@
     <section class="get">
         <div class="title">
             <h2>Delete Request</h2>
-            <p>This form is being sent using post request!</p>
+            <p>This form is being sent using post request with CGI !</p>
         </div>
         <button class="delete" id="delete">DELETE 💣</button>
+        <p>If you use this button without CGI, it will delete the delete.php file instead of delete_file.html</p>
         <a href="/delete_method" target="_blank" >If it works you will no longer see the file in directory's list</a>
         
         <nav>
-            <a href="download.html" class="previous">Previous</a>
-            <a href="hardtest.html" class="next">Next</a>
+            <a href="post_cgi.html" class="previous">Previous</a>
+            <a href="endcgi.html" class="next">Next</a>
         </nav>
     </section>
     <script>
         let deleteBtn = document.getElementById("delete");
         deleteBtn.addEventListener("click", function () {
             alert("Delete request");
-            fetch('http://localhost:8080/delete_method/delete_file.html', {
+            fetch('http://localhost:8080/delete_method/delete.php', {
             method: 'DELETE'
             })
             .then(response => {

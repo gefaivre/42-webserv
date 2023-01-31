@@ -16,9 +16,9 @@
     <section class="get">
         <div class="title">
             <h2>Second Form</h2>
-            <p>This form is being sent using post request!</p>
+            <p>This form is being sent using post request with CGI !</p>
         </div>
-        <form action="show_post.php" method="post" target="_blank" enctype="multipart/form-data">
+        <form action="show_post.php" method="post" enctype="multipart/form-data">
             <label>
                 Name<br>
                 <input type="text" name="name" placeholder="Please insert a name to the file!" required>
@@ -30,8 +30,8 @@
             <input type="submit" name="submit" value="Submit">
         </form>
         <nav>
-            <a href="get.html" class="previous">Previous</a>
-            <a href="download.html" class="next">Next</a>
+            <a href="get_cgi.html" class="previous">Previous</a>
+            <a href="delete_cgi.html" class="next">Next</a>
         </nav>
     </section>
 </body>

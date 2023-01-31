@@ -112,12 +112,23 @@ int ParsingRequest::filepermission()
 		setFileToSend("404_noSpecified.html");
 	else if (_errorcode == 500)
 		setFileToSend("500.html");
+	std::cout <<  _requestData.methode << std::endl;
 	fd = access(_requestData.fileToSend.c_str(), F_OK);
-	if (fd == -1 || _errorcode == 404)
-		setFileToSend("404.html");
+	if (fd == -1)
+	{
+		if (!(_requestData.methode == "DELETE"))
+			setFileToSend("404.html");
+	}
+	if (_errorcode == 404)
+			setFileToSend("404.html");
 	fd = access(_requestData.fileToSend.c_str(), R_OK);
-	if (fd == -1 || _autoindex == 0)
-		setFileToSend("403.html");
+	if (fd == -1)
+	{
+		if (!(_requestData.methode == "DELETE"))
+			setFileToSend("403.html");
+	}
+	if(_autoindex == 0)
+			setFileToSend("403.html");
 	return (0);
 }
 

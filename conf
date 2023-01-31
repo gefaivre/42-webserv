@@ -1,7 +1,7 @@
 server {
   listen 8080;
   server_name domain1.com;
-  cgi .php /usr/bin/php-cgi;
+  # cgi .php /usr/bin/php-cgi;
   root /mnt/nfs/homes/jbach/Documents/2901/html;
   autoindex on;
   accepted_methods       GET POST;

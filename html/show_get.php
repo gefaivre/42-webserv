@@ -26,7 +26,7 @@
 
     </header>
     <nav>
-            <a href="startcgi.html" class="previous">Previous</a>
+            <a href="get_cgi.html" class="previous">Previous</a>
             <a href="post_cgi.html" class="next">Next</a>
 	</nav>
 </body>

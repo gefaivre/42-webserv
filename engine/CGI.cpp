@@ -197,7 +197,6 @@ void CGI::verifyCgi()
 			}
 		}
 	}
-	
 }
 
 
