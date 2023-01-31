@@ -37,7 +37,10 @@
                 if (!response.ok) {
                     throw new Error(response.status);
                 }
-                }))
+                }
+                ).catch(error => {
+                    console.log(error);
+            }))
             }
 
             let start = performance.now();
@@ -47,8 +50,8 @@
                 let timeTaken = end - start;
                 alert(`ok, took ${timeTaken} ms`);
                 })
-                .catch(() => {
-                alert('error');
+                .catch((error) => {
+                   console.log(error);
                 });
         }
 
