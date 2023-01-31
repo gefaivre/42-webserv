@@ -88,7 +88,7 @@ void ParsingRequest::parsingRequest()
 void ParsingRequest::setFileToSend(std::string errorcode)
 {
 	std::string path;
-	std::cout << "888  -- " << _requestData.path<< std::endl;
+	// std::cout << "888  -- " << _requestData.path<< std::endl;
 	path = _server->getLocationByPath("/" +_requestData.path).getRoot();
 	std::cout << _server->getLocationByPath("/").getRoot() << std::endl;
 	path += errorcode;
@@ -96,6 +96,7 @@ void ParsingRequest::setFileToSend(std::string errorcode)
 		_requestData.fileToSend = path;
 	else
 		_requestData.fileToSend = ft_pwd() + "/error_pages/" + errorcode;
+	std::cout << _requestData.fileToSend << std::endl;
 }
 
 int ParsingRequest::filepermission()

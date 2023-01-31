@@ -50,14 +50,6 @@ CreateResponse::~CreateResponse()
 ** --------------------------------- METHODS ----------------------------------
 */
 
-
-void CreateResponse::collectData(int newsocket)
-{
-	(void)newsocket;
-	std::cout << "post method!" << std::endl;
-	
-}
-
 void CreateResponse::fillFilesExtension()
 {
 	_switchFilesExtension.insert( std::pair<std::string, std::string>("html","text/html"));

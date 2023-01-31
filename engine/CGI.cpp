@@ -108,7 +108,6 @@ void CGI::verifyCgi()
 	key = _loc.getKey();
 	if (key.length() != 1)
 		requestFile = requestFile.substr(key.length() - 2);
-	std::cout << "999 -- " << requestFile << std::endl;
 	if (postIndex != std::string::npos)
 	{
 		std::cout << "** POST **" << std::endl;
@@ -163,9 +162,13 @@ void CGI::verifyCgi()
 	{
 		std::cout << "** DELETE **" << std::endl;
 		if (!_loc.getAcceptedMethods()._delete)
+		{
 			*_errorcode = 405;
+			std::cout << "*_errorcode" << *_errorcode<< std::endl;
+		}
 		else
 		{
+			std::cout << "SALUT " << std::endl;
 			try
 			{
 				workDeleteCgi(_loc.getCgiValue(format), requestFile);
@@ -366,6 +369,7 @@ int CGI::workGetCgi(std::string format, std::string requestFile)
 
 int CGI::workDeleteCgi(std::string format, std::string requestFile)
 {
+	std::cout << "*** DELETE CGI ***" << std::endl;
 	pid_t pid;
     int fd_out[2];
 	char buf[1024];

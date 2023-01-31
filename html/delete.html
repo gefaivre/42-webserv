@@ -20,7 +20,8 @@
             <p>This form is being sent using post request!</p>
         </div>
         <button class="delete" id="delete">DELETE 💣</button>
-        <a href="#">If it works you will no longer see the file in directory's list</a>
+        <p>If you use this button without CGI, it will delete the delete.php file instead of delete_file.html</p>
+        <a href="/delete_method" >If it works you will no longer see the file in directory's list</a>
         
         <nav>
             <a href="download.html" class="previous">Previous</a>
@@ -31,17 +32,19 @@
         let deleteBtn = document.getElementById("delete");
         deleteBtn.addEventListener("click", function () {
             alert("Delete request");
-            fetch('http://127.0.0.1:5500/www/html/delete.html', {
+            fetch('http://localhost:8080/delete_method/delete.php', {
             method: 'DELETE'
             })
             .then(response => {
             // handle the response
+                console.log(response);
                 if(!response.ok){
                     throw new Error("Error: "+response.status)
                 }
             })
             .catch(error => {
             // handle the error
+             alert(error);
             });
         });
     </script>

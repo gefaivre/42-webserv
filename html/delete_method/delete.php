@@ -2,7 +2,7 @@
 
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') { 
    		echo "You send a DELETE REQUEST\n\n";
-	$status=unlink('delete1.html');    
+	$status=unlink('delete_file.html');    
 	if($status){  
 		echo "File deleted successfully\n";    
 	}else{
@@ -10,4 +10,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 	}  
 }
 else
-	echo "This is not a Delete request !\n";    
+	echo "This is not a Delete request !\n";
