@@ -79,17 +79,16 @@ void CGI::verifyCgi()
 {
 	//TODO: faire une erreur qd le php ne peut pas lire
 	//TODO: que faire ds le cas d'un file sans ext ?
-	std::cout << "** verifyCgi **" << std::endl;
 	std::string format;
 	std::string requestFile;
 	std::string firstReq = (*_request)[0];
 	std::string key;
 	size_t pos_space = 0;
-	size_t pos_slash = 0;
+	// size_t pos_slash = 0;
 	size_t pos_point = 0;
 	pos_space = firstReq.find_last_of(' ');
 	pos_point = firstReq.find_first_of('.');
-	pos_slash = firstReq.find_first_of('/');
+	// pos_slash = firstReq.find_first_of('/');
 	if (pos_space < pos_point)
 		format = "";
 	else
@@ -97,21 +96,17 @@ void CGI::verifyCgi()
 		format = firstReq.substr(pos_point + 1, pos_space - (pos_point + 1));
 		format =format.substr(0, format.find_first_of('?'));
 	}
-	std::cout << "format = " << format<< std::endl;
 	size_t postIndex = firstReq.find("POST");
 	size_t getIndex = firstReq.find("GET");
 	size_t deleteIndex = firstReq.find("DELETE");
 	_getParams = "";
 	requestFile = getRequestFile(firstReq, &_getParams);
-	std::cout << "requestFile= " << requestFile << std::endl;
 	_loc = _server->getLocationByPath('/' + requestFile);
 	key = _loc.getKey();
 	if (key.length() != 1)
 		requestFile = requestFile.substr(key.length() - 2);
-	std::cout << "999 -- " << requestFile << std::endl;
 	if (postIndex != std::string::npos)
 	{
-		std::cout << "** POST **" << std::endl;
 		if (!_loc.getAcceptedMethods()._post)
 			*_errorcode = 405;
 		else {
@@ -121,7 +116,7 @@ void CGI::verifyCgi()
 				// std::cout << "SERVERU = "
 				workPostCgi(_loc.getCgiValue(format), requestFile);
 			}
-			catch(std::exception e)
+			catch(std::exception &e)
 			{
 				// std::cout << "request = " << *_requestBody << std::endl;
 				// exit(1);
@@ -132,7 +127,6 @@ void CGI::verifyCgi()
 	}
 	else if (getIndex != std::string::npos)
 	{
-		std::cout << "** GET **" << std::endl;
 		if (!_loc.getAcceptedMethods()._get)
 			*_errorcode = 405;
 		else
@@ -140,7 +134,7 @@ void CGI::verifyCgi()
 			try {
 				workGetCgi(_loc.getCgiValue(format), requestFile);
 			}
-			catch(std::exception e)
+			catch(std::exception &e)
 			{
 				bool found = false;
 				for (std::vector<std::string>::iterator it = \
@@ -159,7 +153,6 @@ void CGI::verifyCgi()
 	}
 	else if (deleteIndex != std::string::npos)
 	{
-		std::cout << "** DELETE **" << std::endl;
 		if (!_loc.getAcceptedMethods()._get)
 			*_errorcode = 405;
 		else
@@ -220,7 +213,7 @@ int CGI::workPostCgi(std::string format, std::string requestFile)
 		std::cout << "Found boundary" << std::endl;
 		ft_find_boundary_utils(*_requestmap);
 	}
-	catch(std::exception e)
+	catch(std::exception &e)
 	{
 		content_type = "CONTENT_TYPE=application/x-www-form-urlencoded";
 	}

@@ -100,7 +100,6 @@ void Client::transformRequestVectorToMap()
 		if (colon != std::string::npos)
 		{
 			std::string key = _request[i].substr(0, colon);
-			std::cout << "Key = " << key << std::endl;
 			std::string value = _request[i].substr(colon + 2, _request[i].size());
 			_requestmap.insert(std::pair<std::string, std::string>(key, value));
 		}
@@ -114,12 +113,8 @@ void Client::EndOfRead()
 	event.events = EPOLLOUT | EPOLLRDHUP;
 	event.data.fd = _clientfd;
 
-	std::cout << "** EndOfRead **" << std::endl;
-
 	// std::map<std::string,std::string>::const_iterator it_chunked = _requestmapBody.find("transfer-encoding");
-	// std::cout << "Chunked = " << it_chunked->second << std::endl;
 	// if (_requestmapBody.find("transfer-encoding:") != std::string::npos)
-	// 	std::cout << "CHUNKED" << std::endl;
 	epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
 	setKeepAlive();
 	displayRequest();
@@ -131,12 +126,10 @@ void Client::EndOfRead()
 
 bool Client::parseChunked()
 {
-		std::cout << RED <<"** parseChunked **"<<reset<<std::endl;
 		for (size_t i = 0; i < _request.size(); i++)
 		{
 			if (_request[i].find("transfer-encoding: chunked") != std::string::npos)
 			{
-				std::cout << YEL << "CHUNKED" << reset <<std::endl;
 				return (true);
 			}
 	}
@@ -145,7 +138,6 @@ bool Client::parseChunked()
 
 std::string Client::chunkedBody()
 {
-	std::cout << "** Chunked Body **" << std::endl;
 	for (size_t i = 0; i< _request.size(); i++)
 	{
 		if (_request[i].find("transfer-encoding: chunked") != std::string::npos)
@@ -154,7 +146,6 @@ std::string Client::chunkedBody()
 	std::string str;
 	std::vector<std::string> vector;
 	vector = ft_split_chunked_request(_requestBody);
-	// std::vector<std::string>::iterator it;
 	for (size_t i = 0; i< vector.size();i++)
 	{
 		if (vector[i].find("Content-Disposition") != std::string::npos)
@@ -172,7 +163,6 @@ std::string Client::chunkedBody()
 		i--;
 	}
 	vector.erase(vector.begin());
-	std::cout << "BODYYYYYY == " << _requestBody << std::endl;
 	for (size_t i = 0; i< vector.size(); i++)
 	{
 		str += vector[i];
@@ -183,7 +173,6 @@ std::string Client::chunkedBody()
 
 int Client::readRequest1()
 {
-	std::cout << "READ REQUEST CLIENT FD = "  << _clientfd << std::endl;
 	char buf[READING_BUFFER];
 	int sizeRead;
 	bzero(buf, READING_BUFFER);
@@ -222,50 +211,36 @@ int Client::readRequest1()
 	}
 	else if (parseChunked() == true || _bodyContentLenght)
 	{
-		std::cout << "------- Body" << std::endl;
 		if ((sizeRead = recv(_clientfd, buf, READING_BUFFER - 1, 0)) != 0)
 		{
 			if (sizeRead == -1)
 				std::cout << "Error recv" << std::endl;
 			_requestBody.insert(_requestBody.size(), buf, sizeRead);
-			// std::cout << "BDYYYYY= " << _requestBody <<std::endl;
 		}
 		if (_requestBody.size() == _bodyContentLenght || _requestBody.find(ft_find_boundary_utils(_requestmap) + "\r\n" + '0') !=  std::string::npos)
 		{
 			if (parseChunked() == true)
 				_requestBody = chunkedBody();
-			// for (size_t i = 0; i < _request.size();i++)
-			// 	std::cout << YEL <<_request[i] << reset <<std::endl;
-			// std::cout << YEL <<_requestBody << reset <<std::endl;
+
 			loc = _server->getLocationByPath('/' + getRequestFile(_request[0], NULL));
 			if ((_bodyContentLenght > (size_t)loc.getClientMaxBodySize()) && (loc.getClientMaxBodySize() != 0))
 					_errorcode = 413;
-			std::cout << "LOC2" <<std::endl;
-			std::cout << "LOC2" << loc.getClientMaxBodySize()<<std::endl;
 			EndOfRead();
-			std::cout << "EOR "  << _clientfd << std::endl;
 		}
 	}
-	// for (size_t i = 0; i < _request.size(); i++)
-	// 	std::cout << "**_request = ." << _request[i] << "." <<std::endl;
-	// std::cout << "** Body request - " << _requestBody << std::endl;
 	return (1);
 }
 
 void Client::createResponse()
 {
-	std::cout << "** CREATE RESPONSE **" << std::endl;
 	ParsingRequest parsingRequest(_request, _server, _cgiResponse, _errorcode);
 	CreateResponse createResponse(_server, _requestmap, parsingRequest.getData());
 	createResponse.displayHeaderResponse();
-	// createResponse.displayFullResponse();
 	_response = createResponse.getResponse();
 }
 
 void Client::resetClient()
 {
-	std::cout << RED << "RESET CLIENT" << reset << std::endl;
-
 	_requestLine.clear();
 	_request.clear();
 	_requestmap.clear();
@@ -309,9 +284,7 @@ int Client::sendResponse()
 			resetClient();
 			event.events =  EPOLLIN | EPOLLRDHUP;
 			event.data.fd = _clientfd;
-			// std::cout << "1" << std::endl;
 			epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
-			// std::cout << "2" << std::endl;
 		}
 		else
 		{

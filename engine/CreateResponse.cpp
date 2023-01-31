@@ -76,7 +76,6 @@ int CreateResponse::checkErrorPage(std::string errorCode, std::string path)
 
 void CreateResponse::errorStatus()
 {
-	std::cout << "IN ERRORSTATUS" << std::endl;
 
 	std::string path = _server->getLocationByPath("/" + _requestData.path).getRoot();
 	if (path + _requestData.path != _requestData.fileToSend)
@@ -128,7 +127,6 @@ void CreateResponse::fillHeaderData()
 {
 	
 	_headerData.protocol = _requestData.protocol;
-	std::cout << "protocol = " << _headerData.protocol<<std::endl;
 	errorStatus();
 	std::string type = _requestData.fileToSend.substr(_requestData.fileToSend.find('.') + 1, _requestData.fileToSend.size());
 	_headerData.contentType = _switchFilesExtension[type];
@@ -154,7 +152,6 @@ void CreateResponse::createHeader()
 	_header += "Content-length:  " + _headerData.contentLength + "\r\n";
 	_header += "Content-Type:  " + _headerData.contentType + "\r\n";
 	_header += "Connection: " + _headerData.connection + "\r\n";
-	std::cout << "header = " << _header << std::endl;
 }
 
 void CreateResponse::BodyIsCgi()
@@ -172,15 +169,8 @@ void CreateResponse::createBody()
 		BodyIsNotIndex();
 }
 
-#include <ctime>
-
 void CreateResponse::BodyIsNotIndex()
 {
-	std::cout << "** BodyIsNotIndex **"<<std::endl;
-
-	time_t current_time;
-  	current_time = time(NULL);
-	
 	std::string line;
 	std::ifstream myfile;
 
@@ -192,19 +182,6 @@ void CreateResponse::BodyIsNotIndex()
 		_body += line;
 	}
 	myfile.close();
-
-
-
-    // std::ifstream file(_requestData.fileToSend.c_str(), std::ifstream::in);
-	// if (file.good())
-	// {
-	// 	_body.insert(_body.begin(), std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
-	// 	file.close();
-	// }
-	// else
-	// 	std::cout << "can' t open file in create body" << std::endl;
-
-	std::cout << "Seconde for read file = " << BYEL << time(NULL) - current_time << reset << std::endl;
 }
 
 

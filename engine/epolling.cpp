@@ -44,7 +44,6 @@ void epolling(vector<Server *> servers)
 		event.events = EPOLLIN;
 		event.data.fd = servers[i]->getServerFd();
 
-		std::cout << "serverfd = " << servers[i]->getServerFd() << std::endl;
 		
 		if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, servers[i]->getServerFd(), &event))
 		{
@@ -64,22 +63,22 @@ void epolling(vector<Server *> servers)
 			{
 				if (events[i].data.fd == servers[s]->getServerFd())
 				{
-					std::cout << "----------SERVER EVENT" << std::endl;
+				// 	std::cout << "----------SERVER EVENT" << std::endl;
 					servers[s]->newclient(servers[s]->getEpollFd());
 				}
 				else if (events[i].events & (EPOLLHUP | EPOLLRDHUP))
 				{
-					std::cout << RED << "EPOLLHUP" << reset << std::endl;
+					// std::cout << RED << "EPOLLHUP" << reset << std::endl;
 					servers[s]->deleteClient(events[i].data.fd);
 				}
 				else if (events[i].events & EPOLLIN)
 				{
-					std::cout << "----------EPOLLIN EVENT" << std::endl;
+					// std::cout << "----------EPOLLIN EVENT" << std::endl;
 					servers[s]->clients[events[i].data.fd]->readRequest1();
 				}
 				else if (events[i].events & EPOLLOUT)
 				{
-					std::cout << "----------EPOLLOUT EVENT" << std::endl;
+					// std::cout << "----------EPOLLOUT EVENT" << std::endl;
 					if (servers[s]->clients[events[i].data.fd]->sendResponse() == 0)
 						servers[s]->deleteClient(events[i].data.fd);
 				}		

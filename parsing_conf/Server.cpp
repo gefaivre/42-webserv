@@ -64,9 +64,7 @@ void Server::newclient(int epoll_fd)
 		ft_define_error("Error the connection with the socket was not established");
 	event.events = EPOLLIN | EPOLLRDHUP;
 	event.data.fd = clientfd;
-	std::cout << "NEWCLIENT FD = " << clientfd << std::endl;
 	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, clientfd, &event);
-	std::cout << "After epoll" << std::endl;
 	Client *client = new Client(this, clientfd);
 	clients.insert(std::pair<int, Client *>(clientfd, client));
 }

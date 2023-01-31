@@ -70,8 +70,6 @@ void ParsingRequest::parsingRequest()
 	if (key.length() != 1)
 		_requestData.path = _requestData.path.substr(key.length() - 1);
 	_autoindex = _server->getLocationByPath(_requestData.path).getAutoIndex();
-	std::cout << "KEY 00 " << _requestData.pathKey << std::endl;
-	std::cout << "_requestData.path  " << _requestData.path << std::endl;
 }
 
 // void ParsingRequest::setFileToSend404()
