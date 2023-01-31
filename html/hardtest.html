@@ -19,7 +19,7 @@
             <h2>Multiple Requests</h2>
             <p>Type the number of requests that you want to send</p>
         </div>
-        <input type="number" value="100" id="number">
+        <input type="number" value="100" id="number" min="1" max="100000">
         <button class="delete" id="hardTest">Test 😬</button>
         <nav>
             <a href="delete.html" class="previous">Previous</a>
@@ -31,7 +31,7 @@
             let promises = [];
 
             for (let i = 0; i < numOfRequests; i++) {
-                promises.push(fetch('http://127.0.0.1:5500/www/html/hardtest.html', {
+                promises.push(fetch('http://localhost:8080/hardtest.html', {
                 method: 'GET',
                 }).then(response => {
                 if (!response.ok) {
@@ -56,6 +56,11 @@
 
         button.addEventListener("click", function() {
             let num = document.getElementById("number").value;
+            if (num < 1 || num > 100000)
+            {
+                alert('value should be between 1 & 100 000');
+                return ;
+            }
             sendMultipleRequests(num);
         });
     </script>
