@@ -1,18 +1,19 @@
 server {
   listen 8080;
-    server_name domain1.com;
+  server_name domain1.com;
+  # cgi .php /usr/bin/php-cgi;
   root /mnt/nfs/homes/jbach/Documents/2901/www;
   autoindex on;
-  accepted_methods       GET;
+  accepted_methods       GET POST;
   location / {
-    accepted_methods GET;
+    accepted_methods GET POST;
   }
 
   location /put/test/ {
     accepted_methods POST;
   }
 
-  cgi .bla /mnt/nfs/homes/jbach/Documents/2901/cgi_tester;
+  # cgi .bla /mnt/nfs/homes/jbach/Documents/2901/cgi_tester;
   location /postbody {
     client_max_body_size 100;
   }

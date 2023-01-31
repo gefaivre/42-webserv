@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 12:42:44 by gefaivre          #+#    #+#             */
-/*   Updated: 2023/01/18 15:31:52 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/31 13:45:19 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ void epolling(vector<Server *> servers)
 				{
 					std::cout << "----------EPOLLIN EVENT" << std::endl;
 					servers[s]->clients[events[i].data.fd]->readRequest1();
+					// std::cout << "--- After Epollin" << std::endl;
 				}
 				else if (events[i].events & EPOLLOUT)
 				{

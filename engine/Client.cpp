@@ -186,6 +186,7 @@ int Client::readRequest1()
 	std::cout << "READ REQUEST CLIENT FD = "  << _clientfd << std::endl;
 	char buf[READING_BUFFER];
 	int sizeRead;
+	size_t loc_boundary;
 	bzero(buf, READING_BUFFER);
 	Location loc;
 
@@ -225,12 +226,23 @@ int Client::readRequest1()
 		std::cout << "------- Body" << std::endl;
 		if ((sizeRead = recv(_clientfd, buf, READING_BUFFER - 1, 0)) != 0)
 		{
-			if (sizeRead == -1)
+			if (sizeRead == -1) 
 				std::cout << "Error recv" << std::endl;
 			_requestBody.insert(_requestBody.size(), buf, sizeRead);
 			// std::cout << "BDYYYYY= " << _requestBody <<std::endl;
 		}
-		if (_requestBody.size() == _bodyContentLenght || _requestBody.find(ft_find_boundary_utils(_requestmap) + "\r\n" + '0') !=  std::string::npos)
+		// std::cout << "ft_find_boundary_utils"<< std::endl;
+		// std::cout << "ft_find_boundary_utils.size()" <<ft_find_boundary_utils(_requestmap) + "\r\n" + '0' << std::endl;
+		try 
+		{
+			ft_find_boundary_utils(_requestmap);
+			loc_boundary = _requestBody.find(ft_find_boundary_utils(_requestmap) + "\r\n" + '0');
+		}
+		catch(std::exception e)
+		{
+			loc_boundary = std::string::npos;
+		}
+		if (_requestBody.size() == _bodyContentLenght || loc_boundary !=  std::string::npos)
 		{
 			if (parseChunked() == true)
 				_requestBody = chunkedBody();

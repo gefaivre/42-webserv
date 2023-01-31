@@ -162,9 +162,13 @@ std::string	ft_find_boundary_utils(std::map<std::string, std::string> requestmap
 		it = requestmap.find("content-type");
 	if (it != requestmap.end())
 	{
+		std::cout << "it->first" << it->first<< std::endl;
+		std::cout << "it->second" << it->second<< std::endl;
 		pos_equal = it->second.find_last_of('=');
 		if (pos_equal == std::string::npos)
 			throw std::exception();
+		else if (pos_equal == 0)
+			return (NULL);
 		boundary = it->second.substr(pos_equal + 1);
 	}
 	// std::cout << "Bound = ." << boundary + '\n' + '0'<<"." << std::endl;

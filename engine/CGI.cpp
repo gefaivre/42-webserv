@@ -119,11 +119,13 @@ void CGI::verifyCgi()
 				// _server->getLocationByPath(_requestData.path)
 				// std::cout << "_server->getCgiValue(format)" << format << std::endl;
 				// std::cout << "SERVERU = "
+				std::cout << "request = " << format << std::endl;
 				workPostCgi(_loc.getCgiValue(format), requestFile);
 			}
 			catch(std::exception e)
 			{
-				// std::cout << "request = " << *_requestBody << std::endl;
+				// std::cout << "Request = " <<
+				std::cout << "request = " << *_requestBody << std::endl;
 				// exit(1);
 				if (!saveFile(*_requestmap, *_requestBody))
 					*_errorcode = 405;
@@ -160,7 +162,7 @@ void CGI::verifyCgi()
 	else if (deleteIndex != std::string::npos)
 	{
 		std::cout << "** DELETE **" << std::endl;
-		if (!_loc.getAcceptedMethods()._get)
+		if (!_loc.getAcceptedMethods()._delete)
 			*_errorcode = 405;
 		else
 		{

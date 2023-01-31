@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/style.css">
+    <title>WebServ</title>
+</head>
+<body>
+    
+    <header>
+        <h1>WebServ</h1>
+        <h2>Group: Jbach, Mgoncalv, Gefaivre</h2>
+        <p>All the content of this site is being loaded from our server using get request!</p>
+    </header>
+    <section class="get">
+        <div class="title">
+            <h2>Delete Request</h2>
+            <p>This form is being sent using post request!</p>
+        </div>
+        <button class="delete" id="delete">DELETE 💣</button>
+        <a href="#">If it works you will no longer see the file in directory's list</a>
+        
+        <nav>
+            <a href="download.html" class="previous">Previous</a>
+            <a href="hardtest.html" class="next">Next</a>
+        </nav>
+    </section>
+    <script>
+        let deleteBtn = document.getElementById("delete");
+        deleteBtn.addEventListener("click", function () {
+            alert("Delete request");
+            fetch('http://127.0.0.1:5500/www/html/delete.html', {
+            method: 'DELETE'
+            })
+            .then(response => {
+            // handle the response
+                if(!response.ok){
+                    throw new Error("Error: "+response.status)
+                }
+            })
+            .catch(error => {
+            // handle the error
+            });
+        });
+    </script>
+</body>
+</html>
