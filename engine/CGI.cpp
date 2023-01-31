@@ -130,6 +130,7 @@ void CGI::verifyCgi()
 					*_errorcode = 405;
 			}
 		}
+		std::cout << "** error" << *_errorcode <<std::endl;
 	}
 	else if (getIndex != std::string::npos)
 	{
@@ -315,11 +316,11 @@ int CGI::workGetCgi(std::string format, std::string requestFile)
 	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	// char *args[]= {const_cast<char*>(format.c_str()), const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *header[] = {
-	const_cast<char*> (script_filename.c_str()),
-	const_cast<char*> (request_method.c_str()),
-	const_cast<char*> (query_string.append(_getParams).c_str()),
-	(char *) "REDIRECT_STATUS=200",
-	(char *) NULL
+		const_cast<char*> (script_filename.c_str()),
+		const_cast<char*> (request_method.c_str()),
+		const_cast<char*> (query_string.append(_getParams).c_str()),
+		(char *) "REDIRECT_STATUS=200",
+		(char *) NULL
 	};
 
 	pipe(fd_out);
