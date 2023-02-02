@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aavezou <aavezou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/18 15:19:16 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/01 15:32:58 by aavezou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,3 +172,25 @@ int				Server::getEpollFd() const
 	return(this->_epollfd);
 }
 
+void			Server::setServers(vector<Server *>	servers)
+{
+	this->_servers = servers;
+}
+
+std::vector<Server *>	Server::getServers()
+{
+	return (_servers);
+}
+
+Server 			*Server::getServerByName(std::string name)
+{
+	for (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end(); ++it)
+	{
+		std::vector<string> names = (*it)->getName();
+		if (std::find(names.begin(), names.end(), name) != names.end())
+		{
+			return (*it);
+		}
+	}
+	return (NULL);
+}

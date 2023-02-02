@@ -36,6 +36,7 @@ private:
 	int _sockfd;
 	struct sockaddr_in _addr;
 	int _epollfd;
+	std::vector<Server *> _servers;
 		
 
 	
@@ -69,6 +70,9 @@ public:
 
 	void 			deleteClient(int fd);
 	void 			setupLocations();
+	void			setServers(vector<Server *>	servers);
+	std::vector<Server *> getServers();
+	Server 			*getServerByName(std::string name);
 };
 
 

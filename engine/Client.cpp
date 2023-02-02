@@ -89,6 +89,13 @@ size_t Client::findBodyContentLenght()
 	return (atoi(_requestmap[std::string("content-length")].c_str()));
 	
 }
+std::string Client::getHost()
+{
+	std::string host;
+	host = _requestmap[std::string("Host")];
+	host.erase(host.find(":"));
+	return(host);
+}
 
 size_t Client::setBodyContentLenght()
 {
@@ -109,6 +116,9 @@ void Client::setKeepAlive()
 	else
 		_isKeepAlive = false;
 }
+
+
+
 
 void Client::transformRequestVectorToMap()
 {
@@ -283,6 +293,10 @@ int Client::CreateAndSendResponse()
 	int ret;
 	if(_firstTimeCreate == false)
 	{
+		Server *server;
+		server = _server->getServerByName(getHost());
+		if (server != NULL)
+			_server = server;
 		setKeepAlive();
 		CGI cgi = CGI(&_request, _server, &_errorcode, &_requestBody, &_requestmap, &_cgiResponse);
 		ParsingRequest parsingRequest(_request, _server, _cgiResponse, _errorcode);

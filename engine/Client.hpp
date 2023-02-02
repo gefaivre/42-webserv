@@ -67,6 +67,7 @@ class Client
 		size_t setBodyContentLenght();
 		void transformRequestVectorToMap();
 		size_t findBodyContentLenght();
+		std::string getHost();
 		void setKeepAlive();
 		bool _isKeepAlive;
 		bool parseChunked();

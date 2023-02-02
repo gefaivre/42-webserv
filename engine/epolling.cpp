@@ -22,35 +22,36 @@ void epolling(vector<Server *> servers)
 { 
 	int running = 1, event_count, i;
 	struct epoll_event events[MAX_EVENTS];
+	std::map<int, bool> portMap;
 
 
-
-
-	
 	for (size_t i = 0; i < servers.size(); i++)
 	{
 		struct epoll_event event;
-		
-		int epoll_fd = epoll_create1(0);
-		if (epoll_fd == -1)
+		if (portMap.find(servers[i]->getPort()) == portMap.end())
 		{
-			fprintf(stderr, "Failed to create epoll file descriptor\n");
-			return;
-		}
-	
-		servers[i]->setEpollFd(epoll_fd);
-		servers[i]->setSocket();
-	
-		event.events = EPOLLIN;
-		event.data.fd = servers[i]->getServerFd();
+			portMap.insert(std::pair<int, bool>(servers[i]->getPort(), true));
+			int epoll_fd = epoll_create1(0);
+			if (epoll_fd == -1)
+			{
+				fprintf(stderr, "Failed to create epoll file descriptor\n");
+				return;
+			}
 
+			servers[i]->setEpollFd(epoll_fd);
+			servers[i]->setSocket();
 		
-		if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, servers[i]->getServerFd(), &event))
-		{
-			fprintf(stderr, "Failed to add file descriptor to epoll\n");
-			std::cout << "errno = " << errno << std::endl;
-			close(epoll_fd);
-			return;
+			event.events = EPOLLIN;
+			event.data.fd = servers[i]->getServerFd();
+
+			
+			if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, servers[i]->getServerFd(), &event))
+			{
+				fprintf(stderr, "Failed to add file descriptor to epoll\n");
+				std::cout << "errno = " << errno << std::endl;
+				close(epoll_fd);
+				return;
+			}
 		}
 	}
 
@@ -81,7 +82,7 @@ void epolling(vector<Server *> servers)
 					// std::cout << "----------EPOLLOUT EVENT" << std::endl;
 						if (servers[s]->clients[events[i].data.fd]->CreateAndSendResponse() == DELETE_CLIENT)
 							servers[s]->deleteClient(events[i].data.fd);
-				}		
+				}
 			}
 			if (s == servers.size())
 				s = 0;

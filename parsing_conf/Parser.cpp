@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aavezou <aavezou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/18 13:38:33 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/01 15:26:03 by aavezou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,5 +193,9 @@ Parser::~Parser(void)
 
 vector<Server*>	Parser::getServers(void)
 {
+	for  (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end(); ++it)
+	{
+		(*it)->setServers(_servers);
+	}
 	return (_servers);
 }
