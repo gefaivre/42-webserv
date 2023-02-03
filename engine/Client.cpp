@@ -13,6 +13,7 @@ Client::Client()
 
 Client::Client(Server *server, int clientfd) : _clientfd(clientfd), _server(server)
 {
+	_createR = NULL;
 	this->_headerIsRead = false;
 	this->_firstTimeBody = true;
 	this->_bodyContentLenght = 0;
@@ -26,6 +27,7 @@ Client::Client(Server *server, int clientfd) : _clientfd(clientfd), _server(serv
 
 Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._server)
 {
+	_createR = NULL;
 	this->_headerIsRead = false;
 	this->_firstTimeBody = true;
 	this->_bodyContentLenght = 0;
@@ -155,6 +157,8 @@ void Client::resetClient()
 	if (_createR != NULL)
 	{
 		delete _createR;
+		_createR = NULL;
+
 	}
 	//apeler dans le delete dans le server
 }

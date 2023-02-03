@@ -6,16 +6,18 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/03 16:04:33 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/03 19:05:05 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
+#include <limits.h>
 
 Config::Config()
 {
 	_wasSet = new std::vector<std::string>();
 	_autoIndex = true;
+	_clientMaxBodySize = INT_MAX;
 	
 }
 
