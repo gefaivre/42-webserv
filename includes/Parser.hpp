@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:21:20 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/02 15:21:34 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/03 18:15:19 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ public:
 	void	parseAutoIndex(std::string directive, std::vector<Config *> conf);
 	void	parseDirective(size_t nextSemiColon, std::vector<Config *> conf);
 	Server	*getServerConf(void);
-	std::vector<Server *>	getServers(void);
+	std::vector<Server *>	*getServers(void);
 	void				verifyServerName();
 };
 

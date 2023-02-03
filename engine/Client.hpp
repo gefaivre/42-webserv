@@ -45,6 +45,7 @@ class Client
 
 		std::vector<std::string> getRequest() const;
 
+		void resetClient();
 	private:
 
 		std::string _requestLine;
@@ -75,7 +76,6 @@ class Client
 		std::string chunkedBody();
 
 		void EndOfRead();
-		void resetClient();
 
 
 		// POLLING CREATE RESPONSE

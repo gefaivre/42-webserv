@@ -1,6 +1,6 @@
 NAME= webserv
 
-SRCS=	main.cpp \
+SRCS=	engine/main.cpp \
 		engine/utils.cpp \
 		engine/Client.cpp \
 		engine/CGI.cpp \

@@ -8,6 +8,7 @@
 
 Client::Client()
 {
+	_createR = NULL;
 }
 
 Client::Client(Server *server, int clientfd) : _clientfd(clientfd), _server(server)
@@ -150,6 +151,12 @@ void Client::resetClient()
 	_isSend = false;
 	_moverSave = 0;
 	_errorcode = 0;
+	//delete new create response
+	if (_createR != NULL)
+	{
+		delete _createR;
+	}
+	//apeler dans le delete dans le server
 }
 
 void Client::EndOfRead()

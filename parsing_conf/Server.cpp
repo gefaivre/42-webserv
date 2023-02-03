@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/03 16:03:53 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/03 18:19:27 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,16 @@ Server::~Server()
 	}
 	if (_sockfd != -1)
 		close(_sockfd);
+		
+	//std::map<int, Client *> 		clients;
+	std::map<int, Client *>::iterator it;
+	for (it = clients.begin(); it != clients.end();) {
+		(it->second)->resetClient();
+		delete it->second;
+		clients.erase(it++);
+	}
 
+	
 }
 
 void Server::setSocket()

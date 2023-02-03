@@ -113,6 +113,11 @@ void CreateResponse::errorStatus()
 			_headerData.statusCode = "404";
 			_headerData.statusMessage = "Not Found";
 		}
+		else if (checkErrorPage("202.html", path))
+		{
+			_headerData.statusCode = "202";
+			_headerData.statusMessage = "Accepted";
+		}
 		else if (checkErrorPage("413.html", path))
 		{
 			_headerData.statusCode = "413";
@@ -189,14 +194,14 @@ int CreateResponse::create()
 
 int CreateResponse::createBody()
 {
-	int ret;
-	std::cout << "_requestData.isCgi= " << _requestData.isCgi << std::endl;
+	int ret = 0;
 	if (_requestData.isIndex)
 		ret = BodyIsIndex();
 	else if (_requestData.isCgi)
 		ret = BodyIsCgi();
 	else
 		ret = BodyIsNotIndex();
+	// std::cout << "_requestData.isCgi " << _requestData.isCgi << std::endl;
 	return ret;
 }
 

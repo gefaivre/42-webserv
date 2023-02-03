@@ -181,7 +181,10 @@ void CGI::verifyCgi()
 					{
 						//file writable
 						if (!remove(_loc.getRoot().append(requestFile).c_str()))
+						{
+							*_errorcode = 202;
 							std::cout << "File deleted" << std::endl;
+						}
 						else
 							*_errorcode = 500;
 							// std::cout <<"File not deleted" << std::endl;

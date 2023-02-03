@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/03 16:03:51 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/03 18:15:11 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,12 @@ void	Parser::prepareLine()
 	std::string			buffer;
 	
 	while (getline(_configFile, line))
-		if (line.size() && line[line.find_first_not_of(" \n\t\v\f\r")] != '#')
+	{
+		std::cout << "LINE:"<<line.size()<< "."<<std::endl;
+		
+		if (line.size() && line.find_first_not_of(" \n\t\v\f\r") != std::string::npos && line[line.find_first_not_of(" \n\t\v\f\r")] != '#')
 			buffer += line;
+	}
 	ft_remove_invalid_spaces(&buffer);
 	ft_wrap_brackets_in_spaces(&buffer);
 	ft_remove_double_spaces(&buffer);
@@ -229,15 +233,21 @@ Parser::Parser(char *configName)
 Parser::~Parser(void)
 {
 	// std::cout << "PARSER DESTRUCTEUR" << std::endl;
-	for (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end(); ++it) {
+	// for (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end(); ++it) {
+	// 	std::cout << "PORT was destructed: " << (*it) << std::endl;
+    // 	delete (*it);
+	// }
+	for (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end();) {
 		std::cout << "PORT was destructed: " << (*it) << std::endl;
-    	delete (*it);
+		delete (*it);
+		it = _servers.erase(it);
 	}
+	_servers.clear();
 	_configFile.close();
 }
 
-std::vector<Server*>	Parser::getServers(void)
+std::vector<Server*>	*Parser::getServers(void)
 {
-	
-	return (_servers);
+	std::cout << "_Serv:" << &_servers <<std::endl;
+	return (&_servers);
 }
