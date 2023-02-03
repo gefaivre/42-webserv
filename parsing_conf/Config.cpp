@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/18 13:36:35 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/03 16:04:33 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,12 @@ Config::Config()
 
 Config::~Config()
 {
-	std::cout << "CONF DESTRUCTEUR" << std::endl;
+	// std::cout << "CONF DESTRUCTEUR" << std::endl;
 
 	
 	if (_wasSet)
 	{
-		std::cout << "was set loc:" << _wasSet <<std::endl;
+		// std::cout << "was set loc:" << _wasSet <<std::endl;
 		delete _wasSet;
 		_wasSet = NULL;
 	}

@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/02 17:22:10 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/03 16:03:53 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ Server::Server()
 
 Server::~Server()
 {
-	std::cout << "SERVER DESTRUCTEUR" << std::endl;
+	// std::cout << "SERVER DESTRUCTEUR" << std::endl;
 	for (std::map<std::string, Location *>::iterator it = _locations.begin(); it != _locations.end(); ++it) {
     	delete it->second;
 	}

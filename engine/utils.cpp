@@ -39,6 +39,7 @@ std::vector<std::string>	ft_split_vector_string_file(std::string str, char c, st
 	size_t file_start = 0;
 	size_t colon_equal = 0;
 	size_t colon_no_null = 0;
+	std::cout << "str = " << str<< std::endl;
 	while (end < str.length())
 	{
 		if (file_end != 0)

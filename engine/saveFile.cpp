@@ -80,6 +80,7 @@ std::map<std::string, std::string>  transformBodyStringtoMap(std::map<std::strin
 		try
 		{
 			std::string boundary = ft_find_boundary_utils(requestmap);
+			std::cout << "requestBody= " << requestBody << std::endl;
 			vector = ft_split_vector_string_file(requestBody, '\r', boundary);
 			for (size_t i = 0; i < vector.size(); i++)
 			{
@@ -135,6 +136,7 @@ bool saveFile(std::map<std::string, std::string> requestmap, std::string request
 	//TODO: remettre les spaces ds le file 
 	std::cout << "** Save file **" << std::endl;
 	// exit(1);
+	
 	std::map<std::string, std::string> requestmapBody;
 	requestmapBody = transformBodyStringtoMap(requestmapBody, requestmap, requestBody);
 	std::map<std::string,std::string>::iterator it;

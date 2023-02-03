@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/18 13:38:33 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/03 16:03:51 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,7 +228,7 @@ Parser::Parser(char *configName)
 
 Parser::~Parser(void)
 {
-	std::cout << "PARSER DESTRUCTEUR" << std::endl;
+	// std::cout << "PARSER DESTRUCTEUR" << std::endl;
 	for (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end(); ++it) {
 		std::cout << "PORT was destructed: " << (*it) << std::endl;
     	delete (*it);

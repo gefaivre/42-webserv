@@ -42,7 +42,7 @@ Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._serve
 
 Client::~Client()
 {
-	std::cout << "DESTRUCTEUR CLIENT" << std::endl;
+	// std::cout << "DESTRUCTEUR CLIENT" << std::endl;
 }
 
 /*
@@ -234,7 +234,8 @@ int Client::readRequestHeader()
 	if (_request.size() != 0 && (_request[_request.size() - 1].size() == 0))
 	{
 		_requestBody += _requestLine;
-		_bodyContentLenght = setBodyContentLenght();
+		transformRequestVectorToMap();
+		_bodyContentLenght = findBodyContentLenght();
 		if ((_bodyContentLenght == 0 || _requestBody.size() == _bodyContentLenght) && parseChunked() == false)
 			{
 				Location loc;
@@ -254,7 +255,7 @@ void Client::readRequestBody()
 	int sizeRead;
 
 	bzero(buf, READING_BUFFER);
-
+	std::cout << "READ REQUEST BODY" << std::endl;
 	if ((sizeRead = recv(_clientfd, buf, READING_BUFFER - 1, 0)) != 0)
 	{
 		if (sizeRead == -1)
@@ -276,6 +277,7 @@ void Client::readRequestBody()
 
 void Client::readRequest1()
 {
+	std::cout << "readRequest1 = "  <<std::endl;
 	if (_headerIsRead == false)
 	{
 		if (readRequestHeader() == READ)
@@ -283,6 +285,7 @@ void Client::readRequest1()
 			_headerIsRead = true;
 			transformRequestVectorToMap();
 		}
+		std::cout << "LENGTH = " <<_bodyContentLenght <<std::endl;
 	}
 	else if (_bodyContentLenght || parseChunked() == true )
 		readRequestBody();
@@ -301,6 +304,12 @@ int Client::CreateAndSendResponse()
 		CGI cgi = CGI(&_request, _server, &_errorcode, &_requestBody, &_requestmap, &_cgiResponse);
 		ParsingRequest parsingRequest(_request, _server, _cgiResponse, _errorcode);
 		CreateResponse *CR = new CreateResponse(_server, _requestmap, parsingRequest.getData());
+		std::map<std::string,std::string>::iterator it;
+
+		// for (it = _requestmap.begin(); it != _requestmap.end(); it++)
+		// {
+		// 	std::cout << "first = " << it->first << "second = " << it->second << std::endl;
+		// }
 		_createR = CR;
 		if (!_errorcode)
 			cgi.verifyCgi();

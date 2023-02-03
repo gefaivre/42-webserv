@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 14:08:38 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/18 13:39:00 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/03 16:04:25 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,14 @@ Location::Location(/* args */)
 
 Location::Location(Location const & src)
 {
-	std::cout << "Copy constructor called" << std::endl;
+	// std::cout << "Copy constructor called" << std::endl;
 	*this = src;
 	return ;
 }
 
 Location&	Location::operator=(Location const & rhs)
 {
-	std::cout << "Copy assignment operator called" << std::endl;
+	// std::cout << "Copy assignment operator called" << std::endl;
 	_wasSet = new std::vector<std::string>();
 	_wasSet->insert(_wasSet->end(), rhs._wasSet->begin(), rhs._wasSet->end());
 	
@@ -52,7 +52,7 @@ Location::Location(std::string key)
 
 Location::~Location()
 {
-	std::cout << "LOC DESTRUCTEUR " << this->_key << std::endl;
+	// std::cout << "LOC DESTRUCTEUR " << this->_key << std::endl;
 }
 
 std::string	Location::getKey(void)

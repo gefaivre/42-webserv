@@ -58,7 +58,7 @@ class Client
 		int _clientfd;
 		Server *_server;
 
-		char * _responsePointer;
+		// char * _responsePointer;
 
 		int _errorcode;
 
