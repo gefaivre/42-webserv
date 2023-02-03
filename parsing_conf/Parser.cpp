@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/03 23:36:52 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/03 23:45:00 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,11 +109,7 @@ void	Parser::parseDirective(size_t nextSemiColon, std::vector<Config *> conf)
 				else if (ft_starts_with(directive, "server_name "))
 					conf.back()->setName(ft_split(directive.substr(12, directive.length() - 11), ' '));
 				else if (ft_starts_with(directive, "index "))
-				{
-					conf.back()->setIndex(directive.substr(8, directive.length() - 7));
-					std::cout << "Idx:"<<conf.back()->getIndex()<< "!"<< std::endl;
-					exit(1);
-				}
+					conf.back()->setIndex(directive.substr(6, directive.length() - 5));
 				else if (ft_starts_with(directive, "autoindex "))
 					parseAutoIndex(directive, conf);
 				else if (ft_starts_with(directive, "root "))

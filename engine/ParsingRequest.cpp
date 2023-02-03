@@ -137,7 +137,12 @@ int ParsingRequest::foundFileToSend()
 
 	_requestData.fileToSend = rootPath + _requestData.path ;
 	fullPathFile = _requestData.fileToSend;
-	if (_autoindex == 1 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
+	
+	if(isDirectory(fullPathFile) && _server->getIndex().size())
+	{
+		_requestData.fileToSend = rootPath + _server->getIndex();
+	}
+	else if (_autoindex == 1 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
 	{
 		_requestData.fileToSend = fullPathFile;
 		_requestData.isIndex = 1;
