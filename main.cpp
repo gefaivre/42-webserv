@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 g_servers = config;
 	vector<Server *> servers = config->getServers();
 	
-	// delete config;
+	
 
 	if (signal(SIGINT, sig_handler) == SIG_ERR)
  		std::cout << "can't catch SIGINT" << std::endl;
@@ -58,6 +58,6 @@ g_servers = config;
 	
 	epolling(servers);
 	
-
+	// delete config;
 	return (0);
 }
