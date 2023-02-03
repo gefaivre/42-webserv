@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/03 20:17:00 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/03 23:32:18 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,13 +104,13 @@ int		Config::getClientMaxBodySize(void)
 	return (_clientMaxBodySize);
 }
 
-void			Config::setIndex(std::vector<std::string> index)
+void			Config::setIndex(std::string index)
 {
 	_wasSet.push_back("index");
 	this->_index = index;
 }
 
-std::vector<std::string> 			Config::getIndex(void)
+std::string 			Config::getIndex(void)
 {
 	return (_index);
 }

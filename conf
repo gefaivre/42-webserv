@@ -7,6 +7,7 @@ server {
   accepted_methods       GET POST;
   location / {
     accepted_methods GET POST DELETE;
+    rewrite /index.html www.youtube.com;
   }
 
   location /put/test/ {

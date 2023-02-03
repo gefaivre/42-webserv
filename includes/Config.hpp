@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:03 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/03 19:41:22 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/03 23:32:00 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ protected:
 	
 	int						_clientMaxBodySize;
 	std::vector<std::string>			_name;
-	std::vector<std::string> 		_index;
+	std::string 		_index;
 public:
 
 	std::vector<std::string> 		_wasSet;
@@ -59,8 +59,8 @@ public:
 	int						getClientMaxBodySize(void);
 	void			setClientMaxBodySize(int clientMaxBodySize);
 
-	void			setIndex(std::vector<std::string> index);
-	std::vector<std::string> 			getIndex(void);
+	void			setIndex(std::string index);
+	std::string			getIndex(void);
 	
 };
 
