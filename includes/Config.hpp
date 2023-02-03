@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:03 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/03 23:32:00 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/04 00:17:05 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ class Config
 {
 protected:
 	std::map<std::string, std::string> _cgi;
+	std::map<std::string, std::string> _redirections;
 	bool				_autoIndex;
 	std::string				_root;
 	t_methods			_acceptedMethods;
@@ -41,6 +42,10 @@ public:
 	void	addCgi(std::string key, std::string value);
 	std::map<std::string, std::string> getCgiMap(void);
 	std::string	getCgiValue(std::string key);
+
+	void	addRedirection(std::string key, std::string value);
+	std::map<std::string, std::string> getRedirectionsMap(void);
+	std::string	getRedirectionValue(std::string key);
 
 	void	setAutoIndex(bool autoIndex);
 	bool	getAutoIndex(void);

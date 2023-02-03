@@ -5,10 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/03 23:45:00 by gefaivre         ###   ########.fr       */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2023/02/04 00:41:20 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
 
 #include "Parser.hpp"
 #include "Location.hpp"
@@ -100,16 +102,19 @@ void	Parser::parseDirective(size_t nextSemiColon, std::vector<Config *> conf)
 						_repeatedPorts.insert(port);
 					
 				}
-				// else if (ft_starts_with(directive, "rewrite "))
-				// {
-				// 	std::vector<std::string> vector_rew = ft_split(directive.substr(12, directive.length() - 11), ' ');
-				// 	std::cout << "Key:"<<vector_rew[0] << ". Value:"<< vector_rew[1] << std::endl; 
-				// 	exit(1);
-				// }
+				else if (ft_starts_with(directive, "rewrite "))
+				{
+					std::vector<std::string> vector_rew = ft_split(directive.substr(8, directive.length() - 7), ' ');
+					std::cout << "Key:"<<vector_rew[0] << ". Value:"<< vector_rew[1] << std::endl; 
+					// exit(1);
+				}
 				else if (ft_starts_with(directive, "server_name "))
 					conf.back()->setName(ft_split(directive.substr(12, directive.length() - 11), ' '));
 				else if (ft_starts_with(directive, "index "))
+				{
 					conf.back()->setIndex(directive.substr(6, directive.length() - 5));
+					// std::cout << "Idx:"<<conf.back()->getIndex()<< "!"<< std::endl;
+				}
 				else if (ft_starts_with(directive, "autoindex "))
 					parseAutoIndex(directive, conf);
 				else if (ft_starts_with(directive, "root "))

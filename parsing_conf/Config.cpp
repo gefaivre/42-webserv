@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/03 23:32:18 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/04 00:38:20 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,28 @@ std::string	Config::getCgiValue(std::string key)
 {
 	if (_cgi.find(key) != _cgi.end())
 		return (_cgi[key]);
+	else
+		throw (std::exception());
+}
+
+void	Config::addRedirection(std::string key, std::string value)
+{
+	_wasSet.push_back("redirection");
+	if (_redirections.find(key) != _redirections.end())
+		std::cerr << "This redirection is already: " << _redirections[key] << std::endl;
+	else
+		_redirections[key] = value;
+}
+
+std::map<std::string, std::string> Config::getRedirectionsMap(void)
+{
+	return (_redirections);
+}
+
+std::string	Config::getRedirectionValue(std::string key)
+{
+	if (_redirections.find(key) != _redirections.end())
+		return (_redirections[key]);
 	else
 		throw (std::exception());
 }
@@ -107,10 +129,12 @@ int		Config::getClientMaxBodySize(void)
 void			Config::setIndex(std::string index)
 {
 	_wasSet.push_back("index");
+
 	this->_index = index;
 }
 
 std::string 			Config::getIndex(void)
 {
+	// std::cout << "Index:"<<_index <<"."<< std::endl;
 	return (_index);
 }
