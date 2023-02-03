@@ -7,6 +7,7 @@
 ParsingRequest::ParsingRequest( std::vector<std::string> request, Server *server, std::string cgiResponse, int error_code):
  _errorcode(error_code), _request(request), _server(server)
 {
+	std::cout << "cgiResponse = " << cgiResponse <<std::endl;
 	_requestData.isCgi = !cgiResponse.empty();
 	if (_requestData.isCgi)
 		_requestData._cgiResponse = cgiResponse;

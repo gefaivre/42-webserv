@@ -190,7 +190,7 @@ int CreateResponse::create()
 int CreateResponse::createBody()
 {
 	int ret;
-
+	std::cout << "_requestData.isCgi= " << _requestData.isCgi << std::endl;
 	if (_requestData.isIndex)
 		ret = BodyIsIndex();
 	else if (_requestData.isCgi)

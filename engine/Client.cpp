@@ -302,6 +302,8 @@ int Client::CreateAndSendResponse()
 			_server = server;
 		setKeepAlive();
 		CGI cgi = CGI(&_request, _server, &_errorcode, &_requestBody, &_requestmap, &_cgiResponse);
+		if (!_errorcode)
+			cgi.verifyCgi();
 		ParsingRequest parsingRequest(_request, _server, _cgiResponse, _errorcode);
 		CreateResponse *CR = new CreateResponse(_server, _requestmap, parsingRequest.getData());
 		std::map<std::string,std::string>::iterator it;
@@ -311,8 +313,6 @@ int Client::CreateAndSendResponse()
 		// 	std::cout << "first = " << it->first << "second = " << it->second << std::endl;
 		// }
 		_createR = CR;
-		if (!_errorcode)
-			cgi.verifyCgi();
 
 		_firstTimeCreate = true;
 		return NOT_READ_YET;

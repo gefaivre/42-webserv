@@ -331,6 +331,7 @@ int CGI::workGetCgi(std::string format, std::string requestFile)
 	else if (!pid) 
 	{ 
 		/* child */
+		// std::cout << "**2" <<std::endl;
 		dup2(fd_out[1], STDOUT_FILENO);
 		dup2(fd_out[1], STDERR_FILENO);
 		close(fd_out[0]);
@@ -341,11 +342,13 @@ int CGI::workGetCgi(std::string format, std::string requestFile)
 	else 
 	{ 
 		/* parent */
+		// std::cout << "**3" <<std::endl;
 		close(fd_out[1]);
 		while (waitpid(-1, NULL, WUNTRACED) != -1)
 			;
 		std::cout << "Before read" << std::endl;
 		int n = read(fd_out[0], buf, 1024);
+		// std::cout << "n = " <<n <<std::endl;
 		if (n < 0)
 		{
 			std::cout << "Error read" << std::endl;
@@ -359,7 +362,7 @@ int CGI::workGetCgi(std::string format, std::string requestFile)
 			if (mystring.find(substring) != std::string::npos && mystring.find_first_of("\n\n") != std::string::npos)
 				mystring.erase(mystring.find(substring), mystring.find_first_of("\n\n"));
 			_cgiResponse->append(mystring);
-			std::cout << "CGI response ="<<_cgiResponse << std::endl;
+			// std::cout << "CGI response ="<<*_cgiResponse << std::endl;
 		}
 	}
 	return (1);
