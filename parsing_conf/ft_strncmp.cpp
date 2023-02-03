@@ -3,18 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strncmp.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mateus <mateus@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/05 13:30:12 by mateus            #+#    #+#             */
-/*   Updated: 2022/12/05 13:55:25 by mateus           ###   ########.fr       */
+/*   Updated: 2023/02/02 15:19:12 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 
-using namespace std;
-
-int ft_strncmp(string str1, string str2, size_t n)
+int ft_strncmp(std::string str1, std::string str2, size_t n)
 {
     size_t i;
 

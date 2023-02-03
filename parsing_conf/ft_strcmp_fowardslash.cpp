@@ -6,13 +6,13 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:06:09 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/23 14:08:17 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/02 15:26:18 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.h"
 
-int	ft_strcmp_fowardslash(string str1, string str2)
+int	ft_strcmp_fowardslash(std::string str1, std::string str2)
 {
 	int	foward = 0;
 	int i = 0;

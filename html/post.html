@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/style.css">
+    <title>WebServ</title>
+</head>
+<body>
+    <header>
+        <h1>WebServ</h1>
+        <h2>Group: Jbach, Mgoncalv, Gefaivre</h2>
+        <p>All the content of this site is being loaded from our server using get request!</p>
+    </header>
+    <section class="get">
+        <div class="title">
+            <h2>Second Form</h2>
+            <p>This form is being sent using post request!</p>
+        </div>
+        <form action="" method="post" enctype="multipart/form-data">
+            <label>
+                Name<br>
+                <input type="text" name="name" placeholder="Please insert a name to the file!" required>
+            </label>
+            <label>
+                File<br>
+                <input type="file" name="file" required>
+            </label>
+            <input type="submit" name="submit" value="Submit">
+        </form>
+        <a href="/new_files" target="_blank" >If it works you will see the file in the folder new_files</a>
+        <nav>
+            <a href="get.html" class="previous">Previous</a>
+            <a href="download.html" class="next">Next</a>
+        </nav>
+    </section>
+</body>
+</html>

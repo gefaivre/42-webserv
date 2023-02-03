@@ -11,7 +11,7 @@ class ParsingRequest
 
 	public:
 
-		ParsingRequest(std::vector<std::string> request, Server *server);
+		ParsingRequest(std::vector<std::string> request, Server *server, std::string cgiResponse, int error_code);
 		~ParsingRequest();
 
 		t_requestData getData();
@@ -21,6 +21,7 @@ class ParsingRequest
 		ParsingRequest();
 		std::string _path;
 		bool 		_autoindex;
+		int _errorcode;
 
 
 		std::vector<std::string> _request;
@@ -29,8 +30,8 @@ class ParsingRequest
 
 		Server *_server;
 
-		void setFileToSend404();
-		void setFileToSend403();
+		// void setFileToSend404();
+		void setFileToSend(std::string errorcode);
 
 
 		void parsingRequest();

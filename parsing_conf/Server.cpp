@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/05 17:41:04 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/02 17:22:10 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,48 @@
 
 Server::Server()
 {
-	Location *location;
-	location = new Location("/");
-	this->addLocation(location);
-	
-	
+	// TODO
+	// Location *location;
+	// location = new Location("/");
+	// this->addLocation(location);
+	_sockfd = -1;
 }
+
+// Server::Server(Server const & src)
+// {
+// 	std::cout << "ICI 2" << std::endl;
+// 	exit(1);
+// 	*this = src;
+// 	return ;
+// }
+
+// Server&	Server::operator=(Server const & rhs)
+// {
+// 	// std::map<std::string, Location *>	_locations;
+// 	// int _sockfd;
+// 	// struct sockaddr_in _addr;
+// 	// int _epollfd;
+// 	std::cout << "ICI" << std::endl;
+// 	exit(1);
+		
+// 	_locations = rhs._locations;
+// 	_sockfd = rhs._sockfd;
+// 	_addr = rhs._addr;
+// 	_epollfd = rhs._epollfd;
+// 	// std::cout << "Copy assignment operator called" << std::endl;
+// 	// this->_virguleFixe = rhs.getVirguleFixe();
+// 	return (*this);
+// }
 
 Server::~Server()
 {
-	close(_sockfd);
+	std::cout << "SERVER DESTRUCTEUR" << std::endl;
+	for (std::map<std::string, Location *>::iterator it = _locations.begin(); it != _locations.end(); ++it) {
+    	delete it->second;
+	}
+	if (_sockfd != -1)
+		close(_sockfd);
+
 }
 
 void Server::setSocket()
@@ -56,18 +88,33 @@ void Server::setStruct()
 
 void Server::newclient(int epoll_fd)
 {
-	int serverfd;
+	int clientfd;
 	struct epoll_event event;
 	socklen_t addrlen = sizeof(_addr);
 
-	serverfd = accept(this->getServerFd(), (struct sockaddr *)&_addr, &addrlen);
-	if (serverfd == -1)
+	clientfd = accept(this->getServerFd(), (struct sockaddr *)&_addr, &addrlen);
+	if (clientfd == -1)
 		ft_define_error("Error the connection with the socket was not established");
-	event.events = EPOLLIN;
-	event.data.fd = serverfd;
-	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, serverfd, &event);
-	
-	
+	event.events = EPOLLIN | EPOLLRDHUP;
+	event.data.fd = clientfd;
+	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, clientfd, &event);
+	Client *client = new Client(this, clientfd);
+	clients.insert(std::pair<int, Client *>(clientfd, client));
+}
+
+void Server::deleteClient(int clientfd) {
+	epoll_ctl(getEpollFd(), EPOLL_CTL_DEL, clientfd, NULL);
+	if (close(clientfd) == -1)
+		ft_define_error("Close error");
+	std::map<int, Client *>::iterator it = clients.find(clientfd);
+	if (it != clients.end())
+	{
+		if (it->second)
+			delete it->second;
+		clients.erase(it);
+	}
+	else
+		std::cout << GRN << "Le client existe pas" << reset << std::endl;
 }
 
 void	Server::setPort(int port)
@@ -99,33 +146,46 @@ void		Server::addLocation(Location *location)
 {
 	if (!locationExist(location->getKey()))
 	{
-		_locations[location->getKey()] = *location;
+		_locations[location->getKey()] = location;
 	}
 	else
-		cerr << "Location already exists!" << endl;
+		std::cerr << "Location already exists!" << std::endl;
 		
 }
 
 Location	Server::getLocationByPath(std::string path)
 {
-	int			max = 0;
-	Location	loc;
-
-	std::map<std::string, Location>::iterator	it;
+	int			max = -1;
+	int 		newMax = -1;
+	Location	*loc;
+	std::map<std::string, Location *>::iterator	it;
+	// std::cout << "path = " << path<< std::endl;
 	for (it = _locations.begin(); it != _locations.end(); it++)
 	{
-		if	(ft_strcmp_fowardslash(path, it->first) > max)
+		// std::cout << "it -> " << it->second.getRoot() << std::endl;
+		newMax = ft_strcmp_fowardslash(path, it->first);
+		if	( newMax > max)
+		{
+			max = newMax;
 			loc = it->second;
+			// std::cout << "LOC = " << loc.getKey() << std::endl;
+		}
 	}
-	return loc;
+	return *loc;
 }
 
 void	Server::setupLocations()
 {
-	std::map<std::string, Location>::iterator iter;
+	if (!_locations.count("/"))
+	{
+		Location *location;
+		location = new Location("/");
+		this->addLocation(location);
+	}
+	std::map<std::string, Location *>::iterator iter;
 	for (iter = _locations.begin(); iter != _locations.end(); iter++)
 	{
-		iter->second.beSetup(this);
+		iter->second->beSetup(this);
 	}
 }
 
@@ -145,3 +205,15 @@ int				Server::getEpollFd() const
 	return(this->_epollfd);
 }
 
+Server 			*Server::getServerByName(std::string name)
+{
+	for (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end(); ++it)
+	{
+		std::vector<string> names = (*it)->getName();
+		if (std::find(names.begin(), names.end(), name) != names.end())
+		{
+			return (*it);
+		}
+	}
+	return (NULL);
+}

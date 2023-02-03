@@ -1,9 +1,0 @@
-server{
-	server_name server_test;
-	listen 8042;
-
-	accepted_methods	GET POST DELETE;
-	autoindex on;
-	cgi .php /usr/bin/php-cgi;
-	root /mnt/nfs/homes/jbach/Documents/gefaivreB/www;
-}

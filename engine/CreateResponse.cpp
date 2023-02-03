@@ -5,18 +5,16 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-CreateResponse::CreateResponse(std::string path, bool autoindex, t_requestData const requestData):
-_path(path), _autoindex(autoindex), _requestData(requestData)
+CreateResponse::CreateResponse(Server *server,std::map<std::string, std::string> &requestMap, t_requestData const requestData):
+	_server(server), _requestData(requestData), _requestMap(requestMap)
 {
-	fillHeaderData();
-	createHeader();
-	createBody();
-	joinHeaderBody();
-	if (_requestData.methode == "POST")
-	{
-		// std::cout << "new socket = " << newsocket << std::endl;
-		// collectData(newsocket);
-	}
+
+	fillFilesExtension();
+	_createBody = false;
+	_fillHeaderData = false;
+	_createHeader = false;
+	_firstTimeBody = true;
+	_bodyIsRead = false;
 }
 
 
@@ -55,46 +53,12 @@ CreateResponse::~CreateResponse()
 */
 
 
+
 void CreateResponse::collectData(int newsocket)
 {
 	(void)newsocket;
 	std::cout << "post method!" << std::endl;
-	// int cgiPipe[2];
-	// int nReponse = 0;
-	// if (pipe(cgiPipe))
-	// 	perror("error from pipe cgi");
-			
-
-	// int cgiPid = fork();
-
-
-	// if (cgiPid == 0)
-	// {
-	// 	//child
-	// 	char **cgienvs = ft_split((char *)"last_name=jbach GATEWAY_INTERFACE=CGI/1.1 PATH_INFO=/website/sendDatas/data.php REQUEST_METHOD=POST SCRIPT_FILENAME=./website/sendDatas/data.php SERVER_PROTOCOL=HTTP/1.1 REDIRECT_STATUS=200 CONTENT_TYPE=application/x-www-form-urlencoded CONTENT_LENGTH=11 /usr/bin/php-cgi");
-	// 	char *args[]= {(char *)"/usr/bin/php-cgi", NULL};
-	// 	close(cgiPipe[1]);
-	// 	dup2(cgiPipe[0], newsocket);
-	// 	dup2(nReponse, newsocket);
-	// 	if (execve(args[0], args, cgienvs))
-	// 	{
-	// 		/* unable to execute CGI... */
-    // 		perror("error execve cgi");
-	// 	// sendString(nRemote,
-	// 	//     "HTTP/1.1 200 OK\r\n"
-	// 	//     "Content-length: 97\r\n"
-	// 	//     "Content-Type: text/html\r\n\r\n"
-	// 	//     "<!doctype html><html><head><title>CGI Error</title></head><body><h1>CGI Error.</h1></body></html>\r\n"
-	// 		// return ;
-	// 	}
-	// }
-	// else if (cgiPid > 0)
-	// {
-	// 	//parent
-	// 	close(cgiPid[0]);
-
-	// }
-
+	
 }
 
 void CreateResponse::fillFilesExtension()
@@ -106,42 +70,78 @@ void CreateResponse::fillFilesExtension()
 	_switchFilesExtension.insert(std::pair<std::string, std::string>("default","text/html") );
 }
 
-void CreateResponse::fillHeaderData()
+int CreateResponse::checkErrorPage(std::string errorCode, std::string path)
 {
-	fillFilesExtension();
-	_headerData.protocol = _requestData.protocol;
-	if (_requestData.fileToSend == _path + "404.html")
+	if ((_requestData.fileToSend == path + errorCode) || (_requestData.fileToSend == ft_pwd() + "/error_pages/" + errorCode))
+		return (1);
+	return (0);
+}
+
+void CreateResponse::errorStatus()
+{
+
+	std::string path = _server->getLocationByPath("/" + _requestData.path).getRoot();
+	if (path + _requestData.path != _requestData.fileToSend)
 	{
-		_headerData.statusCode = "404";
-		_headerData.statusMessage = "Not Found";
+		if (checkErrorPage("400.html", path))
+		{
+			_headerData.statusCode = "400";
+			_headerData.statusMessage = "Bad Request";
+		}
+		else if (checkErrorPage("403.html", path))
+		{
+			_headerData.statusCode = "403";
+			_headerData.statusMessage = "Forbidden";
+		}
+		else if (checkErrorPage("404.html", path))
+		{
+			_headerData.statusCode = "404";
+			_headerData.statusMessage = "Not Found";
+		}
+		else if (checkErrorPage("405.html", path))
+		{
+			_headerData.statusCode = "405";
+			_headerData.statusMessage = "Not Allowed";
+		}
+		else if (checkErrorPage("500.html", path))
+		{
+			_headerData.statusCode = "500";
+			_headerData.statusMessage = "Internal Server Error";
+		}
+		else if (checkErrorPage("404_noSpecified.html", path))
+		{
+			_headerData.statusCode = "404";
+			_headerData.statusMessage = "Not Found";
+		}
+		else if (checkErrorPage("413.html", path))
+		{
+			_headerData.statusCode = "413";
+			_headerData.statusMessage = "Request Entity Too Large";
+		}
 	}
 	else
 	{
 		_headerData.statusCode = "200";
 		_headerData.statusMessage = "OK";
 	}
+}
+
+void CreateResponse::fillHeaderData()
+{
+	
+	_headerData.protocol = _requestData.protocol;
+	errorStatus();
 	std::string type = _requestData.fileToSend.substr(_requestData.fileToSend.find('.') + 1, _requestData.fileToSend.size());
 	_headerData.contentType = _switchFilesExtension[type];
 	if (_headerData.contentType.size() == 0)
 		_headerData.contentType = _switchFilesExtension["default"];
 
-	std::string file;
-	std::string line;
-	std::ifstream myfile;
+	if (_requestMap[std::string("Connection")] == std::string("keep-alive"))
+		_headerData.connection = std::string("keep-alive");
+	else
+		_headerData.connection = std::string("close");
 
-	myfile.open(_requestData.fileToSend.c_str(), std::ifstream::in);
-	while ( std::getline(myfile,line) )
-	{
-		if (file.size() != 0)
-			file += '\n';
-		file += line;
-	}
-	myfile.close();
-	// std::time_t time_now = std::time(0);
-	// _headerData.date = time_now;
-	std::stringstream oui;
-	oui << file.size();
-	oui >> _headerData.contentLength;
+	_headerData.contentLength = itos(_body.size());
 }
 
 void CreateResponse::createHeader()
@@ -152,43 +152,87 @@ void CreateResponse::createHeader()
 	_header += _headerData.statusCode;
 	_header += " ";
 	_header += _headerData.statusMessage + "\r\n";
-	
-	// _header += " ";
-	// _header += _headerData.date ;
-	// _header += "Content-Length: " + _headerData.contentLength + "\r\n";
+	_header += "Content-length:  " + _headerData.contentLength + "\r\n";
+	_header += "Content-Type:  " + _headerData.contentType + "\r\n";
+	_header += "Connection: " + _headerData.connection + "\r\n";
 }
 
-void CreateResponse::createBody()
+
+int CreateResponse::create()
 {
-	if (_requestData.isIndex)
-		BodyIsIndex();
-	else
-		BodyIsNotIndex();
-}
+	int ret;
 
-void CreateResponse::BodyIsNotIndex()
-{
-	_header += "Content-Type: " + _headerData.contentType;
-	_header += "\r\n";
-
-	std::string file;
-	std::string line;
-	std::ifstream myfile;
-
-	myfile.open(_requestData.fileToSend.c_str(), std::ifstream::in);
-	while ( std::getline(myfile,line) )
+	if (_createBody == false)
 	{
-		if (file.size() != 0)
-			file += '\n';
-		file += line;
+		ret = createBody();
+		if (ret == READ)
+			_createBody = true;
+		return NOT_READ_YET;
 	}
-	myfile.close();
+	else if (_fillHeaderData == false)
+	{
+		fillHeaderData();
+		_fillHeaderData = true;
+		return NOT_READ_YET;
+	}
+	else if (_createHeader == false)
+	{
+		createHeader();
+		_createHeader = true;
+		return READ;
+	}
+	else
+		return ERROR;
 
-	_body += file;
 }
 
 
-void CreateResponse::BodyIsIndex()
+int CreateResponse::createBody()
+{
+	int ret;
+
+	if (_requestData.isIndex)
+		ret = BodyIsIndex();
+	else if (_requestData.isCgi)
+		ret = BodyIsCgi();
+	else
+		ret = BodyIsNotIndex();
+	return ret;
+}
+
+int CreateResponse::BodyIsCgi()
+{
+	_body = _requestData._cgiResponse;
+	return READ;
+}
+
+int CreateResponse::BodyIsNotIndex()
+{
+	if (_firstTimeBody == true)
+	{
+		_myfile.open(_requestData.fileToSend.c_str(), std::ifstream::in);
+		_firstTimeBody = false;
+		return NOT_READ_YET;
+	}
+	else if (_myfile && _bodyIsRead == false)
+	{
+		char buf[READING_BUFFER];
+		bzero(buf, READING_BUFFER);
+		
+		_myfile.read(buf, READING_BUFFER - 1);
+		_body +=  std::string(buf, _myfile.gcount());
+		if (!_myfile)
+		{
+			_myfile.close();
+			_bodyIsRead = true;
+			return READ;
+		}
+		return NOT_READ_YET;
+	}
+	return ERROR;
+}
+
+int CreateResponse::BodyIsIndex()
 {
 	_body += "<!DOCTYPE html>\n<html>\n<head>\n<title> Index of ";
 	_body += _requestData.path;
@@ -222,27 +266,38 @@ void CreateResponse::BodyIsIndex()
 	_body += "</h1>\n";
 	_body += "<hr>\n<p>Webserv/1.0</p>\n</body>";
 	_body += "\n\r";
+	return READ;
 }
 
-void CreateResponse::joinHeaderBody()
-{
-	_response = _header + "\r\n" + _body;
-}
 
 void CreateResponse::displayHeaderResponse() const
 {
 	std::cout << _header << std::endl;
 }
 
+void CreateResponse::displayFullResponse() const
+{
+	std::cout << _header << std::endl;
+	std::cout << _body << std::endl;
+}
 
 
 /*
 ** --------------------------------- ACCESSOR ---------------------------------
 */
 
+std::string CreateResponse::getHeaderResponse() const
+{
+	return(_header);
+}
 std::string CreateResponse::getResponse() const
 {
-	return(_response);
+	return(_header + "\r\n" + _body);
+}
+
+std::string CreateResponse::getBodyResponse() const
+{
+	return(_body);
 }
 
 

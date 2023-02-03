@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:03 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/12/16 17:47:00 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/02 17:48:50 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,48 +17,46 @@
 #include <iostream>
 #include "webserv.h"
 
-using namespace std;
-
 class Config
 {
 protected:
-	map<string, string> _cgi;
+	std::map<std::string, std::string> _cgi;
 	bool				_autoIndex;
-	string				_root;
+	std::string				_root;
 	t_methods			_acceptedMethods;
 
-	vector<string> 		*_wasSet;
 	int					_port;
 
 	
 	int						_clientMaxBodySize;
-	vector<string>			_name;
+	std::vector<std::string>			_name;
 	
 public:
 
+	std::vector<std::string> 		*_wasSet;
 	Config(/* args */);
 	virtual ~Config();
 
 	// Acessors:
-	void	addCgi(string key, string value);
-	map<string, string> getCgiMap(void);
-	string	getCgiValue(string key);
+	void	addCgi(std::string key, std::string value);
+	std::map<std::string, std::string> getCgiMap(void);
+	std::string	getCgiValue(std::string key);
 
 	void	setAutoIndex(bool autoIndex);
 	bool	getAutoIndex(void);
 
-	void	setRoot(string root);
-	string	getRoot(void);
+	void	setRoot(std::string root);
+	std::string	getRoot(void);
 
 	void 		setAcceptedMethods(t_methods methods);
 	t_methods	getAcceptedMethods();
 
 	virtual void			setPort(int port) = 0;
-	virtual void			setName(vector<string> name) = 0;
+	virtual void			setName(std::vector<std::string> name) = 0;
 	virtual void			setClientMaxBodySize(int clientMaxBodySize) = 0;
 
 	int						getPort(void);
-	vector<string> 			getName(void);
+	std::vector<std::string> 			getName(void);
 	int						getClientMaxBodySize(void);
 	
 };

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/style.css">
+    <title>WebServ</title>
+</head>
+<body>
+    <header>
+        <h1>WebServ</h1>
+        <h2>Group: Jbach, Mgoncalv, Gefaivre</h2>
+        <p>All the content of this site is being loaded from our server using get request!</p>
+    </header>
+    <section class="get">
+        <div class="title">
+            <h2>Second Form</h2>
+            <p>This form is being sent using post request with CGI !</p>
+        </div>
+        <form action="show_post.php" method="post" enctype="multipart/form-data">
+            <label>
+                Name<br>
+                <input type="text" name="name" placeholder="Please insert a name to the file!" required>
+            </label>
+            <label>
+                File<br>
+                <input type="file" name="my_file" required>
+            </label>
+            <input type="submit" name="submit" value="Submit">
+        </form>
+        <nav>
+            <a href="get_cgi.html" class="previous">Previous</a>
+            <a href="delete_cgi.html" class="next">Next</a>
+        </nav>
+    </section>
+</body>
+</html>

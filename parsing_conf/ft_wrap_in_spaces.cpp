@@ -6,17 +6,14 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/25 16:38:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2022/11/29 14:26:18 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/02 15:19:41 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include "webserv.h"
 
-using namespace std;
-
-
-void	ft_wrap_in_spaces(string *str)
+void	ft_wrap_in_spaces(std::string *str)
 {
 	//TODO: podemos usar a funcao wrap target in space, o target seria a propria string;
 	//Contra: menos performance pois tem que comparar a string inteira.

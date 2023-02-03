@@ -35,6 +35,10 @@ public:
 	Location(string key);
 	~Location();
 
+
+	Location(Location const & src);
+	Location &	operator=(Location const & rhs);
+	
 	string	getKey(void);
 
 	// void	addCgi(string key, string value);

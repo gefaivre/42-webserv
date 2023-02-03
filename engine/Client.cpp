@@ -1,19 +1,40 @@
 #include "Client.hpp"
-
+#include <algorithm>
+#include <vector>
+#include <iostream>
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Client::Client(Server *server, int clientfd):
-    _clientfd(clientfd), _server(server)
+Client::Client()
 {
-	headerIsRead = 0;
 }
 
-// Client::Client( const Client & src )
-// {
-// }
+Client::Client(Server *server, int clientfd) : _clientfd(clientfd), _server(server)
+{
+	this->_headerIsRead = false;
+	this->_firstTimeBody = true;
+	this->_bodyContentLenght = 0;
+	this->_isSend = false;
+	this->_moverSave = 0;
+	this->_errorcode = 0;
+	this->_cgiResponse.clear();
+	this->_firstTimeCreate = 0;
+	this->_createIsFinish = 0;
+}
 
+Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._server)
+{
+	this->_headerIsRead = false;
+	this->_firstTimeBody = true;
+	this->_bodyContentLenght = 0;
+	this->_errorcode = 0;
+	this->_isSend = false;
+	this->_moverSave = 0;
+	this->_cgiResponse.clear();
+	this->_firstTimeCreate = 0;
+	this->_createIsFinish = 0;
+}
 
 /*
 ** -------------------------------- DESTRUCTOR --------------------------------
@@ -21,21 +42,35 @@ Client::Client(Server *server, int clientfd):
 
 Client::~Client()
 {
+	std::cout << "DESTRUCTEUR CLIENT" << std::endl;
 }
-
 
 /*
 ** --------------------------------- OVERLOAD ---------------------------------
 */
 
-// Client &				Client::operator=( Client const & rhs )
-// {
-// 	//if ( this != &rhs )
-// 	//{
-// 		//this->_value = rhs.getValue();
-// 	//}
-// 	return *this;
-// }
+Client &Client::operator=(Client const &rhs)
+{
+	if (this != &rhs)
+	{
+		this->_requestLine = rhs._requestLine;
+		this->_request = rhs._request;
+		this->_requestmap = rhs._requestmap;
+		this->_requestBody = rhs._requestBody;
+
+		this->_clientfd = rhs._clientfd;
+		this->_server = rhs._server;
+		this->_headerIsRead = rhs._headerIsRead;
+		this->_firstTimeBody = rhs._firstTimeBody;
+		this->_isKeepAlive = rhs._isKeepAlive;
+		this->_moverSave = rhs._moverSave;
+		this->_cgiResponse = rhs._cgiResponse;
+		this->_errorcode = rhs._errorcode;
+		this->_firstTimeCreate = rhs._firstTimeCreate;
+		this->_createIsFinish = rhs._createIsFinish;
+	}
+	return *this;
+}
 
 // std::ostream &			operator<<( std::ostream & o, Client const & i )
 // {
@@ -43,155 +78,331 @@ Client::~Client()
 // 	return o;
 // }
 
-
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
-int	ft_find_content_lenght(std::map<std::string, std::string> _requestmap)
-{
-	std::map<std::string,std::string>::iterator it;
-	it = _requestmap.find("Content-Length");
-	int content_lenght = 0;
-	if (it != _requestmap.end())
-	{
-		content_lenght = std::atoi(it->second.c_str());
 
-		// while ((tmp_recv = recv(_newsocket, &a, 1, 0)) && content_lenght--) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
-		// {
-		// 	std::cout << a;
-		// }
-	}
-	return (content_lenght);
+size_t Client::findBodyContentLenght()
+{
+	if (atoi(_requestmap[std::string("Content-Length")].c_str()))
+		return (atoi(_requestmap[std::string("Content-Length")].c_str()));
+	return (atoi(_requestmap[std::string("content-length")].c_str()));
+	
+}
+std::string Client::getHost()
+{
+	std::string host;
+	host = _requestmap[std::string("Host")];
+	host.erase(host.find(":"));
+	return(host);
 }
 
-std::string	ft_find_boundary(std::map<std::string, std::string> _requestmap, int content_lenght)
+size_t Client::setBodyContentLenght()
 {
-	std::string boundary;
-	size_t pos_equal = 0;
-	std::map<std::string,std::string>::iterator it;
-	if (content_lenght > 0)
+	for(size_t i = 0; i < _request.size(); i++)
 	{
-		it = _requestmap.find("Content-Type");
-		if (it != _requestmap.end())
-		{
-			pos_equal = it->second.find_last_of('=');
-			std::cout << "equal = " << pos_equal << std::endl;
-		}
+		 if (_request[i].find("Content-Length:") != std::string::npos)
+		 	return (std::atoi(_request[i].c_str()));
+		if (i == (_request.size() - 1))
+			return 0;
 	}
-	return (boundary);
+	return 0;
+}
+
+void Client::setKeepAlive()
+{
+	if (_requestmap[std::string("Connection")] == std::string("keep-alive"))
+		_isKeepAlive = true;
+	else
+		_isKeepAlive = false;
 }
 
 
-void Client::parseHeader(std::string buf)
+
+
+void Client::transformRequestVectorToMap()
 {
-	_request = ft_split_header(buf);
-	for (size_t i = 0; i < _request.size(); i++)
+	for (size_t i = 1; i < _request.size(); i++)
 	{
 		size_t colon = _request[i].find(": ");
 		if (colon != std::string::npos)
 		{
 			std::string key = _request[i].substr(0, colon);
-			std::string value = _request[i].substr(colon + 2, _request.size());
+			std::string value = _request[i].substr(colon + 2, _request[i].size());
 			_requestmap.insert(std::pair<std::string, std::string>(key, value));
 		}
 	}
-	int content_lenght = ft_find_content_lenght(_requestmap);
-	std::string boundary = ft_find_boundary(_requestmap, content_lenght);
-	
 }
 
-void Client::readRequest()
+void Client::resetClient()
 {
-	char a = 0;
-	std::string buf;
+	_requestLine.clear();
 	_request.clear();
-	// size_t last_newline;
-	ssize_t tmp_recv;
-	while ((tmp_recv = recv(_clientfd, &a, 1, 0))) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
-	{
-		if (tmp_recv == -1)
-			ft_define_error("Error with the message from a socket");
-		buf += a;
-			if (buf.find("\r\n\r\n") != std::string::npos)
+	_requestmap.clear();
+	_requestBody.clear();
+	_response.clear();
+	_cgiResponse.clear();
+	_requestmapBody.clear();
+	_headerIsRead = false;
+	_firstTimeBody = false;
+	_bodyContentLenght = 0;
+	_isKeepAlive = false;
+	_isSend = false;
+	_moverSave = 0;
+	_errorcode = 0;
+}
+
+void Client::EndOfRead()
+{
+	struct epoll_event event;
+	event.events = EPOLLOUT | EPOLLRDHUP;
+	event.data.fd = _clientfd;
+	epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
+
+	
+	// _requestmap.clear();
+}
+
+bool Client::parseChunked()
+{
+		for (size_t i = 0; i < _request.size(); i++)
+		{
+			if (_request[i].find("transfer-encoding: chunked") != std::string::npos)
 			{
-				std::cout << "hello" << std::endl;
-				break;
+				return (true);
 			}
 	}
-	parseHeader(buf);
-
+	return (false);
 }
 
+std::string Client::chunkedBody()
+{
+	for (size_t i = 0; i< _request.size(); i++)
+	{
+		if (_request[i].find("transfer-encoding: chunked") != std::string::npos)
+			_request.erase(_request.begin() + i);
+	}
+	std::string str;
+	std::vector<std::string> vector;
+	vector = ft_split_chunked_request(_requestBody);
+	for (size_t i = 0; i< vector.size();i++)
+	{
+		if (vector[i].find("Content-Disposition") != std::string::npos)
+		{
+			if (vector[i + 1].empty() && (i + 2) < vector.size())
+				vector.erase(vector.begin() + i + 2);
+		}
+		//TODO: verifier si vector[i + 1] est un num sinon error
+		vector[i].find_last_of("Content-Disposition");
+	}
+	size_t i = vector.size() - 1;
+	while (vector[i].find(ft_find_boundary_utils(_requestmap)) == std::string::npos)
+	{
+		vector.erase(vector.begin() + i);
+		i--;
+	}
+	vector.erase(vector.begin());
+	for (size_t i = 0; i< vector.size(); i++)
+	{
+		str += vector[i];
+		str += "\r\n";
+	}
+	return (str);
+}
+
+int Client::readRequestHeader()
+{
+	char buf[READING_BUFFER];
+	int sizeRead;
+
+	bzero(buf, READING_BUFFER);
+
+	sizeRead = recv(_clientfd, buf, READING_BUFFER - 1, 0);
+	if (sizeRead == -1)
+		return ERROR;
+	if (sizeRead == 0)
+		return READ;
+	_requestLine += std::string(buf);
+	while (_requestLine.find("\r\n") != std::string::npos)
+	{
+		std::string line = _requestLine.substr(0, _requestLine.find("\r\n"));
+		_requestLine.erase(0, _requestLine.find("\r\n") + 2);
+		_request.push_back(line);
+		if (line.size() == 0)
+			break;
+	}
+	if (_request.size() != 0 && (_request[_request.size() - 1].size() == 0))
+	{
+		_requestBody += _requestLine;
+		_bodyContentLenght = setBodyContentLenght();
+		if ((_bodyContentLenght == 0 || _requestBody.size() == _bodyContentLenght) && parseChunked() == false)
+			{
+				Location loc;
+				loc = _server->getLocationByPath('/' + getRequestFile(_request[0], NULL));
+				if ((_bodyContentLenght > (size_t)loc.getClientMaxBodySize()) && (loc.getClientMaxBodySize() != 0))
+					_errorcode = 413;
+				EndOfRead();
+			}
+			return READ;
+	}
+	return NOT_READ_YET;
+}
+
+void Client::readRequestBody()
+{
+	char buf[READING_BUFFER];
+	int sizeRead;
+
+	bzero(buf, READING_BUFFER);
+
+	if ((sizeRead = recv(_clientfd, buf, READING_BUFFER - 1, 0)) != 0)
+	{
+		if (sizeRead == -1)
+			std::cout << "Error recv" << std::endl;
+		_requestBody.insert(_requestBody.size(), buf, sizeRead);
+	}
+	if (_requestBody.size() == _bodyContentLenght || _requestBody.find(ft_find_boundary_utils(_requestmap) + "\r\n" + '0') !=  std::string::npos)
+	{
+		Location loc;
+		if (parseChunked() == true)
+			_requestBody = chunkedBody();
+
+		loc = _server->getLocationByPath('/' + getRequestFile(_request[0], NULL));
+		if ((_bodyContentLenght > (size_t)loc.getClientMaxBodySize()) && (loc.getClientMaxBodySize() != 0))
+				_errorcode = 413;
+		EndOfRead();
+	}
+}
 
 void Client::readRequest1()
 {
-
-	char buf[50];
-	int sizeRead;
-	struct epoll_event event;
-
-	bzero(buf, 50);
-
-	if (headerIsRead == 0)
+	if (_headerIsRead == false)
 	{
-		sizeRead = recv(_clientfd, buf, 49, 0);
-		if (sizeRead == -1)
-			std::cout << "Error recv" << std::endl;
-		_requestLine += std::string(buf);
-		
-		while (_requestLine.find("\r\n") != std::string::npos)
+		if (readRequestHeader() == READ)
 		{
-			std::string line = _requestLine.substr(0, _requestLine.find("\r\n"));
-			_requestLine.erase(0, _requestLine.find("\r\n") + 2);
-			_request.push_back(line);
-
+			_headerIsRead = true;
+			transformRequestVectorToMap();
 		}
-		if ((_request[_request.size() - 1].size() == 0))
+	}
+	else if (_bodyContentLenght || parseChunked() == true )
+		readRequestBody();
+}
+
+int Client::CreateAndSendResponse()
+{
+	int ret;
+	if(_firstTimeCreate == false)
+	{
+		Server *server;
+		server = _server->getServerByName(getHost());
+		if (server != NULL)
+			_server = server;
+		setKeepAlive();
+		CGI cgi = CGI(&_request, _server, &_errorcode, &_requestBody, &_requestmap, &_cgiResponse);
+		ParsingRequest parsingRequest(_request, _server, _cgiResponse, _errorcode);
+		CreateResponse *CR = new CreateResponse(_server, _requestmap, parsingRequest.getData());
+		_createR = CR;
+		if (!_errorcode)
+			cgi.verifyCgi();
+
+		_firstTimeCreate = true;
+		return NOT_READ_YET;
+	}
+	else if(_createIsFinish == false)
+	{
+		ret = _createR->create();
+		if (ret == READ)
 		{
-			event.events = EPOLLOUT;
+			_response = _createR->getResponse();
+			_createIsFinish = true;
+		}
+		return NOT_READ_YET;
+	}
+	else
+	{
+		ret = sendResponse();
+		if (ret != NOT_READ_YET)
+		{
+			displayRequest();
+			_createR->displayHeaderResponse();
+			// _createR->displayFullResponse();
+			_response = _createR->getResponse();
+			if (ret == DELETE_CLIENT)
+				return DELETE_CLIENT;
+			else if (ret == READ)
+			{
+				resetClient();
+				return READ;
+			}
+		}
+		else
+			return NOT_READ_YET;
+	}
+	return ERROR;
+}
+
+
+int Client::sendResponse()
+{
+	// std::cout << "SEND RESPONSE" << std::endl;
+
+	struct epoll_event event;
+	int ret;
+	size_t mover = _moverSave * SENDING_BUFFER;
+	size_t responseSize = _response.size() - mover;
+
+
+	if (_isSend == false)
+	{
+		int max_size = responseSize > SENDING_BUFFER ? SENDING_BUFFER : responseSize;
+
+		if ((ret = send(_clientfd, &_response[mover], max_size, 0)) == -1)
+			ft_define_error("Send error");
+
+		if (ret < SENDING_BUFFER || mover > _response.size())
+			_isSend = true;
+		else
+			_moverSave++;
+	}
+	else
+	{
+		if (_isKeepAlive)
+		{
+			event.events =  EPOLLIN | EPOLLRDHUP;
 			event.data.fd = _clientfd;
 			epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
-			headerIsRead = 1;
+			return READ;
 		}
-		// if ("\r\n\r\n")
-		// 	headerIsRead = 1;
+		else
+			return DELETE_CLIENT;
 	}
 
-	
-	// else if (parseHeader(buf) != 0)
-	// {
-
-	// }
-
+	return NOT_READ_YET;
 }
 
-void Client::createResponse()
-{
-    ParsingRequest parsingRequest(_request, _server);
-	CreateResponse createResponse("www/", true, parsingRequest.getData());
-	createResponse.displayHeaderResponse();
-    _response = createResponse.getResponse();
-}
 
-void Client::sendResponse()
-{
-	if (send(_clientfd, _response.c_str(), _response.size(), 0) == -1)
-		ft_define_error("Send error");
-	if (close(_clientfd) == -1)
-		ft_define_error("Close error");
-}
+
+
 
 void Client::displayRequest()
 {
-	std::cout << "\n" << "\033[33m" << _request[0] << "\033[0m" << std::endl;
+	std::cout << "\n"
+			  << YEL << _request[0] << "\033[0m" << std::endl;
 }
 
 void Client::displayFullRequest()
 {
 	std::cout << std::endl;
-	for(size_t i = 0; i < _request.size(); i++)
-		std::cout << "\033[33m" << _request[i] << "\033[0m" << std::endl;
+	for (size_t i = 0; i < _request.size(); i++)
+		std::cout << YEL << _request[i] << "\033[0m" << std::endl;
 }
+
+void Client::displayFullBody()
+{
+	std::cout << _requestBody << std::endl;
+}
+
+
 
 /*
 ** --------------------------------- ACCESSOR ---------------------------------

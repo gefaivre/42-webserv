@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:21:20 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/05 16:14:28 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/02 15:21:34 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,19 +24,18 @@
 #include "webserv.h"
 
 #include "Server.hpp"
-
-using namespace std;
-
+#include <set>
 class Parser
 {
 private:
-	ifstream		_configFile;
-	string			_fileName;
-	stack<string>	_context;
-	string			_content;
+	std::ifstream		_configFile;
+	std::string			_fileName;
+	std::stack<std::string>	_context;
+	std::string			_content;
 	size_t			_currIdx;
-	vector<Server *>	_servers;
-	
+	std::vector<Server *>	_servers;
+	std::vector<int>			_allPorts;
+	std::set<int>			_repeatedPorts;
 public:
 	Parser(void);
 	~Parser(void);
@@ -45,13 +44,14 @@ public:
 
 	void	prepareLine();
 	void	checkHttpContext();
-	string	ft_read_file_ignoring_comments();
+	std::string	ft_read_file_ignoring_comments();
 	void	parseEndOfContext(int i);
 	Location *parseNewContext(size_t nextOpenBracket, Server *server);
-	void	parseAutoIndex(string directive, vector<Config *> conf);
-	void	parseDirective(size_t nextSemiColon, vector<Config *> conf);
+	void	parseAutoIndex(std::string directive, std::vector<Config *> conf);
+	void	parseDirective(size_t nextSemiColon, std::vector<Config *> conf);
 	Server	*getServerConf(void);
-	vector<Server *>	getServers(void);
+	std::vector<Server *>	getServers(void);
+	void				verifyServerName();
 };
 
 

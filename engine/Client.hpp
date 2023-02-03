@@ -4,35 +4,43 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <string>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <algorithm>
+#include <fcntl.h>
+#include <sys/wait.h>
 #include "utils.hpp"
 #include "ParsingRequest.hpp"
+#include "CGI.hpp"
 #include "CreateResponse.hpp"
+#include "define.hpp"
 
 
-char **ft_split(const char *str);
-std::vector<std::string>	ft_split_header(std::string str);
 class Server;
+class CreateResponse;
 
 
 class Client
 {
-
 	public:
 
+		Client();
 		Client(Server *server, int clientfd);
-		// Client( Client const & src );
+		Client( Client const & src );
+		Client &operator=( Client const & rhs );
 		~Client();
 
 		void displayRequest();
 		void displayFullRequest();
-		void readRequest();
+		void displayFullBody();
+
+		int readRequestHeader();
+		void readRequestBody();
 		void readRequest1();
-		void parseHeader(std::string buf);
-		void sendResponse();
-		void createResponse();
+
+		int CreateAndSendResponse();
+		int sendResponse();
+
 
 		std::vector<std::string> getRequest() const;
 
@@ -41,12 +49,44 @@ class Client
 		std::string _requestLine;
 		std::vector<std::string> _request;
 		std::map<std::string, std::string> _requestmap;
+		std::string _requestBody;
+		std::map<std::string, std::string> _requestmapBody;
+
 		std::string _response;
 
 		int _clientfd;
 		Server *_server;
 
-		int headerIsRead;
+		char * _responsePointer;
+
+		int _errorcode;
+
+		size_t _bodyContentLenght;
+
+		std::string _cgiResponse;
+		size_t setBodyContentLenght();
+		void transformRequestVectorToMap();
+		size_t findBodyContentLenght();
+		std::string getHost();
+		void setKeepAlive();
+		bool _isKeepAlive;
+		bool parseChunked();
+		std::string chunkedBody();
+
+		void EndOfRead();
+		void resetClient();
+
+
+		// POLLING CREATE RESPONSE
+		bool _headerIsRead;
+		bool _firstTimeBody;
+		bool _firstTimeCreate;
+		bool _createIsFinish;
+		bool _isSend;
+		size_t _moverSave;
+
+		CreateResponse *_createR;
+
 
 
 };

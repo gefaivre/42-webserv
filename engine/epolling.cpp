@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 12:42:44 by gefaivre          #+#    #+#             */
-/*   Updated: 2023/01/05 18:35:37 by jbach            ###   ########.fr       */
+/*   Updated: 2023/01/18 15:31:52 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,97 +15,86 @@
 #include "Server.hpp"
 #include "Client.hpp"
 
-
-
 #define MAX_EVENTS 5
 #define READ_SIZE 10
 
-void epolling(Server server)
+void epolling(vector<Server *> servers)
 { 
 	int running = 1, event_count, i;
-	// char read_buffer[READ_SIZE + 1];
-	struct epoll_event event, events[MAX_EVENTS];
+	struct epoll_event events[MAX_EVENTS];
+	std::map<int, bool> portMap;
 
 
-
-	int epoll_fd = epoll_create1(0);
-	if (epoll_fd == -1)
+	for (size_t i = 0; i < servers.size(); i++)
 	{
-		fprintf(stderr, "Failed to create epoll file descriptor\n");
-		return;
-	}
-	server.setEpollFd(epoll_fd);
-
-	event.events = EPOLLIN;
-	event.data.fd = server.getServerFd();
-	
-	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server.getServerFd(), &event))
-	{
-		fprintf(stderr, "Failed to add file descriptor to epoll\n");
-		close(epoll_fd);
-		return;
-	}
-
-	
-	while (running)
-	{
-		event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
-		
-		for (i = 0; i < event_count; i++)
+		struct epoll_event event;
+		if (portMap.find(servers[i]->getPort()) == portMap.end())
 		{
+			portMap.insert(std::pair<int, bool>(servers[i]->getPort(), true));
+			int epoll_fd = epoll_create1(0);
+			if (epoll_fd == -1)
+			{
+				fprintf(stderr, "Failed to create epoll file descriptor\n");
+				return;
+			}
 
-			if (events[i].data.fd == server.getServerFd())
-			{
-				server.newclient(epoll_fd);
-			}
-			else
-			{
-				if (events[i].events == EPOLLIN)
-				{
-					if (server.clients.find(events[i].data.fd) == server.clients.end())
-					{	
-						Client *client = new Client(&server, events[i].data.fd);
-						server.clients.insert(std::pair<int, Client*>(events[i].data.fd, client));
-					}
-					
-					server.clients[events[i].data.fd]->readRequest1();
-				}
-				else if (events[i].events == EPOLLOUT)
-				{
-					server.clients[events[i].data.fd]->displayRequest();
-					server.clients[events[i].data.fd]->createResponse();
-					
-					server.clients[events[i].data.fd]->sendResponse();
-					
-					epoll_ctl(epoll_fd, EPOLL_CTL_DEL, events[i].data.fd, &event);
-					delete server.clients[events[i].data.fd];
-					server.clients.erase(server.clients.find(events[i].data.fd));
-				}
-					
-			}
-			bzero(events, MAX_EVENTS);
+			servers[i]->setEpollFd(epoll_fd);
+			servers[i]->setSocket();
+		
+			event.events = EPOLLIN;
+			event.data.fd = servers[i]->getServerFd();
 
 			
-			// socket.waitRequest();
-			// socket.displayRequest();
-
-			// ParsingRequest parsingRequest(socket.getRequest(), server);
-			// parsingRequest.displayData();
-
-			// CreateResponse createResponse("www/", true, parsingRequest.getData());
-			// createResponse.displayHeaderResponse();
-
-
-			// socket.sendResponse(createResponse.getResponse());
-		
-			// if(!strncmp(read_buffer, "stop\n", 5))
-			// running = 0;
+			if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, servers[i]->getServerFd(), &event))
+			{
+				fprintf(stderr, "Failed to add file descriptor to epoll\n");
+				std::cout << "errno = " << errno << std::endl;
+				close(epoll_fd);
+				return;
+			}
 		}
 	}
 
-	if (close(epoll_fd))
+	while (running)
 	{
-		fprintf(stderr, "Failed to close epoll file descriptor\n");
-		return;
+		for (size_t s = 0; s < servers.size(); s++)
+		{
+			event_count = epoll_wait(servers[s]->getEpollFd(), events, MAX_EVENTS, 0);
+			for (i = 0; i < event_count; i++)
+			{
+				if (events[i].data.fd == servers[s]->getServerFd())
+				{
+				// 	std::cout << "----------SERVER EVENT" << std::endl;
+					servers[s]->newclient(servers[s]->getEpollFd());
+				}
+				else if (events[i].events & (EPOLLHUP | EPOLLRDHUP))
+				{
+					// std::cout << RED << "EPOLLHUP" << reset << std::endl;
+					servers[s]->deleteClient(events[i].data.fd);
+				}
+				else if (events[i].events & EPOLLIN)
+				{
+					// std::cout << "----------EPOLLIN EVENT" << std::endl;
+					servers[s]->clients[events[i].data.fd]->readRequest1();
+				}
+				else if (events[i].events & EPOLLOUT)
+				{
+					// std::cout << "----------EPOLLOUT EVENT" << std::endl;
+						if (servers[s]->clients[events[i].data.fd]->CreateAndSendResponse() == DELETE_CLIENT)
+							servers[s]->deleteClient(events[i].data.fd);
+				}
+			}
+			if (s == servers.size())
+				s = 0;
+			bzero(events, MAX_EVENTS);
+		}
+	}
+	for (size_t s = 0; s < servers.size(); i++)
+	{
+		if (close(servers[s]->getServerFd()))
+		{
+			fprintf(stderr, "Failed to close epoll file descriptor\n");
+			return;
+		}
 	}
 }

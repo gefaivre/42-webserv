@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 14:08:38 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/05 16:14:28 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/02 19:04:32 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,42 @@ Location::Location(/* args */)
 {
 }
 
-Location::Location(string key)
+Location::Location(Location const & src)
+{
+	std::cout << "Copy constructor called" << std::endl;
+	*this = src;
+	return ;
+}
+
+Location&	Location::operator=(Location const & rhs)
+{
+	std::cout << "Copy assignment operator called" << std::endl;
+	_wasSet = new std::vector<std::string>();
+	_wasSet->insert(_wasSet->end(), rhs._wasSet->begin(), rhs._wasSet->end());
+	
+	_key = rhs._key;
+	_cgi = rhs._cgi;
+	_autoIndex = rhs._autoIndex;
+	_root = rhs._root;
+	_acceptedMethods = rhs._acceptedMethods;
+	_port = rhs._port;
+	_clientMaxBodySize = rhs._clientMaxBodySize;
+	_name = rhs._name;
+	
+	return (*this);
+}
+
+Location::Location(std::string key)
 {
 	_key = key;
 }
 
 Location::~Location()
 {
+	std::cout << "LOC DESTRUCTEUR " << this->_key << std::endl;
 }
 
-string	Location::getKey(void)
+std::string	Location::getKey(void)
 {
 	return (_key);
 }
@@ -45,7 +71,7 @@ void	Location::setPort(int port)
 }
 
 
-void	Location::setName(vector<string> name)
+void	Location::setName(std::vector<std::string> name)
 {
 	(void) name;
 	// _name = name;
@@ -66,10 +92,22 @@ void Location::beSetup(Server *server)
 	// cout << "Location '" << this->_key << "' was setup by server !" << endl;
 
 	//SETUP CGI
-	map<string, string> serverCgi = server->getCgiMap();
+	std::map<std::string, std::string> serverCgi = server->getCgiMap();
 	_cgi.insert(serverCgi.begin(), serverCgi.end());
 	// if (find(_wasSet->begin(), _wasSet->end(), "cgi") == _wasSet->end())
 	// nao usamos pois mesmo se o cgi ja foi colocado no location, o server pode ter outras keys
+
+	for (std::map<std::string, std::string>::iterator it = serverCgi.begin(); it != serverCgi.end(); ++it) {
+		std::map<std::string, std::string>::iterator loc = _cgi.find(it->first);
+		if (loc == _cgi.end()) {
+			std::cout << it->second << "!!!!!!!!!!!!!!!!!!!" << std::endl;
+			_cgi.insert(std::make_pair(it->first, it->second));
+		}
+	}
+
+
+
+
 	if (find(_wasSet->begin(), _wasSet->end(), "autoIndex") == _wasSet->end())
 		_autoIndex = server->getAutoIndex();
 	if (find(_wasSet->begin(), _wasSet->end(), "root") == _wasSet->end())
