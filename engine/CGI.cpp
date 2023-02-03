@@ -79,16 +79,15 @@ void CGI::verifyCgi()
 {
 	//TODO: faire une erreur qd le php ne peut pas lire
 	//TODO: que faire ds le cas d'un file sans ext ?
+	std::cout << "** verifyCgi **" << std::endl;
 	std::string format;
 	std::string requestFile;
 	std::string firstReq = (*_request)[0];
 	std::string key;
 	size_t pos_space = 0;
-	// size_t pos_slash = 0;
 	size_t pos_point = 0;
 	pos_space = firstReq.find_last_of(' ');
 	pos_point = firstReq.find_first_of('.');
-	// pos_slash = firstReq.find_first_of('/');
 	if (pos_space < pos_point)
 		format = "";
 	else
@@ -96,17 +95,20 @@ void CGI::verifyCgi()
 		format = firstReq.substr(pos_point + 1, pos_space - (pos_point + 1));
 		format =format.substr(0, format.find_first_of('?'));
 	}
+	std::cout << "format = " << format<< std::endl;
 	size_t postIndex = firstReq.find("POST");
 	size_t getIndex = firstReq.find("GET");
 	size_t deleteIndex = firstReq.find("DELETE");
 	_getParams = "";
 	requestFile = getRequestFile(firstReq, &_getParams);
+	std::cout << "requestFile= " << requestFile << std::endl;
 	_loc = _server->getLocationByPath('/' + requestFile);
 	key = _loc.getKey();
 	if (key.length() != 1)
 		requestFile = requestFile.substr(key.length() - 2);
 	if (postIndex != std::string::npos)
 	{
+		std::cout << "** POST **" << std::endl;
 		if (!_loc.getAcceptedMethods()._post)
 			*_errorcode = 405;
 		else {
@@ -114,19 +116,23 @@ void CGI::verifyCgi()
 				// _server->getLocationByPath(_requestData.path)
 				// std::cout << "_server->getCgiValue(format)" << format << std::endl;
 				// std::cout << "SERVERU = "
+				std::cout << "request = " << format << std::endl;
 				workPostCgi(_loc.getCgiValue(format), requestFile);
 			}
 			catch(std::exception &e)
 			{
-				// std::cout << "request = " << *_requestBody << std::endl;
+				// std::cout << "Request = " <<
+				std::cout << "request = " << *_requestBody << std::endl;
 				// exit(1);
 				if (!saveFile(*_requestmap, *_requestBody))
 					*_errorcode = 405;
 			}
 		}
+		std::cout << "** error" << *_errorcode <<std::endl;
 	}
 	else if (getIndex != std::string::npos)
 	{
+		std::cout << "** GET **" << std::endl;
 		if (!_loc.getAcceptedMethods()._get)
 			*_errorcode = 405;
 		else
@@ -153,10 +159,15 @@ void CGI::verifyCgi()
 	}
 	else if (deleteIndex != std::string::npos)
 	{
-		if (!_loc.getAcceptedMethods()._get)
+		std::cout << "** DELETE **" << std::endl;
+		if (!_loc.getAcceptedMethods()._delete)
+		{
 			*_errorcode = 405;
+			std::cout << "*_errorcode" << *_errorcode<< std::endl;
+		}
 		else
 		{
+			std::cout << "SALUT " << std::endl;
 			try
 			{
 				workDeleteCgi(_loc.getCgiValue(format), requestFile);
@@ -185,7 +196,6 @@ void CGI::verifyCgi()
 			}
 		}
 	}
-	
 }
 
 
@@ -304,11 +314,11 @@ int CGI::workGetCgi(std::string format, std::string requestFile)
 	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	// char *args[]= {const_cast<char*>(format.c_str()), const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *header[] = {
-	const_cast<char*> (script_filename.c_str()),
-	const_cast<char*> (request_method.c_str()),
-	const_cast<char*> (query_string.append(_getParams).c_str()),
-	(char *) "REDIRECT_STATUS=200",
-	(char *) NULL
+		const_cast<char*> (script_filename.c_str()),
+		const_cast<char*> (request_method.c_str()),
+		const_cast<char*> (query_string.append(_getParams).c_str()),
+		(char *) "REDIRECT_STATUS=200",
+		(char *) NULL
 	};
 
 	pipe(fd_out);
@@ -357,6 +367,7 @@ int CGI::workGetCgi(std::string format, std::string requestFile)
 
 int CGI::workDeleteCgi(std::string format, std::string requestFile)
 {
+	std::cout << "*** DELETE CGI ***" << std::endl;
 	pid_t pid;
     int fd_out[2];
 	char buf[1024];

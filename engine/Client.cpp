@@ -384,6 +384,10 @@ int Client::sendResponse()
 
 
 
+
+
+
+
 void Client::displayRequest()
 {
 	std::cout << "\n"

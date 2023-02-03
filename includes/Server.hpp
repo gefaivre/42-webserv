@@ -31,7 +31,7 @@ class Client;
 class Server: public Config
 {
 private:
-	
+
 	int _sockfd;
 	struct sockaddr_in _addr;
 	int _epollfd;

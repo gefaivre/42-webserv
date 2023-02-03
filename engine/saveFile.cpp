@@ -77,37 +77,41 @@ std::map<std::string, std::string>  transformBodyStringtoMap(std::map<std::strin
 	{
 		// for (size_t i = 0; i < vector.size(); i++)
 		// 	std::cout << YEL << vector[i] << reset <<std::endl;
-	
-		std::string boundary = ft_find_boundary_utils(requestmap);
-		std::cout <<boundary <<std::endl;
-		vector = ft_split_vector_string_file(requestBody, '\r', boundary);
-		std::cout <<"REQUEST BODY = "<<requestBody <<std::endl;
-		for (size_t i = 0; i < vector.size(); i++)
+		try
 		{
-			// std::cout<< RED << "VECOT = " <<  vector[i]<< "."<<reset << std::endl;
-			size_t colon_boundary = vector[i].find(boundary);
-			if (colon_boundary == std::string::npos)
+			std::string boundary = ft_find_boundary_utils(requestmap);
+			vector = ft_split_vector_string_file(requestBody, '\r', boundary);
+			for (size_t i = 0; i < vector.size(); i++)
 			{
-				if (vector[i].find("Content-Disposition") != std::string::npos)
-					key = findBodyKey(vector, i);
+				// std::cout<< RED << "VECOT = " <<  vector[i]<< "."<<reset << std::endl;
+				size_t colon_boundary = vector[i].find(boundary);
+				if (colon_boundary == std::string::npos)
+				{
+					if (vector[i].find("Content-Disposition") != std::string::npos)
+						key = findBodyKey(vector, i);
+					else
+					{
+						if (!key.empty())
+						{
+							value += findBodyValue(vector, i, value);
+							// std::cout << YEL<< " *******" << reset<< std::endl;
+						}
+					}
+				}
 				else
 				{
 					if (!key.empty())
 					{
-						value += findBodyValue(vector, i, value);
-						// std::cout << YEL<< " *******" << reset<< std::endl;
+						requestmapBody.insert(std::pair<std::string, std::string>(key, value));
+						value.clear();
+						key.clear();
 					}
 				}
 			}
-			else
-			{
-				if (!key.empty())
-				{
-					requestmapBody.insert(std::pair<std::string, std::string>(key, value));
-					value.clear();
-					key.clear();
-				}
-			}
+		}
+		catch (std::exception &e)
+		{
+			return (requestmapBody);
 		}
 	}
 	catch (std::exception &e)
@@ -143,7 +147,7 @@ bool saveFile(std::map<std::string, std::string> requestmap, std::string request
 	for (it = requestmapBody.begin(); it != requestmapBody.end(); it++)
 	{
 		std::ofstream outfile;
-		std::string new_path = "www/new_files/";
+		std::string new_path = "html/new_files/";
 		mkdir(new_path.c_str(), 0777);
 		outfile.open(new_path.append(it->first).c_str());
 		//write the string

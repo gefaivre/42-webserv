@@ -42,6 +42,7 @@ class Client
 		int sendResponse();
 
 
+
 		std::vector<std::string> getRequest() const;
 
 	private:

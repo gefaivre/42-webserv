@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/02 18:45:36 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/01/18 13:36:35 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ bool	Config::getAutoIndex(void)
 }
 
 void	Config::setRoot(std::string root)
-{ 
+{  
 	_wasSet->push_back("root");
 	if (root.size() != 0 && root[root.size() - 1] != '/')
 		root += '/';
