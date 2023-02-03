@@ -171,7 +171,6 @@ void Client::EndOfRead()
 	event.data.fd = _clientfd;
 	epoll_ctl(_server->getEpollFd(), EPOLL_CTL_MOD, _clientfd, &event);
 
-	
 	// _requestmap.clear();
 }
 
@@ -296,7 +295,6 @@ void Client::readRequest1()
 	}
 	else if (_bodyContentLenght || parseChunked() == true )
 		readRequestBody();
-	std::cout << _requestBody << std::endl;
 }
 
 int Client::CreateAndSendResponse()
@@ -309,6 +307,7 @@ int Client::CreateAndSendResponse()
 		if (server != NULL)
 			_server = server;
 		setKeepAlive();
+		// std::cout << _requestBody << std::endl;
 		CGI cgi = CGI(&_request, _server, &_errorcode, &_requestBody, &_requestmap, &_cgiResponse);
 		if (!_errorcode)
 			cgi.verifyCgi();

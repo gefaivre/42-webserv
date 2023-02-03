@@ -35,6 +35,7 @@ INCLUDES = $(addprefix -I , $(INC_PATH))
 	$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDES)
 
 all: ${NAME}
+	touch html/delete_method/delete_file.html && echo "hello world!" > html/delete_method/delete_file.html
 
 $(NAME): $(OBJS)
 		$(CC) ${CFLAGS} $(OBJS) -o $(NAME)
