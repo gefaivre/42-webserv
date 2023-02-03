@@ -5,9 +5,13 @@ server {
   root /mnt/nfs/homes/mgoncalv/42-webserv/html;
   autoindex on;
   accepted_methods       GET POST;
+
+
+  index index.html;
   location / {
     accepted_methods GET POST DELETE;
-    rewrite /index.html www.youtube.com;
+    rewrite /youtube.html www.youtube.com;
+    
   }
 
   location /put/test/ {
