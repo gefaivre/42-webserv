@@ -168,9 +168,7 @@ void CGI::verifyCgi()
 					{
 						//file writable
 						if (!remove(_loc.getRoot().append(requestFile).c_str()))
-						{
 							*_errorcode = 202;
-						}
 						else
 							*_errorcode = 500;
 					}
@@ -291,7 +289,6 @@ int CGI::workGetCgi(std::string format, std::string requestFile)
 	std::string script_filename = "SCRIPT_FILENAME=";
 	script_filename.append(requestFileRoot);
 	char *args[]= {const_cast<char*>(format.c_str()), (char *) "-f", const_cast<char*>(requestFileRoot.c_str()), NULL};	
-	// char *args[]= {const_cast<char*>(format.c_str()), const_cast<char*>(requestFileRoot.c_str()), NULL};	
 	char *header[] = {
 		const_cast<char*> (script_filename.c_str()),
 		const_cast<char*> (request_method.c_str()),
