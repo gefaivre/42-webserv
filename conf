@@ -11,6 +11,7 @@ server {
 
   location /put/test/ {
     accepted_methods POST;
+     client_max_body_size 100;
   }
 
   cgi .bla /mnt/nfs/homes/jbach/Documents/2901/cgi_tester;

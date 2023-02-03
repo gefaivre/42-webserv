@@ -79,7 +79,6 @@ void CGI::verifyCgi()
 {
 	//TODO: faire une erreur qd le php ne peut pas lire
 	//TODO: que faire ds le cas d'un file sans ext ?
-	std::cout << "** verifyCgi **" << std::endl;
 	std::string format;
 	std::string requestFile;
 	std::string firstReq = (*_request)[0];
@@ -95,44 +94,35 @@ void CGI::verifyCgi()
 		format = firstReq.substr(pos_point + 1, pos_space - (pos_point + 1));
 		format =format.substr(0, format.find_first_of('?'));
 	}
-	std::cout << "format = " << format<< std::endl;
 	size_t postIndex = firstReq.find("POST");
 	size_t getIndex = firstReq.find("GET");
 	size_t deleteIndex = firstReq.find("DELETE");
 	_getParams = "";
 	requestFile = getRequestFile(firstReq, &_getParams);
-	std::cout << "requestFile= " << requestFile << std::endl;
 	_loc = _server->getLocationByPath('/' + requestFile);
 	key = _loc.getKey();
 	if (key.length() != 1)
 		requestFile = requestFile.substr(key.length() - 2);
 	if (postIndex != std::string::npos)
 	{
-		std::cout << "** POST **" << std::endl;
 		if (!_loc.getAcceptedMethods()._post)
 			*_errorcode = 405;
 		else {
 			try {
-				// _server->getLocationByPath(_requestData.path)
-				// std::cout << "_server->getCgiValue(format)" << format << std::endl;
-				// std::cout << "SERVERU = "
-				std::cout << "request = " << format << std::endl;
+
 				workPostCgi(_loc.getCgiValue(format), requestFile);
 			}
 			catch(std::exception &e)
 			{
 				// std::cout << "Request = " <<
-				std::cout << "request = " << *_requestBody << std::endl;
 				// exit(1);
 				if (!saveFile(*_requestmap, *_requestBody))
 					*_errorcode = 405;
 			}
 		}
-		std::cout << "** error" << *_errorcode <<std::endl;
 	}
 	else if (getIndex != std::string::npos)
 	{
-		std::cout << "** GET **" << std::endl;
 		if (!_loc.getAcceptedMethods()._get)
 			*_errorcode = 405;
 		else
@@ -159,15 +149,12 @@ void CGI::verifyCgi()
 	}
 	else if (deleteIndex != std::string::npos)
 	{
-		std::cout << "** DELETE **" << std::endl;
 		if (!_loc.getAcceptedMethods()._delete)
 		{
 			*_errorcode = 405;
-			std::cout << "*_errorcode" << *_errorcode<< std::endl;
 		}
 		else
 		{
-			std::cout << "SALUT " << std::endl;
 			try
 			{
 				workDeleteCgi(_loc.getCgiValue(format), requestFile);
@@ -183,19 +170,15 @@ void CGI::verifyCgi()
 						if (!remove(_loc.getRoot().append(requestFile).c_str()))
 						{
 							*_errorcode = 202;
-							std::cout << "File deleted" << std::endl;
 						}
 						else
 							*_errorcode = 500;
-							// std::cout <<"File not deleted" << std::endl;
 					}
 					else
 						*_errorcode = 4041;
-						// std::cout <<"No rights to delete" << std::endl;
 				}
 				else
 					*_errorcode = 404;
-					// std::cout << "File not exist" << std::endl;
 			}
 		}
 	}
@@ -204,7 +187,6 @@ void CGI::verifyCgi()
 
 int CGI::workPostCgi(std::string format, std::string requestFile)
 {
-	std::cout << "_requestBody =" << _requestBody[0] << std::endl;
 	pid_t pid;
     int fd[2];
     int fd_out[2];
@@ -223,7 +205,6 @@ int CGI::workPostCgi(std::string format, std::string requestFile)
 	script_filename.append(requestFileRoot);
 	try 
 	{
-		std::cout << "Found boundary" << std::endl;
 		ft_find_boundary_utils(*_requestmap);
 	}
 	catch(std::exception &e)
@@ -247,11 +228,7 @@ int CGI::workPostCgi(std::string format, std::string requestFile)
 		(char *) "REDIRECT_STATUS=200",
 		(char *) NULL
 	};
-	std::cout << YEL << "SCRIPT = " << script_filename<<reset<< std::endl;
-	std::cout << YEL << "METHOD = " << request_method<<reset<< std::endl;
-	std::cout << YEL << "TYPE = " << content_type<<reset<< std::endl;
-	std::cout << YEL << "LENGTH = " << content_length<<reset<< std::endl;
-	std::cout << YEL << "Body = " << _requestBody <<reset<< std::endl;
+
    	pipe(fd);
 	pipe(fd_out);
 	write(fd[1], _requestBody->c_str(), _requestBody->length());
@@ -281,11 +258,9 @@ int CGI::workPostCgi(std::string format, std::string requestFile)
 		close(fd_out[1]);
 		while (waitpid(-1, NULL, WUNTRACED) != -1)
 			;
-		std::cout << "Before read" << std::endl;
 		int n = read(fd_out[0], buf, 1024);
 		if (n < 0)
 		{
-			std::cout << "Error read" << std::endl;
 			perror("read");
            	exit(EXIT_FAILURE);
         } else
@@ -296,7 +271,6 @@ int CGI::workPostCgi(std::string format, std::string requestFile)
 			if (mystring.find(substring) != std::string::npos && mystring.find_first_of("\n\n") != std::string::npos)
 				mystring.erase(mystring.find(substring), mystring.find_first_of("\n\n"));
 			_cgiResponse->append(mystring);
-			// std::cout << "_cgiResponse" << *_cgiResponse << std::endl;
 		}
 	}
 	return (1);
@@ -334,7 +308,6 @@ int CGI::workGetCgi(std::string format, std::string requestFile)
 	else if (!pid) 
 	{ 
 		/* child */
-		// std::cout << "**2" <<std::endl;
 		dup2(fd_out[1], STDOUT_FILENO);
 		dup2(fd_out[1], STDERR_FILENO);
 		close(fd_out[0]);
@@ -345,16 +318,12 @@ int CGI::workGetCgi(std::string format, std::string requestFile)
 	else 
 	{ 
 		/* parent */
-		// std::cout << "**3" <<std::endl;
 		close(fd_out[1]);
 		while (waitpid(-1, NULL, WUNTRACED) != -1)
 			;
-		std::cout << "Before read" << std::endl;
 		int n = read(fd_out[0], buf, 1024);
-		// std::cout << "n = " <<n <<std::endl;
 		if (n < 0)
 		{
-			std::cout << "Error read" << std::endl;
 			perror("read");
            	exit(EXIT_FAILURE);
         } else
@@ -365,7 +334,6 @@ int CGI::workGetCgi(std::string format, std::string requestFile)
 			if (mystring.find(substring) != std::string::npos && mystring.find_first_of("\n\n") != std::string::npos)
 				mystring.erase(mystring.find(substring), mystring.find_first_of("\n\n"));
 			_cgiResponse->append(mystring);
-			// std::cout << "CGI response ="<<*_cgiResponse << std::endl;
 		}
 	}
 	return (1);
@@ -373,7 +341,6 @@ int CGI::workGetCgi(std::string format, std::string requestFile)
 
 int CGI::workDeleteCgi(std::string format, std::string requestFile)
 {
-	std::cout << "*** DELETE CGI ***" << std::endl;
 	pid_t pid;
     int fd_out[2];
 	char buf[1024];
@@ -414,11 +381,9 @@ int CGI::workDeleteCgi(std::string format, std::string requestFile)
 		close(fd_out[1]);
 		while (waitpid(-1, NULL, WUNTRACED) != -1)
 			;
-		std::cout << "Before read" << std::endl;
 		int n = read(fd_out[0], buf, 1024);
 		if (n < 0)
 		{
-			std::cout << "Error read" << std::endl;
 			perror("read");
            	exit(EXIT_FAILURE);
         } else
@@ -429,7 +394,6 @@ int CGI::workDeleteCgi(std::string format, std::string requestFile)
 			if (mystring.find(substring) != std::string::npos && mystring.find_first_of("\n\n") != std::string::npos)
 				mystring.erase(mystring.find(substring), mystring.find_first_of("\n\n"));
 			_cgiResponse->append(mystring);
-			std::cout << "CGI DELETE response ="<<_cgiResponse << std::endl;
 		}
 	}
 	return (1);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 13:52:17 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/01/05 16:14:28 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/03 19:28:02 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,6 @@ public:
 	void			setPort(int port);
 	void			setName(vector<string> name);
 
-	void			setClientMaxBodySize(int clientMaxBodySize);
 	void 			beSetup(Server *server);
 };
 

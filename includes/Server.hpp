@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:29:46 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/02 17:03:16 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/03 19:27:57 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,7 @@ public:
 	void			setEpollFd(int epollfd);
 	int				getEpollFd() const;
 
-	void			setClientMaxBodySize(int clientMaxBodySize);
-	int				getClientMaxBodySize(void);
+	
 
 	int 			getServerFd() const;
 

@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/03 19:05:05 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/03 20:17:00 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 Config::Config()
 {
-	_wasSet = new std::vector<std::string>();
 	_autoIndex = true;
 	_clientMaxBodySize = INT_MAX;
 	
@@ -23,20 +22,11 @@ Config::Config()
 
 Config::~Config()
 {
-	// std::cout << "CONF DESTRUCTEUR" << std::endl;
-
-	
-	if (_wasSet)
-	{
-		// std::cout << "was set loc:" << _wasSet <<std::endl;
-		delete _wasSet;
-		_wasSet = NULL;
-	}
 }
 
 void	Config::addCgi(std::string key, std::string value)
 {
-	_wasSet->push_back("cgi");
+	_wasSet.push_back("cgi");
 	if (_cgi.find(key) != _cgi.end())
 		std::cerr << "This cgi is already been handled by: " << _cgi[key] << std::endl;
 	else
@@ -58,7 +48,7 @@ std::string	Config::getCgiValue(std::string key)
 
 void Config::setAutoIndex(bool autoIndex)
 {
-	_wasSet->push_back("autoIndex");
+	_wasSet.push_back("autoIndex");
 	_autoIndex = autoIndex;
 }
 
@@ -69,7 +59,7 @@ bool	Config::getAutoIndex(void)
 
 void	Config::setRoot(std::string root)
 {  
-	_wasSet->push_back("root");
+	_wasSet.push_back("root");
 	if (root.size() != 0 && root[root.size() - 1] != '/')
 		root += '/';
 
@@ -83,7 +73,7 @@ std::string Config::getRoot(void)
 
 void	Config::setAcceptedMethods(t_methods methods)
 {
-	_wasSet->push_back("acceptedMethods");
+	_wasSet.push_back("acceptedMethods");
 	_acceptedMethods = methods;
 }
 
@@ -102,8 +92,25 @@ std::vector<std::string> Config::getName(void)
 	return (_name);
 }
 
+void	Config::setClientMaxBodySize(int clientMaxBodySize)
+{
+	_wasSet.push_back("client_max_body_size");
+	_clientMaxBodySize = clientMaxBodySize;
+}
+
 
 int		Config::getClientMaxBodySize(void)
 {
 	return (_clientMaxBodySize);
+}
+
+void			Config::setIndex(std::vector<std::string> index)
+{
+	_wasSet.push_back("index");
+	this->_index = index;
+}
+
+std::vector<std::string> 			Config::getIndex(void)
+{
+	return (_index);
 }

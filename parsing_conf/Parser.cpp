@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/03 18:15:11 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/03 20:18:13 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ void	Parser::prepareLine()
 	
 	while (getline(_configFile, line))
 	{
-		std::cout << "LINE:"<<line.size()<< "."<<std::endl;
 		
 		if (line.size() && line.find_first_not_of(" \n\t\v\f\r") != std::string::npos && line[line.find_first_not_of(" \n\t\v\f\r")] != '#')
 			buffer += line;
@@ -31,7 +30,6 @@ void	Parser::prepareLine()
 	ft_remove_double_spaces(&buffer);
 	ft_wrap_in_spaces(&buffer);
 	_content = buffer;
-	std::cout << buffer << std::endl;
 }
 
 Parser::Parser(void)
@@ -61,7 +59,6 @@ Location *Parser::parseNewContext(size_t nextOpenBracket, Server *server)
 		directive_value_start = _currIdx + target_length;
 		location = new Location(_content.substr(directive_value_start, nextOpenBracket - directive_value_start - 1));
 		server->addLocation(location);
-		std::cout << "	Location:" << location->getKey() << std::endl;
 	}
 	else
 		std::cerr << "error: { invalid" << std::endl;
@@ -72,7 +69,6 @@ Location *Parser::parseNewContext(size_t nextOpenBracket, Server *server)
 void	Parser::parseAutoIndex(std::string directive, std::vector<Config *> conf)
 {
 	bool autoindex;
-	std::cout << "	Autoindex: " << directive.substr(10) << "."<< std::endl;
 	if (directive.substr(10) == "off")
 		autoindex = false;
 	else if (directive.substr(10) == "on")
@@ -106,6 +102,8 @@ void	Parser::parseDirective(size_t nextSemiColon, std::vector<Config *> conf)
 				}
 				else if (ft_starts_with(directive, "server_name "))
 					conf.back()->setName(ft_split(directive.substr(12, directive.length() - 11), ' '));
+				else if (ft_starts_with(directive, "index "))
+					conf.back()->setIndex(ft_split(directive.substr(8, directive.length() - 7), ' '));
 				else if (ft_starts_with(directive, "autoindex "))
 					parseAutoIndex(directive, conf);
 				else if (ft_starts_with(directive, "root "))
@@ -137,7 +135,6 @@ void	Parser::parseDirective(size_t nextSemiColon, std::vector<Config *> conf)
 						}
 					}
 					conf.back()->setAcceptedMethods(methods);
-					std::cout << "	Accepted_methods: "<< directive.substr(17) << "." << std::endl;
 				}
 				_currIdx = nextSemiColon + 2;
 			}
@@ -153,7 +150,6 @@ Server	*Parser::getServerConf(void)
 	std::string sTarget = "server {";
 	Server *server = new Server();
 	conf.push_back(server);
-	std::cout << "server:" << std::endl;
 	_currIdx += sTarget.length() + 1;
 	while (conf.size())
 	{
@@ -232,11 +228,6 @@ Parser::Parser(char *configName)
 
 Parser::~Parser(void)
 {
-	// std::cout << "PARSER DESTRUCTEUR" << std::endl;
-	// for (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end(); ++it) {
-	// 	std::cout << "PORT was destructed: " << (*it) << std::endl;
-    // 	delete (*it);
-	// }
 	for (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end();) {
 		std::cout << "PORT was destructed: " << (*it) << std::endl;
 		delete (*it);
@@ -248,6 +239,5 @@ Parser::~Parser(void)
 
 std::vector<Server*>	*Parser::getServers(void)
 {
-	std::cout << "_Serv:" << &_servers <<std::endl;
 	return (&_servers);
 }

@@ -6,7 +6,7 @@
 /*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/03 18:19:27 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/03 20:19:18 by mgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,57 +15,23 @@
 
 Server::Server()
 {
-	// TODO
-	// Location *location;
-	// location = new Location("/");
-	// this->addLocation(location);
+
 	_sockfd = -1;
 }
 
-// Server::Server(Server const & src)
-// {
-// 	std::cout << "ICI 2" << std::endl;
-// 	exit(1);
-// 	*this = src;
-// 	return ;
-// }
-
-// Server&	Server::operator=(Server const & rhs)
-// {
-// 	// std::map<std::string, Location *>	_locations;
-// 	// int _sockfd;
-// 	// struct sockaddr_in _addr;
-// 	// int _epollfd;
-// 	std::cout << "ICI" << std::endl;
-// 	exit(1);
-		
-// 	_locations = rhs._locations;
-// 	_sockfd = rhs._sockfd;
-// 	_addr = rhs._addr;
-// 	_epollfd = rhs._epollfd;
-// 	// std::cout << "Copy assignment operator called" << std::endl;
-// 	// this->_virguleFixe = rhs.getVirguleFixe();
-// 	return (*this);
-// }
-
 Server::~Server()
 {
-	// std::cout << "SERVER DESTRUCTEUR" << std::endl;
 	for (std::map<std::string, Location *>::iterator it = _locations.begin(); it != _locations.end(); ++it) {
     	delete it->second;
 	}
 	if (_sockfd != -1)
 		close(_sockfd);
-		
-	//std::map<int, Client *> 		clients;
 	std::map<int, Client *>::iterator it;
 	for (it = clients.begin(); it != clients.end();) {
 		(it->second)->resetClient();
 		delete it->second;
 		clients.erase(it++);
 	}
-
-	
 }
 
 void Server::setSocket()
@@ -88,7 +54,6 @@ void Server::setSocket()
 
 void Server::setStruct()
 {
-	// std::cout<< "Port = " << getPort() << std::endl;
 	memset((char *)&_addr, 0, sizeof(_addr));
 	_addr.sin_addr.s_addr = INADDR_ANY;
 	_addr.sin_port = htons(_port); 
@@ -122,8 +87,6 @@ void Server::deleteClient(int clientfd) {
 			delete it->second;
 		clients.erase(it);
 	}
-	else
-		std::cout << GRN << "Le client existe pas" << reset << std::endl;
 }
 
 void	Server::setPort(int port)
@@ -134,16 +97,6 @@ void	Server::setPort(int port)
 void	Server::setName(std::vector<std::string> name)
 {
 	_name = name;
-}
-
-void	Server::setClientMaxBodySize(int clientMaxBodySize)
-{
-	_clientMaxBodySize = clientMaxBodySize;
-}
-
-int		Server::getClientMaxBodySize(void)
-{
-	return (_clientMaxBodySize);
 }
 
 bool		Server::locationExist(std::string key)
@@ -159,7 +112,6 @@ void		Server::addLocation(Location *location)
 	}
 	else
 		std::cerr << "Location already exists!" << std::endl;
-		
 }
 
 Location	Server::getLocationByPath(std::string path)
@@ -168,16 +120,13 @@ Location	Server::getLocationByPath(std::string path)
 	int 		newMax = -1;
 	Location	*loc;
 	std::map<std::string, Location *>::iterator	it;
-	// std::cout << "path = " << path<< std::endl;
 	for (it = _locations.begin(); it != _locations.end(); it++)
 	{
-		// std::cout << "it -> " << it->second.getRoot() << std::endl;
 		newMax = ft_strcmp_fowardslash(path, it->first);
 		if	( newMax > max)
 		{
 			max = newMax;
 			loc = it->second;
-			// std::cout << "LOC = " << loc.getKey() << std::endl;
 		}
 	}
 	return *loc;

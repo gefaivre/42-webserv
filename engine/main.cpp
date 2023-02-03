@@ -57,7 +57,6 @@ void epolling(vector<Server *> *servers)
 			if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, (*servers)[i]->getServerFd(), &event))
 			{
 				fprintf(stderr, "Failed to add file descriptor to epoll\n");
-				std::cout << "errno = " << errno << std::endl;
 				close(epoll_fd);
 				return;
 			}
@@ -73,22 +72,18 @@ void epolling(vector<Server *> *servers)
 			{
 				if (events[i].data.fd == (*servers)[s]->getServerFd())
 				{
-				// 	std::cout << "----------SERVER EVENT" << std::endl;
 					(*servers)[s]->newclient((*servers)[s]->getEpollFd());
 				}
 				else if (events[i].events & (EPOLLHUP | EPOLLRDHUP))
 				{
-					// std::cout << RED << "EPOLLHUP" << reset << std::endl;
 					(*servers)[s]->deleteClient(events[i].data.fd);
 				}
 				else if (events[i].events & EPOLLIN)
 				{
-					// std::cout << "----------EPOLLIN EVENT" << std::endl;
 					(*servers)[s]->clients[events[i].data.fd]->readRequest1();
 				}
 				else if (events[i].events & EPOLLOUT)
 				{
-					// std::cout << "----------EPOLLOUT EVENT" << std::endl;
 						if ((*servers)[s]->clients[events[i].data.fd]->CreateAndSendResponse() == DELETE_CLIENT)
 							(*servers)[s]->deleteClient(events[i].data.fd);
 				}
@@ -121,11 +116,8 @@ int main(int argc, char **argv)
 	Parser *config = new Parser(argv[1]);
 	g_servers = config;
 
-	std::cout << "G:" << g_servers << std::endl;
-	std::cout << "C:" << config << std::endl;
 	std::vector<Server *> *servers = config->getServers();
 	
-	std::cout << "Serv:" << servers <<std::endl;
 
 	if (signal(SIGINT, sig_handler) == SIG_ERR)
  		std::cout << "can't catch SIGINT" << std::endl;

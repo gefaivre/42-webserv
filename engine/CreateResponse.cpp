@@ -32,7 +32,7 @@ CreateResponse::~CreateResponse()
 	// _headerData.statusMessage.clear();
 	// _headerData.contentLength.clear();
 	_headerData.contentType.erase();
-	_header.clear();
+	// _header.clear();
 }
 
 
@@ -57,7 +57,6 @@ CreateResponse::~CreateResponse()
 void CreateResponse::collectData(int newsocket)
 {
 	(void)newsocket;
-	std::cout << "post method!" << std::endl;
 	
 }
 
@@ -151,7 +150,8 @@ void CreateResponse::fillHeaderData()
 
 void CreateResponse::createHeader()
 {
-	_header.clear();
+	_header = "";
+
 	_header += _headerData.protocol;
 	_header += " ";
 	_header += _headerData.statusCode;
@@ -201,7 +201,6 @@ int CreateResponse::createBody()
 		ret = BodyIsCgi();
 	else
 		ret = BodyIsNotIndex();
-	// std::cout << "_requestData.isCgi " << _requestData.isCgi << std::endl;
 	return ret;
 }
 

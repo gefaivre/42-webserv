@@ -39,7 +39,6 @@ std::vector<std::string>	ft_split_vector_string_file(std::string str, char c, st
 	size_t file_start = 0;
 	size_t colon_equal = 0;
 	size_t colon_no_null = 0;
-	std::cout << "str = " << str<< std::endl;
 	while (end < str.length())
 	{
 		if (file_end != 0)
@@ -50,12 +49,8 @@ std::vector<std::string>	ft_split_vector_string_file(std::string str, char c, st
 			file_end = 0;
 		}
 		else
-		{
-			std::cout <<"start = " << start << std::endl;
 			end = str.find(c, start);
-		}
 		std::string smallstr = str.substr(start, end - start);
-		std::cout << YEL << smallstr << reset << std::endl;
 		arr.push_back(smallstr);
 		start = end + 1;
 
@@ -163,8 +158,6 @@ std::string	ft_find_boundary_utils(std::map<std::string, std::string> requestmap
 		it = requestmap.find("content-type");
 	if (it != requestmap.end())
 	{
-		std::cout << "it->first" << it->first<< std::endl;
-		std::cout << "it->second" << it->second<< std::endl;
 		pos_equal = it->second.find_last_of('=');
 		if (pos_equal == std::string::npos)
 			throw std::exception();
@@ -172,7 +165,6 @@ std::string	ft_find_boundary_utils(std::map<std::string, std::string> requestmap
 			return (NULL);
 		boundary = it->second.substr(pos_equal + 1);
 	}
-	// std::cout << "Bound = ." << boundary + '\n' + '0'<<"." << std::endl;
 	return (boundary);
 }
 

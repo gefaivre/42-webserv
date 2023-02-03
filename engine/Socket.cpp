@@ -96,10 +96,7 @@ void Socket::makeSocketNonBlocking()
 
 void	ft_continue_reading(char a, std::string buf)
 {
-	std::cout << "--- continue reading ---" << std::endl;
 	buf += a;
-	std::cout << "." << a << ".";
-	std::cout << buf;
 }
 
 int	ft_find_content_lenght(std::map<std::string, std::string> _requestmap)
@@ -110,12 +107,6 @@ int	ft_find_content_lenght(std::map<std::string, std::string> _requestmap)
 	if (it != _requestmap.end())
 	{
 		content_lenght = std::atoi(it->second.c_str());
-
-		// while ((tmp_recv = recv(_newsocket, &a, 1, 0)) && content_lenght--) //add -1 to handle errors (This call returns the number of bytes read into the buffer, otherwise it will return -1 on error.)
-		// {
-		// 	std::cout << a;
-		// }
-	}
 	return (content_lenght);
 }
 
@@ -130,7 +121,6 @@ std::string	ft_find_boundary(std::map<std::string, std::string> _requestmap, int
 		if (it != _requestmap.end())
 		{
 			pos_equal = it->second.find_last_of('=');
-			std::cout << "equal = " << pos_equal << std::endl;
 		}
 	}
 	return (boundary);
@@ -172,11 +162,8 @@ void Socket::waitRequest()
 		if (tmp_recv == -1)
 			ft_define_error("Error with the message from a socket");
 		buf += a;
-			if (buf.find("\n\r\n") != std::string::npos)
-			{
-				std::cout << "hello" << std::endl;
-				break;
-			}
+		if (buf.find("\n\r\n") != std::string::npos)
+			break;
 	}
 	parseHeader(buf);
 }

@@ -7,13 +7,11 @@
 ParsingRequest::ParsingRequest( std::vector<std::string> request, Server *server, std::string cgiResponse, int error_code):
  _errorcode(error_code), _request(request), _server(server)
 {
-	std::cout << "cgiResponse = " << cgiResponse <<std::endl;
 	_requestData.isCgi = !cgiResponse.empty();
 	if (_requestData.isCgi)
 		_requestData._cgiResponse = cgiResponse;
 	parsingRequest();
 	foundFileToSend();
-	// std::cout << "**" << std::endl;
 }
 
 
@@ -87,9 +85,7 @@ void ParsingRequest::parsingRequest()
 void ParsingRequest::setFileToSend(std::string errorcode)
 {
 	std::string path;
-	std::cout << "888  -- " << _requestData.path<< std::endl;
 	path = _server->getLocationByPath("/" +_requestData.path).getRoot();
-	std::cout << _server->getLocationByPath("/").getRoot() << std::endl;
 	path += errorcode;
 	if (access(path.c_str(), R_OK) == 0)
 		_requestData.fileToSend = path;
@@ -101,7 +97,6 @@ int ParsingRequest::filepermission()
 {
 	int fd;
 
-	std::cout << "_requestData.fileToSend = " << _requestData.fileToSend << std::endl;
 	if (_errorcode == 405)
 		setFileToSend("405.html");
 	else if (_errorcode == 413)
@@ -112,7 +107,6 @@ int ParsingRequest::filepermission()
 		setFileToSend("404_noSpecified.html");
 	else if (_errorcode == 500)
 		setFileToSend("500.html");
-	std::cout <<  _requestData.methode << std::endl;
 	fd = access(_requestData.fileToSend.c_str(), F_OK);
 	if (fd == -1)
 	{
@@ -145,36 +139,22 @@ int ParsingRequest::foundFileToSend()
 	fullPathFile = _requestData.fileToSend;
 	if (_autoindex == 1 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
 	{
-		std::cout << "--1--" << std::endl;
 		_requestData.fileToSend = fullPathFile;
 		_requestData.isIndex = 1;
 	}
 	else if (isDirectory(fullPathFile))
-	{
-		// std::cout << "--2--" << std::endl;
 		_requestData.fileToSend = rootPath + "index.html";
-	}
 	else if (_autoindex == 0 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
-	{
-		// std::cout << "--3--" << std::endl;
 		filepermission();
-	}
 	else if (_errorcode)
-	{
-		// std::cout << "--4--" << std::endl;
 		filepermission();
-	}
 	else
-	{
-		// std::cout << "--5--" << std::endl;
 		_requestData.fileToSend = fullPathFile;
-	}
 
 
 	FILE *f = fopen(fullPathFile.c_str(), "r+");
 	if ( f == NULL)
 	{
-		std::cout << "Can't Open" << std::endl;
 		if (_autoindex == 1 && errno == 21)
 			return (1);
 		filepermission();
@@ -190,7 +170,7 @@ void ParsingRequest::displayData() const
 	std::cout << "Request Data :" << std::endl;
 	std::cout << "methode \t= " 				<< _requestData.methode << std::endl;
 	std::cout << "protocol \t= " 			<< _requestData.protocol << std::endl;
-	// std::cout << "Connection = "			<< _requestData.Connection << std::endl;
+	std::cout << "Connection = "			<< _requestData.Connection << std::endl;
 	std::cout << "path \t\t= "					<< _requestData.path << std::endl;
 	std::cout << "fileToSend \t= "			<< _requestData.fileToSend << std::endl;
 	std::cout << "isIndex \t= " 				<< _requestData.isIndex << std::endl;

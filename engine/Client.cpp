@@ -45,7 +45,6 @@ Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._serve
 
 Client::~Client()
 {
-	// std::cout << "DESTRUCTEUR CLIENT" << std::endl;
 }
 
 /*
@@ -139,6 +138,7 @@ void Client::transformRequestVectorToMap()
 
 void Client::resetClient()
 {
+	// std::cout << RED << "RESET CLIENT" << reset << std::endl;
 	_requestLine.clear();
 	_request.clear();
 	_requestmap.clear();
@@ -153,12 +153,13 @@ void Client::resetClient()
 	_isSend = false;
 	_moverSave = 0;
 	_errorcode = 0;
+	_firstTimeCreate = false;
+	_createIsFinish = false;
 	//delete new create response
 	if (_createR != NULL)
 	{
 		delete _createR;
 		_createR = NULL;
-
 	}
 	//apeler dans le delete dans le server
 }
@@ -203,7 +204,6 @@ std::string Client::chunkedBody()
 			if (vector[i + 1].empty() && (i + 2) < vector.size())
 				vector.erase(vector.begin() + i + 2);
 		}
-		//TODO: verifier si vector[i + 1] est un num sinon error
 		vector[i].find_last_of("Content-Disposition");
 	}
 	size_t i = vector.size() - 1;
@@ -262,15 +262,13 @@ int Client::readRequestHeader()
 
 void Client::readRequestBody()
 {
+	std::cout << "REQUEST BODY" << std::endl;
 	char buf[READING_BUFFER];
 	int sizeRead;
 
 	bzero(buf, READING_BUFFER);
-	std::cout << "READ REQUEST BODY" << std::endl;
 	if ((sizeRead = recv(_clientfd, buf, READING_BUFFER - 1, 0)) != 0)
 	{
-		if (sizeRead == -1)
-			std::cout << "Error recv" << std::endl;
 		_requestBody.insert(_requestBody.size(), buf, sizeRead);
 	}
 	if (_requestBody.size() == _bodyContentLenght || _requestBody.find(ft_find_boundary_utils(_requestmap) + "\r\n" + '0') !=  std::string::npos)
@@ -288,7 +286,6 @@ void Client::readRequestBody()
 
 void Client::readRequest1()
 {
-	std::cout << "readRequest1 = "  <<std::endl;
 	if (_headerIsRead == false)
 	{
 		if (readRequestHeader() == READ)
@@ -296,10 +293,10 @@ void Client::readRequest1()
 			_headerIsRead = true;
 			transformRequestVectorToMap();
 		}
-		std::cout << "LENGTH = " <<_bodyContentLenght <<std::endl;
 	}
 	else if (_bodyContentLenght || parseChunked() == true )
 		readRequestBody();
+	std::cout << _requestBody << std::endl;
 }
 
 int Client::CreateAndSendResponse()
@@ -318,11 +315,6 @@ int Client::CreateAndSendResponse()
 		ParsingRequest parsingRequest(_request, _server, _cgiResponse, _errorcode);
 		CreateResponse *CR = new CreateResponse(_server, _requestmap, parsingRequest.getData());
 		std::map<std::string,std::string>::iterator it;
-
-		// for (it = _requestmap.begin(); it != _requestmap.end(); it++)
-		// {
-		// 	std::cout << "first = " << it->first << "second = " << it->second << std::endl;
-		// }
 		_createR = CR;
 
 		_firstTimeCreate = true;
@@ -346,7 +338,6 @@ int Client::CreateAndSendResponse()
 			displayRequest();
 			_createR->displayHeaderResponse();
 			// _createR->displayFullResponse();
-			_response = _createR->getResponse();
 			if (ret == DELETE_CLIENT)
 				return DELETE_CLIENT;
 			else if (ret == READ)
@@ -364,7 +355,6 @@ int Client::CreateAndSendResponse()
 
 int Client::sendResponse()
 {
-	// std::cout << "SEND RESPONSE" << std::endl;
 
 	struct epoll_event event;
 	int ret;
@@ -410,8 +400,7 @@ int Client::sendResponse()
 
 void Client::displayRequest()
 {
-	std::cout << "\n"
-			  << YEL << _request[0] << "\033[0m" << std::endl;
+	std::cout << "\n" << YEL << _request[0] << "\033[0m" << std::endl;
 }
 
 void Client::displayFullRequest()
