@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 14:08:38 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/04 02:19:24 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/04 02:23:19 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,16 +84,26 @@ void Location::beSetup(Server *server)
 	// cout << "Location '" << this->_key << "' was setup by server !" << endl;
 
 	//SETUP CGI
-	std::map<std::string, std::string> serverCgi = server->getCgiMap();
-	_cgi.insert(serverCgi.begin(), serverCgi.end());
-	// if (find(_wasSet.begin(), _wasSet.end(), "cgi") == _wasSet.end())
-	// nao usamos pois mesmo se o cgi ja foi colocado no location, o server pode ter outras keys
+	// std::map<std::string, std::string> serverCgi = server->getCgiMap();
+	// _cgi.insert(serverCgi.begin(), serverCgi.end());
+	// // if (find(_wasSet.begin(), _wasSet.end(), "cgi") == _wasSet.end())
+	// // nao usamos pois mesmo se o cgi ja foi colocado no location, o server pode ter outras keys
 
-	for (std::map<std::string, std::string>::iterator it = serverCgi.begin(); it != serverCgi.end(); ++it) {
-		std::map<std::string, std::string>::iterator loc = _cgi.find(it->first);
-		if (loc == _cgi.end())
+	// for (std::map<std::string, std::string>::iterator it = serverCgi.begin(); it != serverCgi.end(); ++it) {
+	// 	std::map<std::string, std::string>::iterator loc = _cgi.find(it->first);
+	// 	if (loc == _cgi.end())
+	// 		_cgi.insert(std::make_pair(it->first, it->second));
+	// }
+
+	std::map<std::string, std::string> serverCgi = server->getCgiMap();
+	std::map<std::string, std::string>::iterator it;
+	for (it = serverCgi.begin(); it != serverCgi.end(); ++it) {
+
+		std::map<std::string, std::string>::iterator redt = _cgi.find(it->first);
+		if (redt == _cgi.end())
 			_cgi.insert(std::make_pair(it->first, it->second));
 	}
+//------------------------------
 
 	
 	
