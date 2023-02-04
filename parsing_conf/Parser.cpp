@@ -6,7 +6,7 @@
 /*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2023/02/04 01:58:43 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/02/04 03:03:26 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,7 +230,9 @@ Parser::Parser(char *configName)
 	}
 	prepareLine();
 	while (_content.find("server {", _currIdx) == _currIdx)
+	{
 		servers.push_back(getServerConf());
+	}
 	this->_servers = servers;
 	verifyServerName();
 	_configFile.close();
@@ -249,5 +251,8 @@ Parser::~Parser(void)
 
 std::vector<Server*>	*Parser::getServers(void)
 {
+	for (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end(); it++) {
+		(*it)->_servers = &_servers;
+	}
 	return (&_servers);
 }

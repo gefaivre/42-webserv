@@ -21,7 +21,7 @@ Client::Client(Server *server, int clientfd) : _clientfd(clientfd), _server(serv
 	this->_moverSave = 0;
 	this->_errorcode = 0;
 	this->_cgiResponse.clear();
-	this->_firstTimeCreate = 0;
+	this->_firstTimeCreate = false;
 	this->_createIsFinish = 0;
 }
 
@@ -35,7 +35,7 @@ Client::Client(const Client &src) : _clientfd(src._clientfd), _server(src._serve
 	this->_isSend = false;
 	this->_moverSave = 0;
 	this->_cgiResponse.clear();
-	this->_firstTimeCreate = 0;
+	this->_firstTimeCreate = false;
 	this->_createIsFinish = 0;
 }
 
@@ -159,6 +159,7 @@ void Client::resetClient()
 		delete _createR;
 		_createR = NULL;
 	}
+
 	//apeler dans le delete dans le server
 }
 
@@ -297,12 +298,27 @@ void Client::readRequest1()
 int Client::CreateAndSendResponse()
 {
 	int ret;
+	std::cout << "_firstTimeCreate\t=\t" << _firstTimeCreate << std::endl;
 	if(_firstTimeCreate == false)
 	{
-		Server *server;
-		server = _server->getServerByName(getHost());
-		if (server != NULL)
-			_server = server;
+		// Server server;
+		// std::cout<< getHost() << std::endl;
+
+		// server = *(_server->getServerByName(getHost()));
+
+		// if (server != NULL)
+		// {
+		// 	server->setEpollFd(_server->getEpollFd());
+		// 	server->_sockfd = _server->_sockfd;
+		// 	server->_addr = _server->_addr;
+		// 	server->clients = _server->clients;
+
+		// 	_server = server;
+		// 	std::cout << "_server->getEpollFd()\t=\t" << _server->getEpollFd() << std::endl;
+		// }
+		// else
+		// 	std::cout << "NULL" << std::endl;
+		std::cout << "_server->getLocationByPath()->getAutoindex()\t=\t" << _server->getLocationByPath("/mnt/nfs/homes/gefaivre/Desktop/42-webserv/html").getAutoIndex() << std::endl;
 		setKeepAlive();
 		CGI cgi = CGI(&_request, _server, &_errorcode, &_requestBody, &_requestmap, &_cgiResponse);
 		if (!_errorcode)

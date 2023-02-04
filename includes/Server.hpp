@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:29:46 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/03 19:27:57 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/04 03:45:04 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,15 +32,15 @@ class Server: public Config
 {
 private:
 
-	int _sockfd;
-	struct sockaddr_in _addr;
-	int _epollfd;
-	std::vector<Server *> _servers;
 		
 
 	
 public:
 
+	int _sockfd;
+	struct sockaddr_in _addr;
+	int _epollfd;
+	std::vector<Server *> *_servers;
 	std::map<std::string, Location *>	_locations;
 	Server();
 	// Server(Server const & src);
