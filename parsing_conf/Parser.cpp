@@ -6,7 +6,7 @@
 /*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2023/02/04 00:41:20 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/02/04 01:58:43 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ Location *Parser::parseNewContext(size_t nextOpenBracket, Server *server)
 		directive_value_start = _currIdx + target_length;
 		location = new Location(_content.substr(directive_value_start, nextOpenBracket - directive_value_start - 1));
 		server->addLocation(location);
+	
 	}
 	else
 		std::cerr << "error: { invalid" << std::endl;
@@ -105,7 +106,6 @@ void	Parser::parseDirective(size_t nextSemiColon, std::vector<Config *> conf)
 				else if (ft_starts_with(directive, "rewrite "))
 				{
 					std::vector<std::string> vector_rew = ft_split(directive.substr(8, directive.length() - 7), ' ');
-					std::cout << "Key:"<<vector_rew[0] << ". Value:"<< vector_rew[1] << std::endl; 
 					// exit(1);
 				}
 				else if (ft_starts_with(directive, "server_name "))
@@ -113,7 +113,6 @@ void	Parser::parseDirective(size_t nextSemiColon, std::vector<Config *> conf)
 				else if (ft_starts_with(directive, "index "))
 				{
 					conf.back()->setIndex(directive.substr(6, directive.length() - 5));
-					// std::cout << "Idx:"<<conf.back()->getIndex()<< "!"<< std::endl;
 				}
 				else if (ft_starts_with(directive, "autoindex "))
 					parseAutoIndex(directive, conf);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/03 20:19:18 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/04 01:56:18 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,7 @@ void	Server::setupLocations()
 	{
 		Location *location;
 		location = new Location("/");
+		location->setAutoIndex(this->_autoIndex);
 		this->addLocation(location);
 	}
 	std::map<std::string, Location *>::iterator iter;

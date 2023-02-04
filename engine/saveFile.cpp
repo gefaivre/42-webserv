@@ -100,7 +100,6 @@ std::map<std::string, std::string>  transformBodyStringtoMap(std::map<std::strin
 
 bool saveFile(std::map<std::string, std::string> requestmap, std::string requestBody)
 {
-	std::cout << "IN SAVE FILE" << std::endl;
 	std::map<std::string, std::string> requestmapBody;
 	requestmapBody = transformBodyStringtoMap(requestmapBody, requestmap, requestBody);
 	std::map<std::string,std::string>::iterator it;

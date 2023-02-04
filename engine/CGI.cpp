@@ -10,7 +10,6 @@ std::string *requestBody, std::map<std::string, std::string> *requestmap, std::s
 :_requestBody(requestBody), _server(server), _errorcode(errorcode), _request(request), \
 _requestmap(requestmap), _cgiResponse(cgiResponse)
 {
-		// std::cout << *_requestBody << std::endl;
 
 	this->_getParams.clear();
 	this->authorizedExtension = setAuthorizedExtension(this->authorizedExtension);
@@ -80,7 +79,6 @@ void CGI::verifyCgi()
 {
 	//TODO: faire une erreur qd le php ne peut pas lire
 	//TODO: que faire ds le cas d'un file sans ext ?
-	// std::cout << *_requestBody << std::endl;
 	std::string format;
 	std::string requestFile;
 	std::string firstReq = (*_request)[0];
@@ -111,7 +109,6 @@ void CGI::verifyCgi()
 			*_errorcode = 405;
 		else {
 			try {
-				// std::cout << *_requestBody << std::endl;
 				workPostCgi(_loc.getCgiValue(format), requestFile);
 			}
 			catch(std::exception &e)
@@ -258,7 +255,6 @@ int CGI::workPostCgi(std::string format, std::string requestFile)
 		while (waitpid(-1, NULL, WUNTRACED) != -1)
 			;
 		int n = read(fd_out[0], buf, 1024);
-		std::cout << "n = "<<n <<std::endl;
 		if (n < 0)
 		{
 			perror("read");

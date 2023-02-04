@@ -69,6 +69,7 @@ void ParsingRequest::parsingRequest()
 	if (key.length() != 1)
 		_requestData.path = _requestData.path.substr(key.length() - 1);
 	_autoindex = _server->getLocationByPath(_requestData.path).getAutoIndex();
+
 }
 
 // void ParsingRequest::setFileToSend404()
@@ -137,10 +138,11 @@ int ParsingRequest::foundFileToSend()
 
 	_requestData.fileToSend = rootPath + _requestData.path ;
 	fullPathFile = _requestData.fileToSend;
-	
-	if(isDirectory(fullPathFile) && _server->getIndex().size())
+	_autoindex =  _server->getLocationByPath(_requestData.pathKey).getAutoIndex();
+	if(isDirectory(fullPathFile) && _server->getLocationByPath(_requestData.pathKey).getIndex().size())
 	{
-		_requestData.fileToSend = rootPath + _server->getIndex();
+		_requestData.fileToSend = rootPath + _server->getLocationByPath(_requestData.pathKey).getIndex();
+		_requestData.path = _server->getLocationByPath(_requestData.pathKey).getIndex();
 	}
 	else if (_autoindex == 1 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
 	{
@@ -148,14 +150,17 @@ int ParsingRequest::foundFileToSend()
 		_requestData.isIndex = 1;
 	}
 	else if (isDirectory(fullPathFile))
+	{
 		_requestData.fileToSend = rootPath + "index.html";
+		_requestData.path = _server->getLocationByPath(_requestData.pathKey).getIndex() + "index.html";
+
+	}
 	else if (_autoindex == 0 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
 		filepermission();
 	else if (_errorcode)
 		filepermission();
 	else
 		_requestData.fileToSend = fullPathFile;
-
 
 	FILE *f = fopen(fullPathFile.c_str(), "r+");
 	if ( f == NULL)

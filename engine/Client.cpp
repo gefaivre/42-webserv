@@ -138,7 +138,6 @@ void Client::transformRequestVectorToMap()
 
 void Client::resetClient()
 {
-	// std::cout << RED << "RESET CLIENT" << reset << std::endl;
 	_requestLine.clear();
 	_request.clear();
 	_requestmap.clear();
@@ -155,7 +154,6 @@ void Client::resetClient()
 	_errorcode = 0;
 	_firstTimeCreate = false;
 	_createIsFinish = false;
-	//delete new create response
 	if (_createR != NULL)
 	{
 		delete _createR;
@@ -261,7 +259,6 @@ int Client::readRequestHeader()
 
 void Client::readRequestBody()
 {
-	std::cout << "REQUEST BODY" << std::endl;
 	char buf[READING_BUFFER];
 	int sizeRead;
 
@@ -307,7 +304,6 @@ int Client::CreateAndSendResponse()
 		if (server != NULL)
 			_server = server;
 		setKeepAlive();
-		// std::cout << _requestBody << std::endl;
 		CGI cgi = CGI(&_request, _server, &_errorcode, &_requestBody, &_requestmap, &_cgiResponse);
 		if (!_errorcode)
 			cgi.verifyCgi();

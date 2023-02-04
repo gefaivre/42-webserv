@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
+/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/04 00:38:20 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/04 01:58:20 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,10 +131,10 @@ void			Config::setIndex(std::string index)
 	_wasSet.push_back("index");
 
 	this->_index = index;
+
 }
 
 std::string 			Config::getIndex(void)
 {
-	// std::cout << "Index:"<<_index <<"."<< std::endl;
 	return (_index);
 }

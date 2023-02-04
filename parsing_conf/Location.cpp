@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
+/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 14:08:38 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/04 00:36:40 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/04 01:55:03 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,14 @@ Location&	Location::operator=(Location const & rhs)
 	
 	_key = rhs._key;
 	_cgi = rhs._cgi;
+	
 	_autoIndex = rhs._autoIndex;
 	_root = rhs._root;
 	_acceptedMethods = rhs._acceptedMethods;
 	_port = rhs._port;
 	_clientMaxBodySize = rhs._clientMaxBodySize;
 	_name = rhs._name;
-	
+	_index = rhs._index;
 	return (*this);
 }
 
@@ -78,6 +79,7 @@ void	Location::setName(std::vector<std::string> name)
 
 void Location::beSetup(Server *server)
 {	
+
 	// _clientMaxBodySize = server->getClientMaxBodySize();
 	_name = server->getName();
 	_port = server->getPort();
@@ -97,22 +99,15 @@ void Location::beSetup(Server *server)
 
 	
 	if (find(_wasSet.begin(), _wasSet.end(), "index") == _wasSet.end())
-	{
-		std::cout << "Get index from parent" << std::endl;
 		_index = server->getIndex();
-	}
 	if (find(_wasSet.begin(), _wasSet.end(), "autoIndex") == _wasSet.end())
 		_autoIndex = server->getAutoIndex();
 	
 	if (find(_wasSet.begin(), _wasSet.end(), "client_max_body_size") == _wasSet.end())
-		_autoIndex = server->getClientMaxBodySize();
+		_clientMaxBodySize = server->getClientMaxBodySize();
 	if (find(_wasSet.begin(), _wasSet.end(), "root") == _wasSet.end())
 		_root = server->getRoot();
 	if (find(_wasSet.begin(), _wasSet.end(), "acceptedMethods") == _wasSet.end())
 		_acceptedMethods = server->getAcceptedMethods();
 
-
-	std::cout << "Index:"<<_index <<"."<< std::endl;
-
-	
 }
