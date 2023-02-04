@@ -8,10 +8,11 @@ server {
 
 
   index index.html;
+  rewrite /youtube.html www.google.com;
   location / {
     accepted_methods GET POST DELETE;
     rewrite /youtube.html www.youtube.com;
-    
+    rewrite /google.html www.google.com;
   }
 
   location /put/test/ {
@@ -28,6 +29,7 @@ server {
     accepted_methods GET;
     root /mnt/nfs/homes/jbach/Documents/2901/YoupiBanane/;
     index youpi.bad_extension;
+    rewrite /mateus.html www.mateus.com;
   }
 }
 

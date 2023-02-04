@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 14:08:38 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/04 00:36:40 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/04 01:17:20 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,34 @@ void Location::beSetup(Server *server)
 			_cgi.insert(std::make_pair(it->first, it->second));
 	}
 
+	// //SETUP REDIRECTION
+	// std::map<std::string, std::string> serverRedirections = server->getRedirectionsMap();
+	// _redirections.insert(serverRedirections.begin(), serverRedirections.end());
+	// // if (find(_wasSet.begin(), _wasSet.end(), "cgi") == _wasSet.end())
+	// // nao usamos pois mesmo se o cgi ja foi colocado no location, o server pode ter outras keys
+
+	// for (std::map<std::string, std::string>::iterator itr = serverRedirections.begin(); itr != serverRedirections.end(); ++itr) {
+	// 	std::map<std::string, std::string>::iterator red = _redirections.find(itr->first);
+	// 	if (red == _redirections.end())
+	// 		_redirections.insert(std::make_pair(itr->first, itr->second));
+	// 	else{
+	// 		std::cout << "REDIRECTION DUPLICATED:"<< itr->second<< "!"<<std::endl;
+	// 	}
+	// }
+
+	std::cout << "REDIRECTION :"<<"!"<<std::endl;
+	
+	std::map<std::string, std::string> serverRedirections = server->getRedirectionsMap();
+	std::map<std::string, std::string>::iterator itr;
+	for (itr = serverRedirections.begin(); itr != serverRedirections.end(); ++itr) {
+
+		std::cout << "REDs:"<< itr->second<< "!"<<std::endl;
+		std::pair<std::map<std::string, std::string>::iterator, bool> ret;
+		ret = _redirections.insert(std::make_pair(itr->first, itr->second));
+		if (ret.second == false) {
+			std::cout << "REDIRECTION DUPLICATED:"<< itr->second<< "!"<<std::endl;
+		}
+	}
 	
 	if (find(_wasSet.begin(), _wasSet.end(), "index") == _wasSet.end())
 	{
@@ -112,7 +140,11 @@ void Location::beSetup(Server *server)
 		_acceptedMethods = server->getAcceptedMethods();
 
 
-	std::cout << "Index:"<<_index <<"."<< std::endl;
+	std::cout << "--------------------------------"<< std::endl;
 
-	
+for (itr = serverRedirections.begin(); itr != serverRedirections.end(); ++itr) {
+
+			std::cout  <<"Key:"<< _key << " --> "<<itr->first<< ":"<< itr->second<< "!"<<std::endl;
+		
+	}
 }
