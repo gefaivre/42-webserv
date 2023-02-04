@@ -8,7 +8,9 @@ server {
 
 
   index index.html;
+  rewrite /jbach www.jbach.dev;
   rewrite /youtube.html www.google.com;
+  rewrite /youtubeeeee.html www.google.com;
   location / {
     accepted_methods GET POST DELETE;
     rewrite /youtube.html www.youtube.com;

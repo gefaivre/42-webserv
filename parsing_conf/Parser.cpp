@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/04 01:19:46 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/04 02:18:14 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,6 @@ void	Parser::parseDirective(size_t nextSemiColon, std::vector<Config *> conf)
 				else if (ft_starts_with(directive, "rewrite "))
 				{
 					std::vector<std::string> vector_rew = ft_split(directive.substr(8, directive.length() - 7), ' ');
-					std::cout << "PARSER"<<vector_rew[0] << ". Value:"<< vector_rew[1] << std::endl;
 					conf.back()->addRedirection(vector_rew[0], vector_rew[1]);
 					// exit(1);
 				}

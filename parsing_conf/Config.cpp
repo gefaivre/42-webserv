@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/04 01:11:30 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/04 02:20:36 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ std::string	Config::getRedirectionValue(std::string key)
 	if (_redirections.find(key) != _redirections.end())
 		return (_redirections[key]);
 	else
-		throw (std::exception());
+		return NULL;
 }
 
 void Config::setAutoIndex(bool autoIndex)
