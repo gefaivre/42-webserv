@@ -6,7 +6,7 @@
 /*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/04 03:40:47 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/02/05 16:00:35 by gefaivre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,7 +166,6 @@ int				Server::getEpollFd() const
 
 Server 			*Server::getServerByName(std::string name)
 {
-	std::cout << "_servers.size()\t=\t" << _servers->size() << std::endl;
 	for (std::vector<Server *>::iterator it = _servers->begin(); it != _servers->end(); ++it)
 	{
 		std::vector<string> names = (*it)->getName();

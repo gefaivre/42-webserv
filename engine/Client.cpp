@@ -11,7 +11,7 @@ Client::Client()
 	_createR = NULL;
 }
 
-Client::Client(Server *server, int clientfd) : _clientfd(clientfd), _server(server)
+Client::Client(Server *server, int clientfd) : _clientfd(clientfd), _server(server), _serverLoc(server)
 {
 	_createR = NULL;
 	this->_headerIsRead = false;
@@ -62,6 +62,7 @@ Client &Client::operator=(Client const &rhs)
 
 		this->_clientfd = rhs._clientfd;
 		this->_server = rhs._server;
+		this->_serverLoc = rhs._serverLoc;
 		this->_headerIsRead = rhs._headerIsRead;
 		this->_firstTimeBody = rhs._firstTimeBody;
 		this->_isKeepAlive = rhs._isKeepAlive;
@@ -248,7 +249,7 @@ int Client::readRequestHeader()
 		if ((_bodyContentLenght == 0 || _requestBody.size() == _bodyContentLenght) && parseChunked() == false)
 			{
 				Location loc;
-				loc = _server->getLocationByPath('/' + getRequestFile(_request[0], NULL));
+				loc = _serverLoc->getLocationByPath('/' + getRequestFile(_request[0], NULL));
 				if ((_bodyContentLenght > (size_t)loc.getClientMaxBodySize()) && (loc.getClientMaxBodySize() != 0))
 					_errorcode = 413;
 				EndOfRead();
@@ -274,7 +275,7 @@ void Client::readRequestBody()
 		if (parseChunked() == true)
 			_requestBody = chunkedBody();
 
-		loc = _server->getLocationByPath('/' + getRequestFile(_request[0], NULL));
+		loc = _serverLoc->getLocationByPath('/' + getRequestFile(_request[0], NULL));
 		if ((_bodyContentLenght > (size_t)loc.getClientMaxBodySize()) && (loc.getClientMaxBodySize() != 0))
 				_errorcode = 413;
 		EndOfRead();
@@ -298,33 +299,24 @@ void Client::readRequest1()
 int Client::CreateAndSendResponse()
 {
 	int ret;
-	std::cout << "_firstTimeCreate\t=\t" << _firstTimeCreate << std::endl;
 	if(_firstTimeCreate == false)
 	{
-		// Server server;
-		// std::cout<< getHost() << std::endl;
+		Server *server;
 
-		// server = *(_server->getServerByName(getHost()));
+		server = _server->getServerByName(getHost());
 
-		// if (server != NULL)
-		// {
-		// 	server->setEpollFd(_server->getEpollFd());
-		// 	server->_sockfd = _server->_sockfd;
-		// 	server->_addr = _server->_addr;
-		// 	server->clients = _server->clients;
-
-		// 	_server = server;
-		// 	std::cout << "_server->getEpollFd()\t=\t" << _server->getEpollFd() << std::endl;
-		// }
-		// else
-		// 	std::cout << "NULL" << std::endl;
-		std::cout << "_server->getLocationByPath()->getAutoindex()\t=\t" << _server->getLocationByPath("/mnt/nfs/homes/gefaivre/Desktop/42-webserv/html").getAutoIndex() << std::endl;
+		if (server != NULL)
+		{
+			_serverLoc = server;
+		}
+		else
+			_serverLoc = _server;
 		setKeepAlive();
-		CGI cgi = CGI(&_request, _server, &_errorcode, &_requestBody, &_requestmap, &_cgiResponse);
+		CGI cgi = CGI(&_request, _serverLoc, &_errorcode, &_requestBody, &_requestmap, &_cgiResponse);
 		if (!_errorcode)
 			cgi.verifyCgi();
-		ParsingRequest parsingRequest(_request, _server, _cgiResponse, _errorcode);
-		CreateResponse *CR = new CreateResponse(_server, _requestmap, parsingRequest.getData());
+		ParsingRequest parsingRequest(_request, _serverLoc, _cgiResponse, _errorcode);
+		CreateResponse *CR = new CreateResponse(_serverLoc, _requestmap, parsingRequest.getData());
 		std::map<std::string,std::string>::iterator it;
 		_createR = CR;
 
