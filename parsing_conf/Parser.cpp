@@ -6,15 +6,40 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/06 16:35:47 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/06 17:52:18 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-
 
 #include "Parser.hpp"
 #include "Location.hpp"
 #include "Config.hpp"
+
+int ft_check_one_word(std::string str)
+{
+	size_t i = 0;
+	while (i < str.length())
+	{
+		if (str[i] == ' ')
+			return (PARS_ERROR);
+		i++;
+	}
+	return (PARS_OK);
+}
+
+int	ft_check_number(std::string str)
+{
+	size_t i = 0;
+	while (i < str.length())
+	{
+		if (str[i] < '0' || str[i] > '9')
+		{
+			if (!(i == str.length() - 1 && str[i] == ' '))
+				return (PARS_ERROR);
+		}
+		i++;
+	}
+	return (PARS_OK);
+}
 
 void	Parser::prepareLine()
 {
@@ -98,7 +123,13 @@ int	Parser::parseDirective(size_t nextSemiColon, std::vector<Config *> conf)
 		std::string directive = _content.substr(_currIdx, nextSemiColon - _currIdx);
 		if (ft_starts_with(directive, "listen "))
 		{
-			int	port = atoi(directive.substr(7, directive.length() - 6).c_str());
+			std::string number = directive.substr(7, directive.length() - 6);
+			if (ft_check_number(number) == PARS_ERROR)
+			{
+				std::cerr << "Error: invalid number -- port"<<std::endl;
+				return PARS_ERROR;
+			}
+			int	port = atoi(number.c_str());
 			conf.back()->setPort(port);
 			_allPorts.push_back(port);
 			if(std::count(_allPorts.begin(), _allPorts.end(), port))
@@ -108,12 +139,22 @@ int	Parser::parseDirective(size_t nextSemiColon, std::vector<Config *> conf)
 		else if (ft_starts_with(directive, "rewrite "))
 		{
 			std::vector<std::string> vector_rew = ft_split(directive.substr(8, directive.length() - 7), ' ');
+			if (vector_rew.size() != 2)
+			{
+				std::cerr << "Error: invalid rewrite!" << std::endl;
+				return PARS_ERROR;
+			}
 			conf.back()->addRedirection(vector_rew[0], vector_rew[1]);
 		}
 		else if (ft_starts_with(directive, "server_name "))
 			conf.back()->setName(ft_split(directive.substr(12, directive.length() - 11), ' '));
 		else if (ft_starts_with(directive, "index "))
 		{
+			if (ft_check_one_word(directive.substr(6, directive.length() - 5)) == PARS_ERROR)
+			{
+				std::cerr << "Error: Invalid string -- index" << std::endl;
+				return PARS_ERROR;
+			}
 			conf.back()->setIndex(directive.substr(6, directive.length() - 5));
 		}
 		else if (ft_starts_with(directive, "autoindex "))
@@ -122,12 +163,32 @@ int	Parser::parseDirective(size_t nextSemiColon, std::vector<Config *> conf)
 				return PARS_ERROR;
 		}
 		else if (ft_starts_with(directive, "root "))
+		{
+			if (ft_check_one_word(directive.substr(5)) == PARS_ERROR)
+			{
+				std::cerr << "Error: Invalid string -- root" << std::endl;
+				return PARS_ERROR;
+			}
 			conf.back()->setRoot(directive.substr(5));
+		}
 		else if (ft_starts_with(directive, "client_max_body_size "))
+		{
+			std::string number = directive.substr(21);
+			if (ft_check_number(number) == PARS_ERROR)
+			{
+				std::cerr << "Error: Invalid number -- client_max_body_size" << std::endl;
+				return PARS_ERROR;
+			}		
 			conf.back()->setClientMaxBodySize(atoi(directive.substr(21).c_str()));
+		}
 		else if (ft_starts_with(directive, "cgi "))
 		{
 			std::vector<std::string> key_value = ft_split(directive.substr(5), ' ');
+			if (key_value.size() != 2)
+			{
+				std::cerr << "Error: invalid cgi directive" << std::endl;
+				return PARS_ERROR;
+			}
 			conf.back()->addCgi(key_value[0], key_value[1]);
 		}
 		else if (ft_starts_with(directive, "accepted_methods "))
