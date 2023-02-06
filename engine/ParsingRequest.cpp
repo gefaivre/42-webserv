@@ -7,6 +7,7 @@
 ParsingRequest::ParsingRequest( std::vector<std::string> request, Server *server, std::string cgiResponse, int error_code):
  _errorcode(error_code), _request(request), _server(server)
 {
+	_requestData.isRedirection = false;
 	_requestData.isCgi = !cgiResponse.empty();
 	if (_requestData.isCgi)
 		_requestData._cgiResponse = cgiResponse;
@@ -72,17 +73,6 @@ void ParsingRequest::parsingRequest()
 
 }
 
-// void ParsingRequest::setFileToSend404()
-// {
-// 	std::string path;
-// 	path = _server->getLocationByPath("/" + _requestData.path).getRoot();
-// 	path += "404.html";
-// 	if (access(path.c_str(), R_OK) == 0)
-// 		_requestData.fileToSend = path;
-// 	else
-// 		_requestData.fileToSend = "error_pages/404.html";
-// }
-
 void ParsingRequest::setFileToSend(std::string errorcode)
 {
 	std::string path;
@@ -129,6 +119,9 @@ int ParsingRequest::filepermission()
 
 int ParsingRequest::foundFileToSend()
 {
+
+	std::cout << "Found file to send" << std::endl;
+
 	std::string rootPath;
 	std::string fullPathFile;
 	_requestData.isIndex = 0;
@@ -139,12 +132,17 @@ int ParsingRequest::foundFileToSend()
 	_requestData.fileToSend = rootPath + _requestData.path ;
 	fullPathFile = _requestData.fileToSend;
 	_autoindex =  _server->getLocationByPath(_requestData.pathKey).getAutoIndex();
-	if(isDirectory(fullPathFile) && _server->getLocationByPath(_requestData.pathKey).getIndex().size())
+
+	std::string redirection = _server->getLocationByPath(_requestData.pathKey).getRedirectionValue(_requestData.pathKey);
+	if(!redirection.empty() )
+	{
+		_requestData.isRedirection = true;
+		_requestData.fileToSend = redirection;
+	}
+	else if(isDirectory(fullPathFile) && _server->getLocationByPath(_requestData.pathKey).getIndex().size())
 	{
 		_requestData.fileToSend = rootPath + _server->getLocationByPath(_requestData.pathKey).getIndex();
 		_requestData.path = _server->getLocationByPath(_requestData.pathKey).getIndex();
-		// std::cout << "_requestData.fileToSend = "<< _requestData.fileToSend <<std::endl;
-		// std::cout << "_requestData.path = "<< _requestData.path <<std::endl;
 	}
 	else if (_autoindex == 1 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
 	{
@@ -164,16 +162,19 @@ int ParsingRequest::foundFileToSend()
 	else
 		_requestData.fileToSend = fullPathFile;
 
-	FILE *f = fopen(_requestData.fileToSend.c_str(), "r+");
-	// FILE *f = fopen(fullPathFile.c_str(), "r+");
-	if ( f == NULL)
+	if(_requestData.isRedirection == false)
 	{
-		if (_autoindex == 1 && errno == 21)
-			return (1);
-		filepermission();
+		FILE *f = fopen(_requestData.fileToSend.c_str(), "r+");
+
+		if (f == NULL)
+		{
+			if (_autoindex == 1 && errno == 21)
+				return (1);
+			filepermission();
+		}
+		else
+			fclose(f);
 	}
-	else
-		fclose(f);
 	return (0);
 }
 

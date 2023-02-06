@@ -139,6 +139,8 @@ void Client::transformRequestVectorToMap()
 
 void Client::resetClient()
 {
+	std::cout << RED << "RESET CLIENT" << reset << std::endl;
+
 	_requestLine.clear();
 	_request.clear();
 	_requestmap.clear();
@@ -298,6 +300,7 @@ void Client::readRequest1()
 
 int Client::CreateAndSendResponse()
 {
+	// std::cout << "Create and send response" << std::endl;
 	int ret;
 	if(_firstTimeCreate == false)
 	{

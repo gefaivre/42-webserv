@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 14:08:38 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/06 15:57:29 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/06 16:28:26 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ Location&	Location::operator=(Location const & rhs)
 	
 	_key = rhs._key;
 	_cgi = rhs._cgi;
+	_redirections = rhs._redirections;
 	
 	_autoIndex = rhs._autoIndex;
 	_root = rhs._root;

@@ -82,7 +82,12 @@ void CreateResponse::errorStatus()
 	std::string path = _server->getLocationByPath("/" + _requestData.path).getRoot();
 	if (path + _requestData.path != _requestData.fileToSend)
 	{
-		if (checkErrorPage("400.html", path))
+		if (_headerData.isRedirection)
+		{
+			_headerData.statusCode = "301";
+			_headerData.statusMessage = "Moved permanently";
+		}
+		else if (checkErrorPage("400.html", path))
 		{
 			_headerData.statusCode = "400";
 			_headerData.statusMessage = "Bad Request";
@@ -134,6 +139,7 @@ void CreateResponse::fillHeaderData()
 {
 	
 	_headerData.protocol = _requestData.protocol;
+	_headerData.isRedirection = _requestData.isRedirection;
 	errorStatus();
 	std::string type = _requestData.fileToSend.substr(_requestData.fileToSend.find('.') + 1, _requestData.fileToSend.size());
 	_headerData.contentType = _switchFilesExtension[type];
@@ -150,16 +156,28 @@ void CreateResponse::fillHeaderData()
 
 void CreateResponse::createHeader()
 {
-	_header = "";
+	if (_headerData.isRedirection)
+	{
+		_header += _headerData.protocol;
+		_header += " ";
+		_header += _headerData.statusCode;
+		_header += " ";
+		_header += _headerData.statusMessage + "\r\n";
+		_header += "Location: " + _requestData.fileToSend + "\r\n";
+		_header += "Content-length: 0\r\n";
 
-	_header += _headerData.protocol;
-	_header += " ";
-	_header += _headerData.statusCode;
-	_header += " ";
-	_header += _headerData.statusMessage + "\r\n";
-	_header += "Content-length:  " + _headerData.contentLength + "\r\n";
-	_header += "Content-Type:  " + _headerData.contentType + "\r\n";
-	_header += "Connection: " + _headerData.connection + "\r\n";
+	}
+	else
+	{
+		_header += _headerData.protocol;
+		_header += " ";
+		_header += _headerData.statusCode;
+		_header += " ";
+		_header += _headerData.statusMessage + "\r\n";
+		_header += "Content-length:  " + _headerData.contentLength + "\r\n";
+		_header += "Content-Type:  " + _headerData.contentType + "\r\n";
+		_header += "Connection: " + _headerData.connection + "\r\n";
+	}
 }
 
 
@@ -195,7 +213,9 @@ int CreateResponse::create()
 int CreateResponse::createBody()
 {
 	int ret = 0;
-	if (_requestData.isIndex)
+	if (_requestData.isRedirection)
+		return READ;
+	else if (_requestData.isIndex)
 		ret = BodyIsIndex();
 	else if (_requestData.isCgi)
 		ret = BodyIsCgi();

@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/06 15:54:26 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/06 16:42:36 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ void	Config::addRedirection(std::string key, std::string value)
 		std::cerr << "This redirection is already: " << _redirections[key] << std::endl;
 	else
 		_redirections[key] = value;
+		
 }
 
 std::map<std::string, std::string> Config::getRedirectionsMap(void)
@@ -62,10 +63,18 @@ std::map<std::string, std::string> Config::getRedirectionsMap(void)
 
 std::string	Config::getRedirectionValue(std::string key)
 {
+	std::cout << "get location value" << std::endl;
+	std::cout << "key = " << key << std::endl;
 	if (_redirections.find(key) != _redirections.end())
+	{
+		std::cout << "1" << std::endl;
 		return (_redirections[key]);
+	}
 	else
-		return NULL;
+	{
+		std::cout << "2" << std::endl;
+		return "";
+	}
 }
 
 void Config::setAutoIndex(bool autoIndex)

@@ -27,6 +27,7 @@ typedef struct	s_requestData
 	std::string	getParams;
 	bool		isCgi;
 	bool		isIndex;
+	bool		isRedirection;
 
 }				t_requestData;
 
@@ -39,6 +40,7 @@ typedef struct	s_headerData
 	std::string contentType;
 	std::string	date;
 	std::string	connection;
+	bool		isRedirection;
 }				t_headerData;
 
 
