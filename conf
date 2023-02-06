@@ -1,0 +1,63 @@
+server {
+  listen 8080;
+  server_name domain1.com;
+  cgi .php /usr/bin/php-cgi;
+  root /mnt/nfs/homes/mgoncalv/42-webserv/html;
+  autoindex on;
+  accepted_methods       GET POST;
+
+
+  index index.html;
+  rewrite /jbach www.jbach.dev;
+  rewrite /youtube.html www.google.com;
+  rewrite /youtubeeeee.html www.google.com;
+  location / {
+    accepted_methods GET POST DELETE;
+    rewrite /youtube.html www.youtube.com;
+    rewrite /google.html www.google.com;
+  }
+
+  location /put/test/ {
+    accepted_methods POST;
+     client_max_body_size 100;
+  }
+
+  cgi .bla /mnt/nfs/homes/jbach/Documents/2901/cgi_tester;
+  location /postbody {
+    client_max_body_size 100;
+  }
+
+  location /directory/ {
+    accepted_methods GET;
+    root /mnt/nfs/homes/jbach/Documents/2901/YoupiBanane/;
+    index youpi.bad_extension;
+    rewrite /mateus.html www.mateus.com;
+  }
+}
+
+# server {
+     
+#     listen  8080;
+#     server_name domain1.com;
+#     # cgi .php /usr/bin/php-cgi;
+#     root /mnt/nfs/homes/jbach/Documents/2901/www;
+#     location /a/ {
+#       root /mnt/nfs/homes/jbach/Documents/2901/www;
+#       # server_name domain1.com;
+#     }
+#     autoindex on;
+#     client_max_body_size 200000;
+#     server_name domain2.com ;
+#     accepted_methods       GET POST DELETE;
+#     location /abc/ {
+#       root /mnt/nfs/homes/jbach/Documents/2901/php;
+#     }
+#   }
+#   server {
+#     listen  9090;
+#     autoindex on;
+#     server_name domain1.com;
+#     location /b/ {
+#       root /var/www/index.html;
+#     }
+#   }

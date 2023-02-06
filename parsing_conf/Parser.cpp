@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2023/02/06 15:43:16 by jbach            ###   ########.fr       */
+/*   Created: 2022/11/14 14:58:25 by mgoncalv          #+#    #+#             */
+/*   Updated: 2023/02/06 15:55:53 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,10 @@ int	Parser::parseDirective(size_t nextSemiColon, std::vector<Config *> conf)
 			
 		}
 		else if (ft_starts_with(directive, "rewrite "))
+		{
 			std::vector<std::string> vector_rew = ft_split(directive.substr(8, directive.length() - 7), ' ');
+			conf.back()->addRedirection(vector_rew[0], vector_rew[1]);
+		}
 		else if (ft_starts_with(directive, "server_name "))
 			conf.back()->setName(ft_split(directive.substr(12, directive.length() - 11), ' '));
 		else if (ft_starts_with(directive, "index "))

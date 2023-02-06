@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:23:00 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/04 01:58:20 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/02/06 15:54:26 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ std::string	Config::getRedirectionValue(std::string key)
 	if (_redirections.find(key) != _redirections.end())
 		return (_redirections[key]);
 	else
-		throw (std::exception());
+		return NULL;
 }
 
 void Config::setAutoIndex(bool autoIndex)

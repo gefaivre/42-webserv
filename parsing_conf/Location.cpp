@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 14:08:38 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/04 01:55:03 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/02/06 15:57:29 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,35 +79,64 @@ void	Location::setName(std::vector<std::string> name)
 
 void Location::beSetup(Server *server)
 {	
-
 	// _clientMaxBodySize = server->getClientMaxBodySize();
 	_name = server->getName();
 	_port = server->getPort();
 	// cout << "Location '" << this->_key << "' was setup by server !" << endl;
 
 	//SETUP CGI
-	std::map<std::string, std::string> serverCgi = server->getCgiMap();
-	_cgi.insert(serverCgi.begin(), serverCgi.end());
-	// if (find(_wasSet.begin(), _wasSet.end(), "cgi") == _wasSet.end())
-	// nao usamos pois mesmo se o cgi ja foi colocado no location, o server pode ter outras keys
+	// std::map<std::string, std::string> serverCgi = server->getCgiMap();
+	// _cgi.insert(serverCgi.begin(), serverCgi.end());
+	// // if (find(_wasSet.begin(), _wasSet.end(), "cgi") == _wasSet.end())
+	// // nao usamos pois mesmo se o cgi ja foi colocado no location, o server pode ter outras keys
 
-	for (std::map<std::string, std::string>::iterator it = serverCgi.begin(); it != serverCgi.end(); ++it) {
-		std::map<std::string, std::string>::iterator loc = _cgi.find(it->first);
-		if (loc == _cgi.end())
+	// for (std::map<std::string, std::string>::iterator it = serverCgi.begin(); it != serverCgi.end(); ++it) {
+	// 	std::map<std::string, std::string>::iterator loc = _cgi.find(it->first);
+	// 	if (loc == _cgi.end())
+	// 		_cgi.insert(std::make_pair(it->first, it->second));
+	// }
+
+	std::map<std::string, std::string> serverCgi = server->getCgiMap();
+	std::map<std::string, std::string>::iterator it;
+	for (it = serverCgi.begin(); it != serverCgi.end(); ++it) {
+
+		std::map<std::string, std::string>::iterator redt = _cgi.find(it->first);
+		if (redt == _cgi.end())
 			_cgi.insert(std::make_pair(it->first, it->second));
 	}
+//------------------------------
 
 	
+	
+	std::map<std::string, std::string> serverRedirections = server->getRedirectionsMap();
+	std::map<std::string, std::string>::iterator itr;
+	for (itr = serverRedirections.begin(); itr != serverRedirections.end(); ++itr) {
+
+		std::map<std::string, std::string>::iterator red = _redirections.find(itr->first);
+		if (red == _redirections.end())
+			_redirections.insert(std::make_pair(itr->first, itr->second));
+	}
+	
 	if (find(_wasSet.begin(), _wasSet.end(), "index") == _wasSet.end())
+	{
 		_index = server->getIndex();
+	}
 	if (find(_wasSet.begin(), _wasSet.end(), "autoIndex") == _wasSet.end())
 		_autoIndex = server->getAutoIndex();
 	
 	if (find(_wasSet.begin(), _wasSet.end(), "client_max_body_size") == _wasSet.end())
-		_clientMaxBodySize = server->getClientMaxBodySize();
+		_autoIndex = server->getClientMaxBodySize();
 	if (find(_wasSet.begin(), _wasSet.end(), "root") == _wasSet.end())
 		_root = server->getRoot();
 	if (find(_wasSet.begin(), _wasSet.end(), "acceptedMethods") == _wasSet.end())
 		_acceptedMethods = server->getAcceptedMethods();
 
+
+	// std::cout << "--------------------------------"<< std::endl;
+
+	// for (itr = _redirections.begin(); itr != _redirections.end(); ++itr) {
+
+	// 		std::cout  <<"Key:"<< _key << " --> "<<itr->first<< ":"<< itr->second<< "!"<<std::endl;
+		
+	// }
 }
