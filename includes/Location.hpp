@@ -6,7 +6,7 @@
 /*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 13:52:17 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/04 00:38:26 by jbach            ###   ########.fr       */
+/*   Updated: 2023/02/06 15:49:45 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,27 +19,25 @@
 #include "Config.hpp"
 
 class Server;
-using namespace std;
-
 class Location : public Config
 {
 private:
 	/* data */
-	string				_key;
+	std::string				_key;
 	// map<string, string> _cgi;
 	// bool				_autoIndex;
 	// string				_root;
 	// t_methods			_acceptedMethods;
 public:
 	Location();
-	Location(string key);
+	Location(std::string key);
 	~Location();
 
 
 	Location(Location const & src);
 	Location &	operator=(Location const & rhs);
 	
-	string	getKey(void);
+	std::string	getKey(void);
 
 	// void	addCgi(string key, string value);
 	// map<string, string> getCgiMap(void);
@@ -55,7 +53,7 @@ public:
 	// t_methods	getAcceptedMethods();
 
 	void			setPort(int port);
-	void			setName(vector<string> name);
+	void			setName(std::vector<std::string> name);
 
 	void 			beSetup(Server *server);
 };

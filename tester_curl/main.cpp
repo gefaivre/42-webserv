@@ -1,6 +1,5 @@
 #include <curl/curl.h>
 #include <iostream>
-using namespace std;
 
 size_t read_callback(void *ptr, size_t size, size_t nmemb, void *userp) {
     static ifstream file("pic.jpg", ios::binary);

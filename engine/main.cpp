@@ -14,7 +14,7 @@ Parser *g_servers;
 
 std::map<int, bool> portMap;
 
-void epolling(vector<Server *> *servers);
+void epolling(std::vector<Server *> *servers);
 
 void sig_handler(int signo)
 {
@@ -27,7 +27,7 @@ void sig_handler(int signo)
 	exit(0);
 }
 
-void epolling(vector<Server *> *servers)
+void epolling(std::vector<Server *> *servers)
 { 
 	int running = 1, event_count, i;
 	struct epoll_event events[MAX_EVENTS];
@@ -108,7 +108,7 @@ int main(int argc, char **argv)
 {
 	if ( argc != 2 )
 	{
-		cerr << "Usage: ./webserv [config file]" << endl;
+		std::cerr << "Usage: ./webserv [config file]" << std::endl;
 		return (1);
 	}
 

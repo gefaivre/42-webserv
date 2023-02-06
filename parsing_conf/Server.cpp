@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 16:37:14 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/05 16:00:35 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/02/06 15:50:28 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,7 +168,7 @@ Server 			*Server::getServerByName(std::string name)
 {
 	for (std::vector<Server *>::iterator it = _servers->begin(); it != _servers->end(); ++it)
 	{
-		std::vector<string> names = (*it)->getName();
+		std::vector<std::string> names = (*it)->getName();
 		if (std::find(names.begin(), names.end(), name) != names.end())
 		{
 			return (*it);
