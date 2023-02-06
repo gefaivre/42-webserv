@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgoncalv <mgoncalv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:21:20 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/03 18:15:19 by mgoncalv         ###   ########.fr       */
+/*   Updated: 2023/02/06 15:24:59 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,10 @@
 
 #include "Server.hpp"
 #include <set>
+
+#define PARS_ERROR 0
+#define PARS_OK 1
+
 class Parser
 {
 private:
@@ -36,22 +40,27 @@ private:
 	std::vector<Server *>	_servers;
 	std::vector<int>			_allPorts;
 	std::set<int>			_repeatedPorts;
+	int checkConfigName(char *configName);
+
+	bool b_error;
+
 public:
 	Parser(void);
 	~Parser(void);
 
-	Parser(char *configName);
+	int set(char *configName);
+
 
 	void	prepareLine();
 	void	checkHttpContext();
 	std::string	ft_read_file_ignoring_comments();
 	void	parseEndOfContext(int i);
 	Location *parseNewContext(size_t nextOpenBracket, Server *server);
-	void	parseAutoIndex(std::string directive, std::vector<Config *> conf);
-	void	parseDirective(size_t nextSemiColon, std::vector<Config *> conf);
+	int	parseAutoIndex(std::string directive, std::vector<Config *> conf);
+	int	parseDirective(size_t nextSemiColon, std::vector<Config *> conf);
 	Server	*getServerConf(void);
 	std::vector<Server *>	*getServers(void);
-	void				verifyServerName();
+	int				verifyServerName();
 };
 
 

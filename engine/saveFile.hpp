@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <map>
 #include "utils.hpp"
+#include <fstream>
+
 
 bool saveFile(std::map<std::string, std::string> requestmap, std::string requestBody);
 std::map<std::string, std::string>  transformBodyStringtoMap(std::map<std::string, std::string> requestmapBody, std::map<std::string, std::string> requestmap, std::string requestBody);

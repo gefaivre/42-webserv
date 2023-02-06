@@ -317,6 +317,7 @@ int Client::CreateAndSendResponse()
 			cgi.verifyCgi();
 		ParsingRequest parsingRequest(_request, _serverLoc, _cgiResponse, _errorcode);
 		CreateResponse *CR = new CreateResponse(_serverLoc, _requestmap, parsingRequest.getData());
+
 		std::map<std::string,std::string>::iterator it;
 		_createR = CR;
 

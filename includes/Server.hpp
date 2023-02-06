@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gefaivre <gefaivre@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jbach <jbach@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 14:29:46 by mgoncalv          #+#    #+#             */
-/*   Updated: 2023/02/04 03:45:04 by gefaivre         ###   ########.fr       */
+/*   Updated: 2023/02/06 14:22:31 by jbach            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,9 @@
 #include "../engine/utils.hpp"
 #include "../includes/Server.hpp"
 #include "../engine/Client.hpp"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
 
 char **ft_split(const char *str);
 class Client;

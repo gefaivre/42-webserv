@@ -143,6 +143,8 @@ int ParsingRequest::foundFileToSend()
 	{
 		_requestData.fileToSend = rootPath + _server->getLocationByPath(_requestData.pathKey).getIndex();
 		_requestData.path = _server->getLocationByPath(_requestData.pathKey).getIndex();
+		// std::cout << "_requestData.fileToSend = "<< _requestData.fileToSend <<std::endl;
+		// std::cout << "_requestData.path = "<< _requestData.path <<std::endl;
 	}
 	else if (_autoindex == 1 && isDirectory(fullPathFile) && !fileExist(fullPathFile + "index.html"))
 	{
@@ -162,7 +164,8 @@ int ParsingRequest::foundFileToSend()
 	else
 		_requestData.fileToSend = fullPathFile;
 
-	FILE *f = fopen(fullPathFile.c_str(), "r+");
+	FILE *f = fopen(_requestData.fileToSend.c_str(), "r+");
+	// FILE *f = fopen(fullPathFile.c_str(), "r+");
 	if ( f == NULL)
 	{
 		if (_autoindex == 1 && errno == 21)

@@ -22,7 +22,6 @@ void sig_handler(int signo)
 	{
 		delete g_servers;
 		portMap.clear();
-
 	}
 	
 	exit(0);
@@ -113,19 +112,22 @@ int main(int argc, char **argv)
 		return (1);
 	}
 
-	Parser *config = new Parser(argv[1]);
-	g_servers = config;
+	Parser *config = new Parser();
 
+	if (config->set(argv[1]) == PARS_ERROR)
+	{
+		delete config;
+		return 1;
+	}
+
+	g_servers = config;
 	std::vector<Server *> *servers = config->getServers();
-	
 
 	if (signal(SIGINT, sig_handler) == SIG_ERR)
  		std::cout << "can't catch SIGINT" << std::endl;
 
-	// while (1)
-	// 	;
+	std::cout << "BEFORE EPOLLING" <<std::endl;
 	epolling(servers);
 	
-	// delete config;
 	return (0);
 }

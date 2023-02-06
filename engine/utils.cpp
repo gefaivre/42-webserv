@@ -1,6 +1,6 @@
 #include "utils.hpp"
 
-// using namespace std;
+
 
 int fileExist(std::string file_path)
 {
@@ -62,9 +62,6 @@ std::vector<std::string>	ft_split_vector_string_file(std::string str, char c, st
 			file_start = str.find('\n', colon_equal);
 			file_end = str.find(boundary, file_start) - 3;
 		}
-		// exit(1);
-
-
 	}
 	if (str[str.length() - 1] != c)
 		arr.push_back(str.substr(start, str.length() - start));
@@ -179,4 +176,10 @@ std::string getRequestFile(std::string firstReq, std::string *getParams)
 		*getParams = requestFile.substr(requestFile.find_first_of('?') + 1);
 	requestFile =requestFile.substr(0, requestFile.find_first_of('?'));
 	return (requestFile);
+}
+
+void	ft_exit_parsing(std::string message)
+{
+	std::cout << "Error through parsing" <<std::endl;
+	std::cout << message <<std::endl;
 }
